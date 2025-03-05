@@ -1,0 +1,75 @@
+% !TeX_ROOT=thesis.tex
+
+\section{TFHE}
+
+
+\TODO{Petit historique}
+
+
+
+
+\subsection{A deep-dive into the Programmable Bootstrapping algorithm}
+
+In his seminal paper, Gentry introduced the concept of bootstrapping, that can be summed up in one phrase by:
+
+\begin{quote}
+	Evaluating homomorphically the decryption circuit on a noisy ciphertext produces a new ciphertext encrypting the same value, but with a smaller noise level.
+\end{quote}
+
+So informally, for a bootstrapping procedure to work, one needs to provide the server \textit{an encryption of the secret key}. This key is called a \textit{Bootstrapping Key}.
+
+
+
+Let $c$ be a ciphertext encrypting a message $m$, with some noise $e$, under a key $s$. We recall that TFHE's decryption circuit looks like:
+
+\begin{enumerate}
+	\item Computing the phase of the ciphertext: $\phi(c) = b - \sum_{i=0}^{n-1} a_i \cdot s_i = m + e$.
+	\item Rounding the phase to the closest plaintext: $m = \round{\phi(c)}$.
+\end{enumerate}
+
+
+Step 1. being purely linear, it is very easy to perform using TFHE's trivial linear homomorphism (at the cost of significant noise growth). But Step 2. is less clear: How to perform rounding homomorphically ? 
+
+In the following, we will explain these two steps, and introduce key concepts such as \textit{Gadget Decompositions}, \textit{External Products} or \textit{Blind Rotation}. A first piece will be dedicated to computing Step 1. with the noise growth the most limited possible. Then, we will see how to implement Step 2. by leveraging some polynomial algebra.
+
+\subsection{Computing the scalar product without noise explosion}
+
+Let $c = (a_0, \dots, a_{n-1}, b)$ be a \LWE ciphertext encrypting a message $m$ under a key $s = (s_0, \dots, s_{n-1}) \in \B^n$. The client has encrypted this key under a second one $s_2$. For now, we suppose that the \LWE flavour of encryption is used as well (we will see in the following that this is not the case in practice, but it makes the explanation clearer). So, the \textit{bootstrapping key} is a collection of $n$ ciphertexts encrypting each of the bits of $s$.
+
+\begin{equation}
+	\TODO{introduire une bootstrapping key}
+\end{equation}
+
+
+From $c$ and $\BSK$, it is easy to see that Step 1. can be trivially computed homomorphically by:
+
+\TODO{Trouver une jolie notation pour les opérateurs TFHE}
+
+
+The major problem with this approach lies in the \textit{noise growth}: remember that the $a_i$'s are sampled at random in the ring $\LWErING$. So the expectation of their magniture will be very high relatively to the size of the ring. But when multiplying with a cleartext, the noise of a ciphertext is multiplied by the same amount. Thus, we need a more sophisticated multiplication algorithm with a better noise behavior.
+
+Enters \textit{Gadget Decomposition}, introduced in \cite{}. We give an informal view of the algorithm in the following paragraph.
+
+
+\paragraph{Gadget Decomposition: }
+
+
+
+
+ \TODO{Reprendre l'explication de Jeremy Kun}. A very great explanation can be found in \cite{}.
+
+
+
+
+
+
+
+\subsubsection{A look at Blind Rotation}
+
+\TODO{Trouver le papier d'où ça vient, et l'expliquer aved des zolis dessins}
+
+
+
+\subsubsection{External product}
+
+
