@@ -1,1 +1,33 @@
-\def\TODO#1{\todo[inline, color=orange!30]{\textbf{TODO:} #1}}
+% !TeX_ROOT=../thesis.tex
+
+\newcommand{\TODO}[1]{\todo[inline, color=orange!30]{\textbf{TODO:} #1}}
+
+
+
+% Classical Spaces
+\newcommand{\B}{\mathbb{B}}
+
+
+% Problems
+\newcommand{\LWE}{\textsf{LWE}~}
+
+
+
+% Classical Mathematical Operations
+\newcommand{\rounding}[1]{\left \lfloor #1 \right \rceil}
+
+
+
+% TFHE-specific notations
+\newcommand{\BSK}{\textsf{BSK}~} 
+% TODO : trouver une otation plus jolie pour BSK
+
+
+%TFHE homomorphic operations
+
+\newcommand{\sumTFHE}[2]{\texttt{SumTFHE}(#1, #2)}
+\newcommand{\sumTFHETernary}[3]{\texttt{SumTFHE}(#1, #2, #3)}
+\newcommand{\clearMultTFHE}[2]{\texttt{ClearMultTFHE}(#1, #2)}
+
+% TFHE-related spaces
+\newcommand{\lweRing}{\mathbb{Z}_q}

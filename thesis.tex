@@ -10,6 +10,11 @@
 \usepackage{lmodern}
 \usepackage{appendix}
 
+\usepackage{amssymb}
+\usepackage{amsmath}
+
+\usepackage{todonotes}
+
 % --------------------------------------
 
 \definecolor{maincolor}{RGB}{36, 56, 141}
@@ -82,9 +87,10 @@
 
 %% ====   Corps du texte   === %%
 \mainmatter
+
 \input{tex/macros.tex}
 
-\section{Introduction: Fully Homomorphic Encryption}
+\chapter{Introduction: Fully Homomorphic Encryption}
 
 
 \input{tex/tfhe.tex}
@@ -93,20 +99,20 @@
 \input{tex/negacyclicity_and_oddness.tex}
 
 
-\section{A first application: Accelerating Boolean circuits evaluation with $p$-encodings}
+\chapter{A first application: Accelerating Boolean circuits evaluation with $p$-encodings}
 
 
-\section{Accelerating AES evaluation}
+\chapter{Accelerating AES evaluation}
 
 
-\section{More efficient transciphering with Transistor}
+\chapter{More efficient transciphering with Transistor}
 
 
 
-\section{Accelerating large look-up tables}
+\chapter{Accelerating large look-up tables}
 
 
-\section{Practical solution to the problem of parameter selection}
+\chapter{Practical solution to the problem of parameter selection}
 %...
 %\include{tex/conclusion}
 %\appendix

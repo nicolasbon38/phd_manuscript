@@ -1,0 +1,11 @@
+*.log
+*.maf
+*.mtc*
+*.out
+*.zip
+*.gz
+*.toc
+*.aux
+*.pdf
+*.bbl
+*.blg
