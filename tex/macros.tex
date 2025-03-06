@@ -8,18 +8,22 @@
 \newcommand{\B}{\mathbb{B}}
 
 
+% Distributions
+\newcommand{\unif}[1]{\mathcal U \left ( #1 \right )}
+
 % Problems
-\newcommand{\LWE}{\textsf{LWE}~}
+\newcommand{\LWE}{\textsf{LWE}}
 
 
 
 % Classical Mathematical Operations
 \newcommand{\rounding}[1]{\left \lfloor #1 \right \rceil}
+\newcommand{\drawfrom}{\overset{\$}{\leftarrow}}
 
 
 
 % TFHE-specific notations
-\newcommand{\BSK}{\textsf{BSK}~} 
+\newcommand{\BSK}{\textsf{BSK}} 
 % TODO : trouver une otation plus jolie pour BSK
 
 
@@ -31,3 +35,10 @@
 
 % TFHE-related spaces
 \newcommand{\lweRing}{\mathbb{Z}_q}
+
+
+
+
+% environments
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]

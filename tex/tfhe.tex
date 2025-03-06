@@ -3,7 +3,64 @@
 \chapter{TFHE}
 
 
-\TODO{Petit historique}
+
+\section{Basics on $\LWE$ Encryption}
+
+
+\subsection{Hardness assumption}
+
+
+In 2005, Regev defined the Learning With Errors ($\LWE$) problem in \cite{regev}. With this work, it laid the foundations for an important part of modern lattice-based cryptography. The version usually used in FHE is presented in Definition \ref{def:LWE}:
+
+
+\begin{definition}
+	(Learning with Errors). Let $q$ and $n$ two integers, respectively called \textit{modulus} and \textit{dimension}.  and let $\chi_s$ and $\chi_e$ be a distribution over the small values of $\lweRing$. We sample a vector $\vec s = (s_0, \dots, s_{n-1}) \drawfrom \chi_s^n$. 
+	
+	We define the $\LWE$ distribution $\mathcal{D}_{q, n, \chi_s, \chi_e}^{\LWE}$ as:
+	
+	 \[
+	 \mathcal{D}_{q, n, \chi_s, \chi_e}^{\LWE} = \left \{(\vec a, b)~\mid~\vec a = (a_1, \dots, a_n) \drawfrom \unif{\lweRing}^n, e \drawfrom \chi_e, b = \sum_{j=1}^n a_j \cdot s_j + e \right \}
+	  \]
+	 
+	 The \textit{decisional} version of the problem is to distinguish this distribution from a uniformely random one, namely:
+	
+	\[\mathcal{D}^{(\textsf{random})} = \{(\vec a, r)~\mid~\vec a \drawfrom \unif{\lweRing}^n, r \drawfrom \unif{\lweRing}\}\]
+
+	The \emph{search} version of the problem is to recover $\vec s$ from samples of $\mathcal{D}_{q, n, \chi_s, \chi_e}^{\LWE}$. 
+	\label{def:LWE}
+\end{definition}
+
+
+
+Both the search and decisional problems are reducible to each other \cite{Regev-LWE} and their average case is as hard as worst-case lattice problems.
+
+
+The  hardness of this problem depends on the parameters $q$, $n$, $\chi_s$ and $\chi_e$. 
+
+
+The distributions can be gaussian, binomial, uniform, etc...
+
+
+\TODO{Finir cette prtie et gerer crypto.bib}
+
+
+
+
+
+\section{Extending to the Polynomials}
+
+
+
+\section{A Word on the Torus}
+\ref{sec:torus_equivalence}
+
+
+
+
+
+
+
+
 
 
 
@@ -49,20 +106,15 @@ From $c$ and $\BSK$, it is easy to see that Step 1. can be trivially computed ho
 \end{equation*}
 
 
-The major problem with this approach lies in the \textit{noise growth}: remember that the $a_i$'s are sampled at random in the ring $\lweRing$. So the expectation of their magniture will be very high relatively to the size of the ring. But when multiplying with a cleartext, the noise of a ciphertext is multiplied by the same amount. Thus, we need a more sophisticated multiplication algorithm with a better noise behavior.
+The major problem with this approach lies in the \textit{noise growth}: remember that the $a_i$'s are sampled at random in the ring $\lweRing$. So the expectation of their magnitude will be very high relatively to the size of the ring. But when multiplying with a cleartext, the noise of a ciphertext is multiplied by the same amount. Thus, we need a more sophisticated multiplication algorithm with a better noise behavior.
 
-Enters \textit{Gadget Decomposition}, introduced in \cite{}. We give an informal view of the algorithm in the following paragraph.
+Enters \textit{Gadget Decomposition}, introduced in \cite{GSW13}. We give an informal view of the algorithm in the following paragraph.
 
 
 \paragraph{Gadget Decomposition: }
 
 
-
-
- \TODO{Reprendre l'explication de Jeremy Kun}. A very great explanation can be found in \cite{}.
-
-\TODO{vOIR AUSSI PAPIER }
-
+Let $c$ be a \LWE ciphertext and $\alpha$ a constant, sampled uniformely at random in $\lweRing$. Directly multiplying every component of the ciphertext by $\alpha$ would also multiply the noise by the same amount. Gadget Decomposition is a construction allowing to performm this homomorphic multiplication while limiting noise growth.
 
 
 
