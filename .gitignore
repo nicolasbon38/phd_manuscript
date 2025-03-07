@@ -9,3 +9,5 @@
 *.pdf
 *.bbl
 *.blg
+cryptobib/
+thesis.brf

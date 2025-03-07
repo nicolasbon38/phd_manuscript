@@ -1,0 +1,72 @@
+@misc{lattice-estimator,
+	author = {Martin R.  Albrecht and Rachel Player and Sam Scott},
+	title = {On the concrete hardness of Learning with Errors},
+	howpublished = {Cryptology {ePrint} Archive, Paper 2015/046},
+	year = {2015},
+	url = {https://eprint.iacr.org/2015/046}
+}
+
+
+
+@article{regev_lwe,
+	author = {Regev, Oded},
+	title = {On lattices, learning with errors, random linear codes, and cryptography},
+	year = {2009},
+	issue_date = {September 2009},
+	publisher = {Association for Computing Machinery},
+	address = {New York, NY, USA},
+	volume = {56},
+	number = {6},
+	issn = {0004-5411},
+	url = {https://doi.org/10.1145/1568318.1568324},
+	doi = {10.1145/1568318.1568324},
+	abstract = {Our main result is a reduction from worst-case lattice problems such as GapSVP and SIVP to a certain learning problem. This learning problem is a natural extension of the “learning from parity with error” problem to higher moduli. It can also be viewed as the problem of decoding from a random linear code. This, we believe, gives a strong indication that these problems are hard. Our reduction, however, is quantum. Hence, an efficient solution to the learning problem implies a quantum algorithm for GapSVP and SIVP. A main open question is whether this reduction can be made classical (i.e., nonquantum).We also present a (classical) public-key cryptosystem whose security is based on the hardness of the learning problem. By the main result, its security is also based on the worst-case quantum hardness of GapSVP and SIVP. The new cryptosystem is much more efficient than previous lattice-based cryptosystems: the public key is of size \~{O}(n2) and encrypting a message increases its size by a factor of \~{O}(n) (in previous cryptosystems these values are \~{O}(n4) and \~{O}(n2), respectively). In fact, under the assumption that all parties share a random bit string of length \~{O}(n2), the size of the public key can be reduced to \~{O}(n).},
+	journal = {J. ACM},
+	month = sep,
+	articleno = {34},
+	numpages = {40},
+	keywords = {Lattice, average-case hardness, cryptography, public key encryption, quantum computation}
+}
+
+
+@article{rlwe,
+	author = {Lyubashevsky, Vadim and Peikert, Chris and Regev, Oded},
+	title = {On Ideal Lattices and Learning with Errors over Rings},
+	year = {2013},
+	issue_date = {November 2013},
+	publisher = {Association for Computing Machinery},
+	address = {New York, NY, USA},
+	volume = {60},
+	number = {6},
+	issn = {0004-5411},
+	url = {https://doi.org/10.1145/2535925},
+	doi = {10.1145/2535925},
+	abstract = {The “learning with errors” (LWE) problem is to distinguish random linear equations, which have been perturbed by a small amount of noise, from truly uniform ones. The problem has been shown to be as hard as worst-case lattice problems, and in recent years it has served as the foundation for a plethora of cryptographic applications. Unfortunately, these applications are rather inefficient due to an inherent quadratic overhead in the use of LWE. A main open question was whether LWE and its applications could be made truly efficient by exploiting extra algebraic structure, as was done for lattice-based hash functions (and related primitives).We resolve this question in the affirmative by introducing an algebraic variant of LWE called ring-LWE, and proving that it too enjoys very strong hardness guarantees. Specifically, we show that the ring-LWE distribution is pseudorandom, assuming that worst-case problems on ideal lattices are hard for polynomial-time quantum algorithms. Applications include the first truly practical lattice-based public-key cryptosystem with an efficient security reduction; moreover, many of the other applications of LWE can be made much more efficient through the use of ring-LWE.},
+	journal = {J. ACM},
+	month = nov,
+	articleno = {43},
+	numpages = {35},
+	keywords = {Lattice, average-case hardness, cryptography, public key encryption, quantum computation}
+}
+
+
+
+@article{bgv,
+	author = {Brakerski, Zvika and Gentry, Craig and Vaikuntanathan, Vinod},
+	title = {(Leveled) Fully Homomorphic Encryption without Bootstrapping},
+	year = {2014},
+	issue_date = {July 2014},
+	publisher = {Association for Computing Machinery},
+	address = {New York, NY, USA},
+	volume = {6},
+	number = {3},
+	issn = {1942-3454},
+	url = {https://doi.org/10.1145/2633600},
+	doi = {10.1145/2633600},
+	abstract = {We present a novel approach to fully homomorphic encryption (FHE) that dramatically improves performance and bases security on weaker assumptions. A central conceptual contribution in our work is a new way of constructing leveled, fully homomorphic encryption schemes (capable of evaluating arbitrary polynomial-size circuits of a-priori bounded depth), without Gentry’s bootstrapping procedure.Specifically, we offer a choice of FHE schemes based on the learning with error (LWE) or Ring LWE (RLWE) problems that have 2 λ security against known attacks. We construct the following.(1) A leveled FHE scheme that can evaluate depth-L arithmetic circuits (composed of fan-in 2 gates) using O(λ. L3) per-gate computation, quasilinear in the security parameter. Security is based on RLWE for an approximation factor exponential in L. This construction does not use the bootstrapping procedure.(2) A leveled FHE scheme that can evaluate depth-L arithmetic circuits (composed of fan-in 2 gates) using O(λ2) per-gate computation, which is independent of L. Security is based on RLWE for quasipolynomial factors. This construction uses bootstrapping as an optimization.We obtain similar results for LWE, but with worse performance. All previous (leveled) FHE schemes required a per-gate computation of Ω(λ3.5), and all of them relied on subexponential hardness assumptions.We introduce a number of further optimizations to our scheme based on the Ring LWE assumption. As an example, for circuits of large width (e.g., where a constant fraction of levels have width Ω(λ)), we can reduce the per-gate computation of the bootstrapped version to O(λ), independent of L, by batching the bootstrapping operation. At the core of our construction is a new approach for managing the noise in lattice-based ciphertexts, significantly extending the techniques of Brakerski and Vaikuntanathan [2011b].},
+	journal = {ACM Trans. Comput. Theory},
+	month = jul,
+	articleno = {13},
+	numpages = {36},
+	keywords = {learning with errors, lattices, Fully homomorphic encryption}
+}
