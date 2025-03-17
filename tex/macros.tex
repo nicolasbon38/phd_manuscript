@@ -9,8 +9,10 @@
 \newcommand{\Z}{\mathbb{Z}}
 \newcommand{\T}{\mathbb{T}}
 
+
 % Distributions
 \newcommand{\unif}[1]{\mathcal U \left ( #1 \right )}
+
 
 % Problems
 \newcommand{\LWE}{\textsf{LWE}}
@@ -26,7 +28,10 @@
 
 % TFHE-specific notations
 \newcommand{\lweSigma}{\sigma_{\LWE}}
+\newcommand{\glweSigma}{\sigma_{\GLWE}}
 
+\newcommand{\lweSecretKey}{\vec s}
+\newcommand{\glweSecretKey}{\vec S}
 
 \newcommand{\BSK}{\textsf{BSK}} 
 % TODO : trouver une otation plus jolie pour BSK
@@ -38,8 +43,12 @@
 \newcommand{\sumTFHETernary}[3]{\texttt{SumTFHE}(#1, #2, #3)}
 \newcommand{\clearMultTFHE}[2]{\texttt{ClearMultTFHE}(#1, #2)}
 
-% TFHE-related spaces
+% TFHE-related spaces\\
+\newcommand{\plaintextTorus}{\mathbb{T}_p}
+\newcommand{\plaintextRing}{\mathbb{Z}_p}
+\newcommand{\lweTorus}{\mathbb{T}_q}
 \newcommand{\lweRing}{\mathbb{Z}_q}
+\newcommand{\glweTorus}{\mathbb{T}_q[X] / (X^N + 1)}
 \newcommand{\glweRing}{\mathbb{Z}_q[X] / (X^N + 1)}
 
 

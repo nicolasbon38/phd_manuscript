@@ -85,7 +85,7 @@ General consensus is that hardness of an instance $\GLWE_{(q, k, N, \sigma)}$ is
 
 
 \section{A Word on the Torus equivalence and its discretization}
-\ref{sec:torus_equivalence}
+\label{sec:torus_equivalence}
 
 
 The T in TFHE stands for \textit{Torus}. This is because in the seminal paper of TFHE \cite{}, authors have worked with a torus-based version of $\LWE$ in order to 
@@ -95,21 +95,71 @@ The T in TFHE stands for \textit{Torus}. This is because in the seminal paper of
 
 When implementing the scheme in practice, torus elements are represented by integer types. The torus is thus seen as \textit{discretized}, which we denote by 
 
-\[ \T_q = \left \{   \frac a q \;\middle|\; a \in \Z_q  \right \} \]$ 
+\[ \T_q = \left \{   \frac a q \;\middle|\; a \in \Z_q  \right \} \] 
 
 with $q = 2^\Omega$ ($\Omega$ denotes the number of bits of precision of the concrete type, so often 32 or 64 bits in most implementations). It is not hard to see that the properties of the torus structure are preserved.
 
-This thesis being mainly about practical instantiations of the scheme, for the sake of clarity we will adopt a notation closer to the reality of the objects manipulated in machine. So the torus elements will be seen as elements of $\lweRing$ (but keeping the rules imposed by the structure of $\T$).
+This thesis being mainly about practical instantiations of the scheme, for the sake of clarity we will adopt a notation closer to the reality of the objects manipulated in machine. So the torus elements will be seen as elements of $\lweRing$ (but keeping the algebraic rules imposed by the structure of $\T$).
 
 
 
 \section{Encryption and Decryption in TFHE}
 
 
+The plaintext space of TFHE is the \textit{discretized torus} $\plaintextTorus$. Like in Section \ref{sec:torus_equivalence}, we trivially identify it to the ring $\plaintextRing$ with $p$ an integer. Let us consider a mapping $\rho: \plaintextRing \rightarrow \lweRing$ (in practice, $p \ll q$), defined as \[
+\rho: m  \mapsto \rounding{\frac{m q} {p}}.
+\]
+The image of this mapping only reaches $p$ elements in $\lweRing$, forming the set $\left \{ \frac {k q}{p} \mid k \in \plaintextRing \right \}$. These elements are evenly distributed across $\lweRing$ and form what we refer to as \emph{sectors of $\lweRing$}, defined as: \[
+\left \{ \left ( \frac{(2 k - 1)q}{2p}, \frac{(2k + 1)q}{2p} \right ) \mid k \in \plaintextRing \right \}.
+\]
+
+TFHE features two types of encryption that share similar structural patterns but operate within different mathematical spaces.
+
+
+\paragraph{LWE Encryption.} Let $m \in \plaintextRing$ be a message and let $\lweSecretKey=(s_1, \dots, s_n)$ represent the secret key, sampled uniformly at random from $\B^n$. First, the message $m$ is encoded into the space $\lweRing$ by $\tilde m = \rho(m)$. A small random Gaussian noise $e \drawfrom \chi_{\lweSigma}$ is then added. Since $e$ is small, the noisy message $\tilde m + e$ remains within the same sector as $\tilde m$. Next, we construct the LWE ciphertext as a vector \[c = (a_0, \dots, a_{n-1}, b)\], where the $a_i$'s are sampled uniformly at random from $\lweRing$, and $b$ is defined by \[b=\sum_{i=0}^{n-1} a_i \cdot s_i + \tilde m + e.\]
+
+Decryption is performed in two steps: first, we compute $\phi(c) = b - \sum_{i=0}^{n - 1} a_i \cdot s_i$, referred to as the \emph{phase} of the ciphertext. Then we round it to the nearest plaintext value: $\tilde m = \rounding{\frac p q \phi(c)}$. As long as $|e| < \frac{q}{2p}$, this rounding produces the right sector center, and thus we recover the correct plaintext value.
+
+The security of this encryption relies on the hardness of the assumption $\LWE_{(q, n, \lweSigma)}$. 
 
 
 
-\section{Linear Homomorphism}
+\paragraph{GLWE Encryption.} This encryption mode mirrors the structure of $\LWE$ encryption but operates within polynomial rings. The secret key $\glweSecretKey$ is here represented as a vector $(S_0, \dots, S_{k-1})$, sampled uniformly at random from $\B_{N, q}[X]^k$. 
+%
+The message is encoded in a polynomial $\tilde M \in \glweRing$. The noise is also a polynomial from the same ring, whose coefficients are drawn from the distribution $\chi_{\glweSigma}$.
+%
+Similar to $\LWE$ encryption, the ciphertext takes the form \[C = (A_0, \dots, A_{k-1}, B)\] where the $A_i$'s are sampled uniformely at random in $\glweRing$ and $B$ is defined by: \[B = \sum_{i=0}^{k-1} A_i \cdot S_i + \tilde M + E.\]
+%
+
+Decryption follows the same steps as the $\LWE$ case: the phase is computed as $\phi(C) = \sum_{i=0}^{k-1} A_i \cdot S_i$ and rounded to the closest plaintext value.
+
+
+The security of this encryption relies on the hardness of the assumption $\GLWE_{(q, k, N, \glweSigma)}$. Because the plaintext is a polynomial of degree $N$, it is possible to trivially batch up to $N$ plaintexts from $\plaintextRing$ by encoding them in the coefficients. With this method, they can be processed in parallel by the linear homomorphism presented below.
+
+
+
+
+\section{Linear Homomorphisms}
+
+On a torus, two operations are well-defined: the sum of two torus elements and the external product between a torus element and a \textit{scalar}.
+
+It is not hard to see that both TFHE encryption modes are linearly homomorphic. We define the two operations \texttt{sumTFHE} and \texttt{clearMultTFHE}, that are well-defined for both encryption flavours:
+
+
+\paragraph{$\sumTFHE{c}{c'}$:} Let $c = (a_0, \dots, a_{n-1}, b)$ and $c' = (a_0', \dots, a_{n-1}', b')$ be two $\LWE$ ciphertexts encrypting the messages $m$ and $m'$ from $\plaintextRing$, with respective noise variance $\sigma$ and $\sigma'$. Summing coefficient-wise both ciphertexts yields a new ciphertext $c'' = (a_0 + a_0', \dots, a_{n-1} + a'_{n-1}, b + b')$ encrypting $m + m'$ with a larger noise $e + e'$. The exact same algorithm works with polynomials for $\GLWE$ encryption. 
+
+
+\paragraph{$\clearMultTFHE{c}{\lambda}$:} Let $c = (a_0, \dots, a_{n-1}, b)$ a $\LWE$ ciphertext encrypting a message $m \in \plaintextRing$ and $\lambda \in \plaintextRing$ a constant. Multypling each coefficient by the constant yields a new ciphertext $c' = (\lambda \cdot a_0, \dots, \lambda \cdot a_{n-1}, \lambda \cdot b)$ encrypting the message $\lambda \cdot m$ with a larger noise $\lambda \cdot e$.
+The same algorithm works for polynomials. The constant can be either a constant from [...] or a polynomial itself from [...], in which case the noise becomes [...].
+
+Actually, it may be useful to do it in Z_q blabla probl_me bruit blabla external product avec la décomposition
+
+\TODO{Revérifier que je ne dis pas de conneries, et que faire de ce paragraphe ?}
+We stress once again that the products between two elements of the torus is not well defined.\TODO{Donner un exemple trivial} Yet, it may be handy to be able to multiply two elements of $\plaintextRing$ regardless of the inherent torus structure of TFHE. To do so, it is necessary to \textit{lift} one of the terms to an external space (such as [...]) and run an external product. This requires to perform homomorphically the gadget decomposition introduced in Section \ref{external_products} which is not straightforward. This is called in the literature a \textit{circuit bootstrapping} (citer et faire le lien avec le packing ?)
+\TODO{Vérifier dans la littérature si le terme \textit{Internal Product} est adapté, et pourquoi ce terme existe ?}
+
+
+\section{Efficient External Products}
 
 
 
