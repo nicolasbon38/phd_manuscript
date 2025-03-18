@@ -88,25 +88,45 @@ General consensus is that hardness of an instance $\GLWE_{(q, k, N, \sigma)}$ is
 \label{sec:torus_equivalence}
 
 
-The T in TFHE stands for \textit{Torus}. This is because in the seminal paper of TFHE \cite{}, authors have worked with a torus-based version of $\LWE$ in order to 
+The T in TFHE stands for \textit{Torus}. This is because in the seminal paper of TFHE \cite{JC:CGGI23}, authors worked with a torus-based version of $\LWE$.
 
-\TODO{Comprendre rationale et introduire le tore d'un point de vue mathématique}
+
+The torus $\T = \R / \Z$ corresponds to the integers modulo 1. It has a $\Z$-module structure, which means that :
+
+\begin{itemize}
+	\item The sum of two torus elements is well-defined.
+	\item The multiplication between an element of $\T$ and an element of $\Z$ is also well-defined, and produces an element of $\T$.
+	\item On the other hand, multiplying two elements of $\mathbb T$ does not make sense. To be convinced of it, we can remark that, for any non-zero torus element $x$, $0 \times x = 0$ while $1 \times x = x$. But since 0 and 1 are equivalent over the torus, these results should not be different. 
+\end{itemize}
+
+
+
+Recall the $\LWE$ assumption (Definition \ref{def:LWE}). If we rescale the elements of $\lweRing$ by dividing them by $q$, we get elements of the torus. We can then redefine seamlessly the $\LWE$ problem over the torus. Extensive details about this transformation can be found in \cite{these_chillotti}.
+
+
+This brings two advantages:
+
+\begin{itemize}
+	\item $\LWE$ over the torus is \textit{scale-invariant}, which makes the analysis of the security and of the noise much simpler.
+	\item The $\Z$-module structure propagate in the ring versions, as well in matrices spaces. Thus, it allows for very powerful generalizations of homomorphic schemes on a wide variety of spaces, like in \cite{chimera, asiacrypt}.
+\end{itemize} 
 
 
 When implementing the scheme in practice, torus elements are represented by integer types. The torus is thus seen as \textit{discretized}, which we denote by 
 
 \[ \T_q = \left \{   \frac a q \;\middle|\; a \in \Z_q  \right \} \] 
 
-with $q = 2^\Omega$ ($\Omega$ denotes the number of bits of precision of the concrete type, so often 32 or 64 bits in most implementations). It is not hard to see that the properties of the torus structure are preserved.
+with $q = 2^\Omega$ ($\Omega$ denotes the number of bits of precision of the concrete type, so often 32 or 64 bits in most implementations). The properties of the torus structure are preserved.
 
-This thesis being mainly about practical instantiations of the scheme, for the sake of clarity we will adopt a notation closer to the reality of the objects manipulated in machine. So the torus elements will be seen as elements of $\lweRing$ (but keeping the algebraic rules imposed by the structure of $\T$).
+
+This thesis is mainly about practical instantiations of the scheme. So, for the sake of clarity we will adopt a notation closer to the reality of the objects manipulated in machine. So the torus elements will be seen as elements of $\lweRing$ (but keeping the algebraic rules imposed by the structure of $\T$), and the same will be applied for the ring extensions. 
 
 
 
 \section{Encryption and Decryption in TFHE}
 
 
-The plaintext space of TFHE is the \textit{discretized torus} $\plaintextTorus$. Like in Section \ref{sec:torus_equivalence}, we trivially identify it to the ring $\plaintextRing$ with $p$ an integer. Let us consider a mapping $\rho: \plaintextRing \rightarrow \lweRing$ (in practice, $p \ll q$), defined as \[
+The plaintext space of TFHE is the \textit{discretized torus} $\plaintextTorus$. As explained in Section \ref{sec:torus_equivalence}, we trivially identify it to the ring $\plaintextRing$ with $p$ an integer. Let us consider a mapping $\rho: \plaintextRing \rightarrow \lweRing$ (in practice, $p \ll q$), defined as \[
 \rho: m  \mapsto \rounding{\frac{m q} {p}}.
 \]
 The image of this mapping only reaches $p$ elements in $\lweRing$, forming the set $\left \{ \frac {k q}{p} \mid k \in \plaintextRing \right \}$. These elements are evenly distributed across $\lweRing$ and form what we refer to as \emph{sectors of $\lweRing$}, defined as: \[
@@ -150,16 +170,22 @@ It is not hard to see that both TFHE encryption modes are linearly homomorphic. 
 
 
 \paragraph{$\clearMultTFHE{c}{\lambda}$:} Let $c = (a_0, \dots, a_{n-1}, b)$ a $\LWE$ ciphertext encrypting a message $m \in \plaintextRing$ and $\lambda \in \plaintextRing$ a constant. Multypling each coefficient by the constant yields a new ciphertext $c' = (\lambda \cdot a_0, \dots, \lambda \cdot a_{n-1}, \lambda \cdot b)$ encrypting the message $\lambda \cdot m$ with a larger noise $\lambda \cdot e$.
-The same algorithm works for polynomials. The constant can be either a constant from [...] or a polynomial itself from [...], in which case the noise becomes [...].
 
-Actually, it may be useful to do it in Z_q blabla probl_me bruit blabla external product avec la décomposition
+The same algorithm works for polynomials. The constant can be either a scalar from $\plaintextRing$ or a polynomial itself.
+
+
+
+%Actually, it may be useful to do it in Z_q blabla probl_me bruit blabla external product avec la décomposition
 
 \TODO{Revérifier que je ne dis pas de conneries, et que faire de ce paragraphe ?}
-We stress once again that the products between two elements of the torus is not well defined.\TODO{Donner un exemple trivial} Yet, it may be handy to be able to multiply two elements of $\plaintextRing$ regardless of the inherent torus structure of TFHE. To do so, it is necessary to \textit{lift} one of the terms to an external space (such as [...]) and run an external product. This requires to perform homomorphically the gadget decomposition introduced in Section \ref{external_products} which is not straightforward. This is called in the literature a \textit{circuit bootstrapping} (citer et faire le lien avec le packing ?)
+We stress once again that the products between two elements of the torus is not well defined. Yet, it may be handy to be able to multiply two elements of $\plaintextRing$ regardless of the inherent torus structure of TFHE. To do so, it is necessary to \textit{lift} one of the terms to an external space (such as [...]) and run an external product. This requires to perform homomorphically the gadget decomposition introduced in Section \ref{external_products} which is not straightforward. This is called in the literature a \textit{circuit bootstrapping} (citer et faire le lien avec le packing ?)
 \TODO{Vérifier dans la littérature si le terme \textit{Internal Product} est adapté, et pourquoi ce terme existe ?}
 
 
 \section{Efficient External Products}
+
+
+
 
 
 
