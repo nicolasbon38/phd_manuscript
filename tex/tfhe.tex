@@ -12,11 +12,11 @@
 
 \paragraph{Original $\LWE$ problem}
 
-In 2005, Regev defined the Learning With Errors ($\LWE$) problem in \cite{regev_lwe}. With this work, he laid the foundations for an important part of modern lattice-based cryptography. The version usually used in FHE is presented in Definition \ref{def:LWE}:
+In 2005, Regev defined the Learning With Errors ($\LWE$) problem in \cite{regev_lwe}. With this work, he laid the foundations for an important part of modern lattice-based cryptography. The version usually used in FHE literature is presented in Definition \ref{def:LWE}:
 
 
 \begin{definition}
-	(Learning with Errors). Let $q$ and $n$ two integers, respectively called \textit{modulus} and \textit{dimension}.  and let $\chi_s$ and $\chi_e$ be distributions over the small values of $\lweRing$. We sample a vector $\vec s = (s_0, \dots, s_{n-1}) \drawfrom \chi_s^n$. 
+	(Learning with Errors). Let $q$ and $n$ two integers, respectively called \textit{modulus} and \textit{dimension}.  and let $\chi_s$ and $\chi_e$ be distributions over small values of $\lweRing$. We sample a vector $\vec s = (s_0, \dots, s_{n-1}) \drawfrom \chi_s^n$. 
 	
 	We define the $\LWE$ distribution $\mathcal{D}_{q, n, \chi_s, \chi_e}^{\LWE}$ as:
 	
@@ -37,18 +37,18 @@ In 2005, Regev defined the Learning With Errors ($\LWE$) problem in \cite{regev_
 
 Regev showed that the search and decisional problems are reducible to each other and their average case is as hard as worst-case lattice problems.
 
-The hardness of this problem depends on the parameters $q$, $n$, $\chi_s$ and $\chi_e$, and so does the security of the schemes built upon it. To derive a concrete security level $\lambda$ from a parameter set, state of the art is a tool named \texttt{lattice-estimator} \cite{lattice-estimator}. Users can input concrete values and distributions for the parameters, and the tool evaluates the security of the underlying $\LWE$ instance by running simulations of attacks of the literature.
+The hardness of this problem depends on the parameters $q$, $n$, $\chi_s$ and $\chi_e$, and so does the security of the schemes built upon it. To derive a concrete security level $\lambda$ from a parameter set, the state of the art is a tool named \texttt{lattice-estimator} \cite{lattice-estimator}. Users can input concrete values and distributions for the parameters, and the tool evaluates the security of the underlying $\LWE$ instance by running simulations of attacks of the literature.
 
-In Definition \ref{def:LWE}, we did not precise the shapes of the distributions $\chi_s$ and $\chi_e$ (beyond yielding small values). So many distributions are possible: a discrete Gaussian with a small variance, a uniform distribution restricted on a small interval, or a binomial. 
+In Definition \ref{def:LWE}, we did not precise the shapes of the distributions $\chi_s$ and $\chi_e$ (beyond the fact they yields small values). Several distributions are possible: a discrete Gaussian with a small variance, a uniform distribution restricted on a small interval, or a binomial. 
 
-Most of implementations of TFHE select a uniform distribution on $\{0, 1\}$ for the secret, and a Gaussian with a small variance $\lweSigma$. Thus, we will use these one in this thesis. We will use the notation $\LWE_{(q, n, \sigma)}$ for these instances.
+Most implementations of TFHE select a uniform distribution on $\{0, 1\}$ for the secret, and a Gaussian with a small variance $\lweSigma$ for the noise. Thus, we will use these one in this thesis. We will use the notation $\LWE_{(q, n, \sigma)}$ for these instances.
 
 
 
 \paragraph{Extension to the Polynomials: $\GLWE$}
 
 
-Looking for more efficient solutions, $\LWE$ problem has been declined in a \textit{ring variant} in \cite{rlwe}, and further expanded in a multitude of variants since them. A generalized version over ring, named $\GLWE$ and used by TFHE, is presented below. It is very similar to the original one, but deals with polynomial values instead of integers:
+Looking for more efficient solutions, $\LWE$ problem has been declined in a \textit{ring variant} in \cite{rlwe}, and further expanded in a multitude of variants since them. A generalized version over rings, named $\GLWE$ and used by TFHE, is presented below. It is very similar to the $\LWE$ one, but deals with polynomial values instead of integers:
 
 \begin{definition}
 	(Generalized Learning with Errors) Let $q$, $k$ and $N$ three integers, respectively called \textit{modulus}, \textit{dimension} and \textit{degree}. Let $\chi_S$ and $\chi_E$ be distributions over the small values of $\glweRing$. We sample a vector $\vec S = (S_0, \dots, S_{k-1}) \drawfrom \chi_S^k$. 
@@ -88,7 +88,7 @@ General consensus is that hardness of an instance $\GLWE_{(q, k, N, \sigma)}$ is
 \label{sec:torus_equivalence}
 
 
-The T in TFHE stands for \textit{Torus}. This is because in the seminal paper of TFHE \cite{JC:CGGI23}, authors worked with a torus-based version of $\LWE$.
+The T in TFHE stands for \textit{Torus}. This is because in the seminal paper of TFHE \cite{JC:CGGI20}, authors worked with a torus-based version of $\LWE$.
 
 
 The torus $\T = \R / \Z$ corresponds to the integers modulo 1. It has a $\Z$-module structure, which means that :
@@ -108,11 +108,11 @@ This brings two advantages:
 
 \begin{itemize}
 	\item $\LWE$ over the torus is \textit{scale-invariant}, which makes the analysis of the security and of the noise much simpler.
-	\item The $\Z$-module structure propagate in the ring versions, as well in matrices spaces. Thus, it allows for very powerful generalizations of homomorphic schemes on a wide variety of spaces, like in \cite{chimera, asiacrypt}.
+	\item The $\Z$-module structure propagate in the ring versions, as well in matrices spaces. Thus, it allows for very powerful generalizations of homomorphic schemes on a wide variety of spaces, like in \cite{chimera, chimera2}.
 \end{itemize} 
 
 
-When implementing the scheme in practice, torus elements are represented by integer types. The torus is thus seen as \textit{discretized}, which we denote by 
+When implementing the scheme in practice, torus elements are represented by integers in machine. The torus is thus seen as \textit{discretized}, which we denote by 
 
 \[ \T_q = \left \{   \frac a q \;\middle|\; a \in \Z_q  \right \} \] 
 
