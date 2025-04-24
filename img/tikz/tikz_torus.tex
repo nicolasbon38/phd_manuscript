@@ -1,0 +1,61 @@
+% Default sizes
+\def\smallRadiusInner{3}
+\def\smallRadiusOuter{3.8}
+\def\bigRadiusInner{3.8}
+\def\bigRadiusOuter{4.5}
+
+% Core macro: (n_parts, n_colors, small/big, showLabels, showRadials, drawColors)
+\newcommand{\drawSingleRing}[6]{%
+	\def\p{#1}
+	\def\pColor{#2}
+	% Set radius based on the second parameter (big or small)
+	\ifthenelse{\equal{#3}{small}}{%
+		\def\radiusInner{\smallRadiusInner}
+		\def\radiusOuter{\smallRadiusOuter}
+	}{%
+		\def\radiusInner{\bigRadiusInner}
+		\def\radiusOuter{\bigRadiusOuter}
+	}
+	%
+	\foreach \i in {0,...,\numexpr\p-1} {
+		\pgfmathsetmacro\angleA{360/\p*(\i - 0.5)}
+		\pgfmathsetmacro\angleB{360/\p*(\i + 0.5)}
+		\pgfmathsetmacro\angleMid{360/\p*\i}
+		\pgfmathsetmacro\radiusMid{(\radiusInner + \radiusOuter)/2}
+		
+%		% Correct hue calculation for each slice
+		
+	\ifthenelse{\equal{#6}{true}}{%
+		\pgfmathsetmacro\hue{floor(\pColor*(\i+(\p/(2*\pColor)))/\p)*360/\pColor / 360} % Calculate hue for each arc
+		\definecolor{mycolor}{hsb}{\hue,1,1} % Set color using the hue
+	}{%
+		\definecolor{mycolor}{rgb}{1, 1, 1} % Use a gray color for default
+	}
+	
+
+		
+
+		\draw[thick, fill=mycolor, opacity=0.5]
+		(\angleA:\radiusInner) arc[start angle=\angleA, end angle=\angleB, radius=\radiusInner] --
+		(\angleB:\radiusOuter) arc[start angle=\angleB, end angle=\angleA, radius=\radiusOuter] -- cycle;
+		%
+		\ifthenelse{\equal{#4}{true}}{%
+			\node at (\angleMid:\radiusMid) {\small \i};
+		}{}
+		\ifthenelse{\equal{#5}{true}}{%
+			\draw[dashed] (0,0) -- (\angleA:\radiusInner);
+			\draw[dashed] (0,0) -- (\angleB:\radiusInner);
+		}{}
+	}
+	\draw[thick] (0,0) circle (\radiusOuter);
+	\draw[thick] (0,0) circle (\radiusInner);
+}
+
+
+% Master macro: two rings with separate label/dash flags
+\newcommand{\wrappedTorus}[3]{%
+	\begin{tikzpicture}
+		\drawSingleRing{#1}{#2}{big}{#3}{false}{true}
+		\drawSingleRing{#2}{#2}{small}{#3}{true}{true}
+	\end{tikzpicture}
+}

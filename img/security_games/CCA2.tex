@@ -1,0 +1,39 @@
+
+
+
+\begin{tikzpicture}[
+	node distance=1.8cm and 2.5cm,
+	every node/.style={font=\small},
+	challenger/.style={rectangle, draw=blue!50, fill=blue!10, thick, minimum width=2.6cm, minimum height=1.2cm},
+	adversary/.style={rectangle, draw=red!60, fill=red!10, thick, minimum width=2.6cm, minimum height=1.2cm},
+	arrow/.style={-{Latex[length=3mm]}, thick},
+	dashedarrow/.style={->, thick, dashed}
+	]
+	
+	% Nodes
+	\node[adversary] (A1) {Adversary $\mathcal{A}$};
+	\node[challenger, right=of A1] (C) {Challenger};
+	\node[adversary, below=2cm of A1] (A2) {Adversary $\mathcal{A}$};
+	
+	% Phase labels
+	\node[above=0.1cm of A1] {Phase 1};
+	\node[above=0.1cm of C] {CCA2 Game};
+	\node[above=0.1cm of A2] {Phase 2};
+	
+	% Oracle box
+	\node[draw, dashed, thick, fit=(A1) (A2), inner sep=0.5cm, label=left:{$\mathcal{D}_{sk}(\cdot)$ Oracle}] {};
+	
+	% Arrows
+	\draw[arrow] (A1) -- node[above] {$(m_0, m_1)$} (C);
+	\draw[arrow] (C) -- node[below] {$c^* \leftarrow \text{Enc}_{pk}(m_b)$} (A2);
+	
+	% Oracle queries
+	\draw[dashedarrow] (A1.east) .. controls +(1.2,-0.5) and +(-1,0.5) .. node[right] {Decryption queries} (A1.east);
+	\draw[dashedarrow] (A2.east) .. controls +(1.2,-0.5) and +(-1,0.5) .. node[right] {Decryption queries ($c^* \not\in Q$)} (A2.east);
+	
+	% Output
+	\draw[arrow] (A2) -- ++(2.5,0) node[midway, above] {$b'$};
+	
+\end{tikzpicture}
+
+

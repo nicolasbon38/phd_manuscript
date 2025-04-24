@@ -4,6 +4,8 @@
 
 
 
+
+
 % Classical Spaces
 \newcommand{\B}{\mathbb{B}}
 \newcommand{\Z}{\mathbb{Z}}
@@ -29,19 +31,28 @@
 % TFHE-specific notations
 \newcommand{\lweSigma}{\sigma_{\LWE}}
 \newcommand{\glweSigma}{\sigma_{\GLWE}}
+\newcommand{\baseDecomp}{B}
+\newcommand{\levelDecomp}{\ell}
+
 
 \newcommand{\lweSecretKey}{\vec s}
 \newcommand{\glweSecretKey}{\vec S}
 
 \newcommand{\BSK}{\textsf{BSK}} 
-% TODO : trouver une otation plus jolie pour BSK
+\newcommand{\KSK}{\textsf{KSK}} 
+% TODO : trouver une otation pl^us jolie pour BSK
 
 
 %TFHE homomorphic operations
 
 \newcommand{\sumTFHE}[2]{\texttt{SumTFHE}(#1, #2)}
 \newcommand{\sumTFHETernary}[3]{\texttt{SumTFHE}(#1, #2, #3)}
+\newcommand{\sumTFHEQuad}[4]{\texttt{SumTFHE}(#1, #2, #3, #4)}
 \newcommand{\clearMultTFHE}[2]{\texttt{ClearMultTFHE}(#1, #2)}
+
+
+% other operations
+\newcommand{\decomp}[3]{\textsf{dec}^{(#1, #2)}(#3)}
 
 % TFHE-related spaces\\
 \newcommand{\plaintextTorus}{\mathbb{T}_p}
