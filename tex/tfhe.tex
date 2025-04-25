@@ -125,8 +125,12 @@ This thesis is mainly about practical instantiations of the scheme. So, for the 
 
 \section{Encryption and Decryption in TFHE}
 
+To understand the encryption procedure of TFHE, we must first introduce the plaintext space and the ciphertext space, and how one can be embedded into the other.
 
-The plaintext space of TFHE is the \textit{discretized torus} $\plaintextTorus$. As explained in Section \ref{sec:torus_equivalence}, we trivially identify it to the ring $\plaintextRing$ with $p$ an integer. Let us consider a mapping $\rho: \plaintextRing \rightarrow \lweRing$ (in practice, $p \ll q$), defined as \[
+The plaintext space of TFHE is the \textit{discretized torus} $\plaintextTorus$. As explained in Section \ref{sec:torus_equivalence}, we trivially identify it to the ring $\plaintextRing$ with $p$ an integer. Conversely, the ciphertext space is the discretized torus $\lweTorus$ introduced int he previous section identified to a ring $\lweRing$, with $q = 2^\Omega$. 
+
+
+We need a way to encode plaintext values into the ciphertext space. To do so, let us consider a mapping $\rho: \plaintextRing \rightarrow \lweRing$ (in practice, $p \ll q$), defined as \[
 \rho: m  \mapsto \rounding{\frac{m q} {p}}.
 \]
 
@@ -135,12 +139,7 @@ The image of this mapping only reaches $p$ elements in $\lweRing$, forming the s
 \left \{ \left ( \frac{(2 k - 1)q}{2p}, \frac{(2k + 1)q}{2p} \right ) \mid k \in \plaintextRing \right \}.
 \]
 
-%\begin{figure}
-%	\centering
-%	\wrappedTorus{64}{5}{true}
-%	\caption{}
-%\end{figure}
-
+To encode a given plaintext element into the ciphertext space, we use the corrsponding center of sector. However, decoding is more permissive: every elements of a sector are decoded by the corresponding plaintext element. This will be useful to remove the noise in ciphertexts.
 
 \begin{figure}[htbp]
 	\centering
@@ -172,30 +171,76 @@ The image of this mapping only reaches $p$ elements in $\lweRing$, forming the s
 \end{figure}
 
 
-TFHE features two types of encryption that share similar structural patterns but operate within different mathematical spaces.
+TFHE features two main types of encryption that share similar structural patterns but operate within different mathematical spaces.
 
 
-\paragraph{LWE Encryption.} Let $m \in \plaintextRing$ be a message and let $\lweSecretKey=(s_1, \dots, s_n)$ represent the secret key, sampled uniformly at random from $\B^n$. First, the message $m$ is encoded into the space $\lweRing$ by $\tilde m = \rho(m)$. A small random Gaussian noise $e \drawfrom \chi_{\lweSigma}$ is then added. Since $e$ is small, the noisy message $\tilde m + e$ remains within the same sector as $\tilde m$. Next, we construct the LWE ciphertext as a vector \[c = (a_0, \dots, a_{n-1}, b)\], where the $a_i$'s are sampled uniformly at random from $\lweRing$, and $b$ is defined by \[b=\sum_{i=0}^{n-1} a_i \cdot s_i + \tilde m + e.\]
+\paragraph{LWE Encryption.}
+$\LWE$ encryption deals with scalar values. The plaintext space is $\plaintextRing$ and the secret key is sampled uniformly at random from $\B^n$. We denote by $q$ the ciphertext modulus. We also need 
+$\chi_{\lweSigma}$, a centered Gaussian distribution of standard deviation $\lweSigma$ in $\lweRing$. The encryption algorithm produces a ciphertext of the form:
 
-Decryption is performed in two steps: first, we compute $\phi(c) = b - \sum_{i=0}^{n - 1} a_i \cdot s_i$, referred to as the \emph{phase} of the ciphertext. Then we round it to the nearest plaintext value: $\tilde m = \rounding{\frac p q \phi(c)}$. As long as $|e| < \frac{q}{2p}$, this rounding produces the right sector center, and thus we recover the correct plaintext value.
+\begin{definition}($\LWE$ ciphertext)
+	A $\LWE$ ciphertext encrypting a message $m \in \plaintextRing$ under a secret key $\lweSecretKey=(s_1, \dots, s_n) \in \B^n$ has the form:
+	
+	\begin{equation}
+		\LWE_{\lweSecretKey}(m) = \left (a_0, \dots, a_{n-1}, b = \sum_{i=0}^{n-1} a_i \cdot s_i + \tilde m + e \right ) \in \lweRing^{n+1}
+	\end{equation}
+	where:
+	\begin{itemize}
+		\item the elements $\{a_i\}_{0 \le i < n}$ are sampled uniformely at random in $\lweRing$.
+		\item $\tilde m$ is the message encoded in the ciphertext space: $\tilde m = \rho(m) \in \lweRing$.
+		\item $e$ is a small random Gaussian noise sampled from $\chi_{\lweSigma}$.
+	\end{itemize}
+\end{definition}
 
-The security of this encryption relies on the hardness of the assumption $\LWE_{(q, n, \lweSigma)}$. 
 
 
 
-\paragraph{GLWE Encryption.} This encryption mode mirrors the structure of $\LWE$ encryption but operates within polynomial rings. The secret key $\glweSecretKey$ is here represented as a vector $(S_0, \dots, S_{k-1})$, sampled uniformly at random from $\B_{N, q}[X]^k$. 
+Decryption is performed in two steps: first, we compute $\phi(c) = b - \sum_{i=0}^{n - 1} a_i \cdot s_i$, referred to as the \emph{phase} of the ciphertext. The phase corresponds to the noisy message $\tilde{m} + e$. To recover the actual message, we simply decode the phase by looking up the plaintext element corresponding to the sector. This can be seen as a rounding: $m = \rounding{\frac p q \phi(c)}$. 
+
+As long as $|e| < \frac{q}{2p}$, this rounding produces the right sector center, and thus we recover the correct plaintext value. Otherwise the phase lies in a different sector and we recover a wrong value. It is thus very important to keep the noise level low enough to ensure correct decryption.
+
+
+The security of this encryption relies on the hardness of the assumption $\LWE_{(q, n, \lweSigma)}$. These three parameters must be dimensioned properly.
+
+
+
+\paragraph{GLWE Encryption.} This encryption mode mirrors the structure of $\LWE$ encryption but operates within polynomial rings.
+This time, the plaintext space is $\plaintextTorusPoly$, identified with the ring $\plaintextRingPoly$.
+
+The secret key $\glweSecretKey$ is represented as a vector $(S_0, \dots, S_{k-1})$, sampled uniformly at random from $\B_{N, q}[X]^k$. 
 %
-The message is encoded in a polynomial $\tilde M \in \glweRing$. The noise is also a polynomial from the same ring, whose coefficients are drawn from the distribution $\chi_{\glweSigma}$.
+The message is encoded in a polynomial $\tilde M \in \glweRing$, with the same encoding process than $\LWE$ (but applied coefficient-wise). The noise is also a polynomial from the same ring, whose coefficients are drawn from the distribution $\chi_{\glweSigma}$.
 %
-Similar to $\LWE$ encryption, the ciphertext takes the form \[C = (A_0, \dots, A_{k-1}, B)\] where the $A_i$'s are sampled uniformely at random in $\glweRing$ and $B$ is defined by: \[B = \sum_{i=0}^{k-1} A_i \cdot S_i + \tilde M + E.\]
-%
+
+The encryption procedure outputs a ciphertext of form:
+
+
+\begin{definition}($\GLWE$ ciphertext)
+	A $\GLWE$ ciphertext encrypting a message $M \in \plaintextRingPoly$ under a secret key $\glweSecretKey = (S_0, \dots, S_{k-1}) \in \B_{N, q}[X]^k$ has the form:
+	
+	\begin{equation*}
+		\GLWE_{\glweSecretKey}(M) = \left ( A_0, \dots, A_{k-1}, B = \sum_{i=0}^{k-1} A_i \cdot S_i + \tilde M + E \right ) \in \glweRing
+	\end{equation*}
+	where:
+	\begin{itemize}
+		\item the elements $\{A_i\}_{0 \le i < k}$ are sampled uniformely at random in $\glweRing$.
+		\item $\tilde M$ is the message encoded in the ciphertext space: $\tilde M = \rho(M)$.
+		\item $E$ is a polynomial with small Gaussian coefficients, that are sampled from $\chi_{\glweSigma}$.
+	\end{itemize}
+\end{definition}
+
+
 
 Decryption follows the same steps as the $\LWE$ case: the phase is computed as $\phi(C) = \sum_{i=0}^{k-1} A_i \cdot S_i$ and rounded to the closest plaintext value.
 
 
 The security of this encryption relies on the hardness of the assumption $\GLWE_{(q, k, N, \glweSigma)}$. Because the plaintext is a polynomial of degree $N$, it is possible to trivially batch up to $N$ plaintexts from $\plaintextRing$ by encoding them in the coefficients. With this method, they can be processed in parallel by the linear homomorphism presented below.
+\medskip
+
+A third encryption flavour, named $\GGSW$ also exists. We introduce it in Section \ref{sec:external_products} where it is neecessary.
 
 
+We can also formulate a \textit{public-key} version of the encryption mechanism. 
 \TODO{Mentionner la version ``clé publique'' rapidement}
 
 
@@ -227,18 +272,6 @@ We stress once again that the products between two elements of the torus is not 
 \section{A first advanced operation: the Key Switching (and a motivation for gadget decomposition)}
 
 
-
-%Linear operations are nice and all but if we want to be able to do \textit{real} work, we need a multiplication operation. 
-%
-%The hard truth is: the multiplication between two torus elements is not defined. But will we let something as trivial as \textit{definitions} stop us ?
-%
-%Okay the ciphertext space has a torus structure, which is a module. Module means that one operation of external product exists: I can take a torus elements, multiply it by a scalar and it yields another torus element. So if we find a way to ``lift'' a torus element into the scalar space, we would have some sort of meaningful multiplication !
-%
-%In \cite{C:GenSahWat13}, the solution comes from a decomposition algorithm:
-%
-%...
-%
-%In TFHE, the authors realized that making this decomposition approximate allowed to gain an important performance factor, while not degrading the accuracy very much.
 
 
 \paragraph{Some intuition on keyswitching}
@@ -354,14 +387,29 @@ It is also possible (under several conditions) to evaluate functions while keysw
 
 
 \section{External Products}
+\label{sec:external_products}
+
+In the previous section, we showed how the use of gadget decomposition allowed for more efficient scalar products. Actually, we can push it further: by using decompositions of ciphertexts themselves, it is possible to actually multiply two ciphertexts together ! Because this was how the old GSW scheme \cite{C:GenSahWat13} worked, those decomposed ciphertexts are called $\GGSW$ ciphertexts.
+
+We give their definition below. We use the formalization of \cite{AC:CLOT21} rather than the one of \cite{JC:CGGI20}.
+
+\begin{definition}($\GGSW$ ciphertext)
+	Let $(\baseDecomp, \levelDecomp)$ an approximate decomposition base. A $\GGSW$ ciphertext encrypting a message $M \in \plaintextRingPoly$ under a GLWE secret key $\glweSecretKey =  (S_0, \dots, S_{k-1}) \in \B_{N, q}[X]^k$ has the form:
+	
+	\begin{equation*}
+		\GGSW_{\glweSecretKey}(M) = \left \lbrace \left ( \GLWE_{\glweSecretKey}\left (-S_\alpha \cdot M \cdot \frac{q}{B^j} \right) \right )_{0 \le j < \levelDecomp} \right \rbrace_{0\le \alpha \le k+1}
+	\end{equation*}
+	
+	with $S_{k+1}$ fixed by convention to -1.
+\end{definition}
 
 
 
 
 
 
-Fin: this is easily explainable with the notion of Z-module
 
+\TODO{Unifirmiser les notations de gadget decomposition}
 \TODO{Aorès ça, faire un lieb avec l'external product dans le cas général (et vec les Z-modules ?)}
 
 
