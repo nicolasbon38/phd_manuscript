@@ -18,10 +18,16 @@
 
 \usepackage{ifthen}
 \usepackage{tikz}
+\usepackage{xcolor}
 \usepackage[rgb]{xcolor}
 \usetikzlibrary{arrows.meta, positioning, fit}
 
 
+\usepackage[algo2e]{algorithm2e} % for algorithms
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\algnewcommand{\LineComment}[1]{\State{\color{gray} \(\triangleright\) #1}}
+\usepackage{listings}
 
 % --------------------------------------
 
@@ -96,7 +102,9 @@
 %% ====   Corps du texte   === %%
 \mainmatter
 
+\input{tex/algorithms/algorithms_settings.tex}
 \input{img/tikz/tikz_torus.tex}
+\input{img/tikz/tikz_accumulator.tex}
 \input{tex/macros.tex}
 
 

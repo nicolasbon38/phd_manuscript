@@ -1,13 +1,15 @@
 % Default sizes
-\def\smallRadiusInner{3}
-\def\smallRadiusOuter{3.8}
-\def\bigRadiusInner{3.8}
-\def\bigRadiusOuter{4.5}
+\def\smallRadiusInner{2.5}
+\def\smallRadiusOuter{3}
+\def\bigRadiusInner{3}
+\def\bigRadiusOuter{3.5}
+
+
 
 % Core macro: (n_parts, n_colors, small/big, showLabels, showRadials, drawColors)
 \newcommand{\drawSingleRing}[6]{%
-	\def\p{#1}
-	\def\pColor{#2}
+	\pgfmathsetmacro{\p}{#1}
+	\pgfmathsetmacro{\pColor}{#2}
 	% Set radius based on the second parameter (big or small)
 	\ifthenelse{\equal{#3}{small}}{%
 		\def\radiusInner{\smallRadiusInner}
@@ -24,16 +26,17 @@
 		\pgfmathsetmacro\radiusMid{(\radiusInner + \radiusOuter)/2}
 		
 %		% Correct hue calculation for each slice
-		
 	\ifthenelse{\equal{#6}{true}}{%
-		\pgfmathsetmacro\hue{floor(\pColor*(\i+(\p/(2*\pColor)))/\p)*360/\pColor / 360} % Calculate hue for each arc
-		\definecolor{mycolor}{hsb}{\hue,1,1} % Set color using the hue
+		% Compute centered color index
+		\pgfmathsetmacro{\colorIndex}{floor(\pColor * (\i + (\p / (2 * \pColor))) / \p)}
+		% Convert to hue [0,1]
+		\pgfmathsetmacro{\hue}{\colorIndex / \pColor}
+		% Set HSB color
+		\definecolor{mycolor}{hsb}{\hue,1,1}
 	}{%
-		\definecolor{mycolor}{rgb}{1, 1, 1} % Use a gray color for default
+		% Fallback to white (or gray)
+		\definecolor{mycolor}{rgb}{1, 1, 1}
 	}
-	
-
-		
 
 		\draw[thick, fill=mycolor, opacity=0.5]
 		(\angleA:\radiusInner) arc[start angle=\angleA, end angle=\angleB, radius=\radiusInner] --
@@ -53,7 +56,7 @@
 
 
 % Master macro: two rings with separate label/dash flags
-\newcommand{\wrappedTorus}[3]{%
+\newcommand{\wrappedTorus}[3]{% q, p, showLabels
 	\begin{tikzpicture}
 		\drawSingleRing{#1}{#2}{big}{#3}{false}{true}
 		\drawSingleRing{#2}{#2}{small}{#3}{true}{true}

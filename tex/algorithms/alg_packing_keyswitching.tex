@@ -1,0 +1,41 @@
+\begin{algorithm}
+	\caption{\texttt{PackingKeySwitch}}
+	\label{alg:packing_keyswitching}
+	\KwContext{
+		$\left\{
+		\begin{array}{l}
+			\lweSecretKey \text{: the input $\LWE$ secret key}\\
+			\lweSecretKey' \text{: the output $\LWE$ secret key}\\
+			\levelDecomp: \text{: the level of the decomposition}\\
+			\baseDecomp: \text{: the base of the decomposition}
+		\end{array}
+		\right.$
+	}
+	
+	\KwIn{
+		$\left\{
+		\begin{array}{l}
+			\left \lbrace c_i = \LWE_{\lweSecretKey}(m_i) \right \rbrace_{0 \le i < \alpha} \text{: a list of $ \alpha~\LWE$ ciphertexts to be packed} \\
+			\KSK = \left\{ \left( \LWE_{\lweSecretKey'} (s_i \cdot \baseDecomp^0), \dots, \LWE_{\lweSecretKey'} (s_i \cdot \baseDecomp^{j-1}) \right) \right\}_{0 \le i < n} \text{: the keyswitching key}
+		\end{array}
+		\right.$
+	}
+	
+	\KwResult{
+		$C_{\textsf{out}}$ \text{: a $\GLWE$ ciphertext encrypting the list of messages $\lbrace m_i \rbrace_{0 \le i < \alpha}$}
+	}
+	
+	
+	% Add vertical space and horizontal line
+	\vspace{0.5em} % adjust the space as needed
+	\hrule
+	\vspace{0.5em} % adjust the space as needed
+	
+	$C_{\textsf{out}} \gets 0$
+	\For{$k \in \lbrace 0, \dots, \alpha-1 \rbrace$}{
+		$C_{k} \gets \texttt{Keyswitch}(c_k, \KSK)$\\
+		$C_{\textsf{out}} \gets C_{\textsf{out}} + X^k \cdot C_{k}$
+	}
+	
+	\Return{$C_{\textsf{out}}$}	
+\end{algorithm}

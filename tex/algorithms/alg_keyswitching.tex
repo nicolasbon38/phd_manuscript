@@ -1,0 +1,42 @@
+\begin{algorithm}
+	\caption{\texttt{$\LWE$-to-$\LWE$ KeySwitching}}
+	\label{alg:keyswitching}
+	\KwContext{
+		$\left\{
+			\begin{array}{l}
+				\lweSecretKey \text{: the input $\LWE$ secret key}\\
+				\lweSecretKey' \text{: the output $\LWE$ secret key}\\
+				\levelDecomp: \text{: the level of the decomposition}\\
+		         \baseDecomp: \text{: the base of the decomposition}
+		  	\end{array}
+		  \right.$
+	}
+	
+    \KwIn{
+		$\left\{
+		\begin{array}{l}
+			c = (a_0, \dots, a_{n-1}, b) \text{: a ciphertext $\LWE_{\lweSecretKey}(m)$} \\
+			\KSK = \left\{ \left( \LWE_{\lweSecretKey'} (s_i \cdot \baseDecomp^0), \dots, \LWE_{\lweSecretKey'} (s_i \cdot \baseDecomp^{j-1}) \right) \right\}_{0 \le i < n} \text{: the keyswitching key}
+		\end{array}
+			\right.$
+	}
+	
+	\KwResult{
+		$c_{\textsf{out}}$ \text{: a ciphertext $\LWE_{\lweSecretKey'}(m)$}
+	}
+	
+	
+	 % Add vertical space and horizontal line
+	 \vspace{0.5em} % adjust the space as needed
+	 \hrule
+	 \vspace{0.5em} % adjust the space as needed
+	
+	$c_{\textsf{out}} \gets (0, \dots, 0, b)$
+	
+	\For{$i \in \lbrace 0, \dots, n-1 \rbrace$}{
+	
+		$c_{\textsf{out}} \gets c_{\textsf{out}} - \left \langle \decomp{\levelDecomp}{\baseDecomp}{a_i}, \KSK_i \right \rangle$
+	}
+	
+	\Return{$c_{\textsf{out}}$}	
+\end{algorithm}

@@ -127,7 +127,7 @@ This thesis is mainly about practical instantiations of the scheme. So, for the 
 
 To understand the encryption procedure of TFHE, we must first introduce the plaintext space and the ciphertext space, and how one can be embedded into the other.
 
-The plaintext space of TFHE is the \textit{discretized torus} $\plaintextTorus$. As explained in Section \ref{sec:torus_equivalence}, we trivially identify it to the ring $\plaintextRing$ with $p$ an integer. Conversely, the ciphertext space is the discretized torus $\lweTorus$ introduced int he previous section identified to a ring $\lweRing$, with $q = 2^\Omega$. 
+The plaintext space of TFHE is the \textit{discretized torus} $\plaintextTorus$. As explained in Section \ref{sec:torus_equivalence}, we trivially identify it to the ring $\plaintextRing$ with $p$ an integer. Conversely, the ciphertext space is the discretized torus $\lweTorus$ introduced in the previous section identified to a ring $\lweRing$, with $q = 2^\Omega$. 
 
 
 We need a way to encode plaintext values into the ciphertext space. To do so, let us consider a mapping $\rho: \plaintextRing \rightarrow \lweRing$ (in practice, $p \ll q$), defined as \[
@@ -139,35 +139,12 @@ The image of this mapping only reaches $p$ elements in $\lweRing$, forming the s
 \left \{ \left ( \frac{(2 k - 1)q}{2p}, \frac{(2k + 1)q}{2p} \right ) \mid k \in \plaintextRing \right \}.
 \]
 
-To encode a given plaintext element into the ciphertext space, we use the corrsponding center of sector. However, decoding is more permissive: every elements of a sector are decoded by the corresponding plaintext element. This will be useful to remove the noise in ciphertexts.
+To encode a given plaintext element into the ciphertext space, we use the corresponding center of sector. However, decoding is more permissive: every elements of a sector are decoded by the corresponding plaintext element. This will be useful to remove the noise in ciphertexts.
 
 \begin{figure}[htbp]
 	\centering
-	% First row: two figures side by side
-	\begin{minipage}{0.45\textwidth}
-		\centering
-		\begin{tikzpicture}
-			\drawSingleRing{4}{4}{small}{true}{true}{true}
-		\end{tikzpicture}
-		\caption{Figure 1}
-	\end{minipage}%
-	\hspace{0.05\textwidth} % Space between the first and second figure
-	\begin{minipage}{0.45\textwidth}
-		\centering
-		\begin{tikzpicture}
-			\drawSingleRing{64}{}{big}{true}{false}{false}
-		\end{tikzpicture}
-		\caption{Figure 2}
-	\end{minipage}
-	
-	% Second row: one figure
-	\vspace{0.5cm} % Space between rows
-	\begin{minipage}{0.45\textwidth}
-		\centering
-		\wrappedTorus{64}{4}{true}
-		\caption{Figure 3}
-	\end{minipage}
-	\caption{Truc}
+	\wrappedTorus{50}{8}{true}
+	\caption{An example of embedding of $\Z_8$ into $\Z_{50}$}
 \end{figure}
 
 
@@ -268,6 +245,8 @@ We stress once again that the products between two elements of the torus is not 
 \TODO{Vérifier dans la littérature si le terme \textit{Internal Product} est adapté, et pourquoi ce terme existe ?}
 
 
+These notations will be used througout this manuscript. However, sometimes when it is clear from the context that we are referring to homomorphic operations, we may use the classical $+$ and $\cdot$ symbols to lighten the formulas.
+
 
 \section{A first advanced operation: the Key Switching (and a motivation for gadget decomposition)}
 
@@ -279,7 +258,11 @@ Linear operations in TFHE are conceptually quite simple, but they are not enough
 
 Now, we introduce a more advanced operation: the \textit{keyswitching}. Let $c = \LWE_{\lweSecretKey}(m) = (a_0, \dots, a_{n-1}, b)$ be a $\LWE$ ciphertext encrypting a message $m$ under the secret key $s$. Keyswitching allows the server to homomorphically transform $c$ into a new ciphertext $c'$ encrypting this same message $m$ under another secret key $\lweSecretKey'$. To do so, it requires a \textit{keyswitching key} denoted by $\KSK$. Intuitively, $\KSK$ is simply an encryption of $\lweSecretKey$ under $\lweSecretKey'$. 
 
-The rationale behind the keyswitching algorithm is to homomorphically evaluate the linear part of the decryption function (namely $b - \langle \vec a, \lweSecretKey \rangle$), encrypted under the key $s'$. As everything is linear, we can easily get a ciphertext $\LWE_{\lweSecretKey'}(b - \langle \vec a, \lweSecretKey \rangle) = \LWE_{\lweSecretKey'}(m + e)$. We start by explaining the $\LWE$-to-$\LWE$ version of keyswitching and then generalize to the ring case.
+The rationale behind the keyswitching algorithm is to homomorphically evaluate the linear part of the decryption function (namely $b - \langle \vec a, \lweSecretKey \rangle$), encrypted under the key $s'$. As everything is linear, we can easily get a ciphertext $\LWE_{\lweSecretKey'}(b - \langle \vec a, \lweSecretKey \rangle) = \LWE_{\lweSecretKey'}(m + e)$. Note that, while it looks a lot like a bootstrapping operation, keyswitching actually increases the noise.  
+
+
+We start by explaining the $\LWE$-to-$\LWE$ version of keyswitching and then generalize to the ring case.
+
 
 More formally, let $\KSK$ be the vector of encryption of every bit of the key $s$ under the key $s'$:
 
@@ -287,33 +270,28 @@ More formally, let $\KSK$ be the vector of encryption of every bit of the key $s
 	\KSK = \left \{ \LWE_{\lweSecretKey'}(s_i ) \right \}_{0 \le i < n}
 \]
 
-Notice how, if we treat the $a_i$'s of $c$ as scalar constants, we can homomorphically evaluate the product $- \langle \vec a ,\lweSecretKey \rangle$ with the basic linear operation of TFHE:
+Notice how, if we treat the coefficients $a_i$ of the mask of $c$ as scalar constants, we can homomorphically evaluate the product $- \langle \vec a ,\lweSecretKey \rangle$ with the basic linear operation of TFHE. Moreover, adding the constant $b$ is easy if we remark that the trivial ciphertext $\TrivialLWE(b) = (0, \dots, 0, b)$ is a valid instance of $\LWE_{\lweSecretKey'}(b)$. So we can write the full operation $b - \langle \vec a, \lweSecretKey \rangle$ as:
 
 
-\begin{equation*}
-	- \left\langle \vec a, \lweSecretKey \right\rangle \sim
-	\sumTFHETernary{
-		\clearMultTFHE{\LWE{\lweSecretKey'}(s_0)}{- a_0}
-	}{
-		\ldots
-	}{
-		\clearMultTFHE{\LWE{\lweSecretKey'}(s_{n-1})}{- a_{n-1}}
-	}
-\end{equation*}
 
-Adding the constant $b$ is easy if we remark that the trivial ciphertext $(0, \dots, 0, b)$ is a valid instance of $\LWE_{\lweSecretKey'}(b)$. So we can write the full operation $b - \langle \vec a, \lweSecretKey \rangle$ as:
+%\begin{align*}
+%	\sumTFHEQuad{(0, \dots, 0, b)}{
+%		\clearMultTFHE{\LWE{\lweSecretKey'}(s_0)}{- a_0}
+%	}{
+%		\ldots
+%	}{
+%		\clearMultTFHE{\LWE{\lweSecretKey'}(s_{n-1})}{- a_{n-1}}
+%	}&\\
+%	 = \LWE{\lweSecretKey'}(b - \langle \vec a, \lweSecretKey \rangle) &\\
+%	 = \LWE{\lweSecretKey'}(m + e)
+%\end{align*}
 
 \begin{align*}
-	\sumTFHEQuad{(0, \dots, 0, b)}{
-		\clearMultTFHE{\LWE{\lweSecretKey'}(s_0)}{- a_0}
-	}{
-		\ldots
-	}{
-		\clearMultTFHE{\LWE{\lweSecretKey'}(s_{n-1})}{- a_{n-1}}
-	}&\\
-	 = \LWE{\lweSecretKey'}(b - \langle \vec a, \lweSecretKey \rangle) &\\
-	 = \LWE{\lweSecretKey'}(m + e)
+	b - \langle \vec a, \vec s \rangle &= \TrivialLWE(b) + \sum_{i=0}^{n-1} -a_i \cdot \LWE_{\lweSecretKey'}(s_i)\\
+	& = \LWE{\lweSecretKey'}(b - \langle \vec a, \lweSecretKey \rangle)\\
+		 &= \LWE{\lweSecretKey'}(m + e)
 \end{align*}
+
 
 and we effectively get a new encryption of $m$ under $\lweSecretKey'$.
 
@@ -360,18 +338,24 @@ One of the innovations of TFHE is the realization that approximating the decompo
 
 \paragraph{Back for a better keyswitching}
 
-Coming back to the keyswitching algorithm, we pick decomposiion parameters $(\baseDecomp$, $\levelDecomp)$ and add a dimension to the keyswitching key to store each scaled version. So $\KSK$ becomes:
+Coming back to the keyswitching algorithm, we pick decomposition parameters $(\baseDecomp$, $\levelDecomp)$ and add a dimension to the keyswitching key to store each scaled version. So $\KSK$ becomes:
 
 \[
-	\KSK = \left \lbrace ( \LWE_{\lweSecretKey'} (s_i \cdot \baseDecomp^0, \dots  \LWE_{\lweSecretKey'} (s_i \cdot \baseDecomp^{j-1}) ) \right \rbrace_{0 \le i < n}
+	\KSK = \left \lbrace \left ( \LWE_{\lweSecretKey'} (s_i \cdot \baseDecomp^0), \dots  \LWE_{\lweSecretKey'} (s_i \cdot \baseDecomp^{j-1}) \right ) \right \rbrace_{0 \le i < n}
 \]
 
 
-and we replace the simple scalar multiplications in the keyswitching algorithm by scalar product between each decompositions. This gives:
+and we replace the simple scalar multiplications in the keyswitching algorithm by scalar product between each decompositions. %This gives:
 
-\[
-	(0, \dots, 0, b) - \sum_{i=0}^{n-1} \left \langle \decomp{\baseDecomp}{\levelDecomp}{a_i}, \KSK_i \right \rangle
-\]
+%\[
+%	(0, \dots, 0, b) - \sum_{i=0}^{n-1} \left \langle \decomp{\baseDecomp}{\levelDecomp}{a_i}, \KSK_i \right \rangle
+%\]
+
+This gives us the full $\LWE$-to-$\LWE$ algorithm, that we detail in Algorithm \ref{alg:keyswitching}
+
+
+
+\input{tex/algorithms/alg_keyswitching.tex}
 
 
 
@@ -379,11 +363,16 @@ and we replace the simple scalar multiplications in the keyswitching algorithm b
 \paragraph{Generalization to $\GLWE$}
 
 
-We introduced keyswitching in its $\LWE$-to-$\LWE$ form, but everything generalizes nicely to construct a $\LWE$-to-$\GLWE$ flavour. Here, $\KSK$ is a collection of GLWE ciphertexts, and the decomposition works coefficient-wise on the polynomials. The resulting $\GLWE$ ciphertext encrypts a polynomial whose degree-zero coefficient encodes the original message.
+We introduced keyswitching in its $\LWE$-to-$\LWE$ form, but everything generalizes nicely to construct a $\LWE$-to-$\GLWE$ flavour. Here, $\KSK$ is a collection of GLWE ciphertexts, and the decomposition works coefficient-wise on the polynomials. The resulting $\GLWE$ ciphertext encrypts a polynomial whose degree-zero coefficient encodes the original message. It is also possible to use a $\GLWE$-to-$\GLWE$ flavour.
 
-It is then possible to pack several $\LWE$ ciphertexts into a single $\GLWE$ one, by mutiplying the results by different monomials to move the encoded coefficient in a higher degree. They can then be summed. This is known in the literature as the \texttt{Packing Keyswitch}.
+\Question{Est-ce que je dois détailler ces algos ? Ils sont un peu redondants et détaillés dans la thèse de Sam que je cite à la fin du paragraphe}
 
-It is also possible (under several conditions) to evaluate functions while keyswitching by applying it on the decomposed scalars (making it a \textit{public} functional keyswitch) or on the encryption of the bits of the original secret key (making it a \textit{private} one). An in-depth tour of keyswitchs can be found in \cite{these_tap}.
+It is then possible to pack several $\LWE$ ciphertexts into a single $\GLWE$ one, by mutiplying the results by different monomials to move the encoded coefficient in a higher degree. They can then be summed. This is known in the literature as the \texttt{Packing Keyswitch}. As this will be useful particularly in Chapter \ref{sec:hyppogriph}, we detail it in Algorithm \ref{alg:packing_keyswitching}.
+
+\input{tex/algorithms/alg_packing_keyswitching.tex}
+
+
+It is also possible (under several conditions) to evaluate functions while keyswitching by applying it on the decomposed scalars (making it a \textit{public} functional keyswitch) or on the encryption of the bits of the original secret key (making it a \textit{private} one). An in-depth tour of keyswitches can be found in \cite{these_tap}.
 
 
 \section{External Products}
@@ -406,6 +395,10 @@ We give their definition below. We use the formalization of \cite{AC:CLOT21} rat
 
 
 
+The external product is \textit{asymetrical}, in the sense that the two inputs to multiply have different shapes: the first one is a $\GGSW$ ciphertext, while the second one is a simple $\GLWE$ ciphertext. It outputs a $\GLWE$ ciphertext.
+
+The line of work of \cite{chimera, AC:BCGGJ24} 
+
 
 
 
@@ -413,12 +406,99 @@ We give their definition below. We use the formalization of \cite{AC:CLOT21} rat
 \TODO{Aorès ça, faire un lieb avec l'external product dans le cas général (et vec les Z-modules ?)}
 
 
+\paragraph{CMUXes}
+
+Beyond adding a new homomorphic capabilities in TFHE's arsenal, external products is more importantly the workhorse of the whole bootstrapping algorithm that we are going to introduce later in this thesis. This is because is allows to construct a CMUX operation, defined like;
+
+\begin{definition}(CMUX)
+	Let $C_sel$ be a $\GGSW$ ciphertext encrypting a bit $b \in \B$. Let $C_0$ and $C_1$ be two $\GLWE$ ciphertexts. The CMUX operation allows to homomorphically select one of these two ciphertexts with respect to the value of the ``selector'' bit $b$ by computing:
+	\begin{equation*}
+		C_b = C_sel \squarewithdot (C_1 - C_0) + C_0
+	\end{equation*}
+	where $\squarewithdot$ denotes the external product, and $+$ the homomorphic sum of TFHE.
+\end{definition}
 
 
 
-\section{A look at Blind Rotation}
+\TODO{ça permet de faire du VP}
 
-\TODO{Trouver le papier d'où ça vient, et l'expliquer aved des zolis dessins}
+
+
+
+\section{Programmable Bootstrapping}
+
+
+\subsection{An informal overview of BlindRotation}
+
+Recall Gentry's blueprint in Section \ref{sec:gentry_bootstrapping}. To be bootstrappable, a scheme requires to be able to evaluate its own decryption circuit using its homomorphic capabilities.
+
+In TFHE, for a $\LWE$ ciphertext $\vec c$ of form $(a_0, \dots, a_{n-1}, b)$, encrypted under a key $(s_0, \dots, s_{n-1})$, the decryption algorithm has two steps:
+\begin{itemize}
+	\item Computing the phase $\phi(\vec c) = b - \langle a, s \rangle$ (``the linear step'')
+	\item Rounding the phase to the closest plaintext value. (``the rounding step'')
+\end{itemize}
+
+Performing the first step homomorphically is quite simple to do (in fact, this is exactly what we do in the KeySwitching algorithm !). But performing the rounding is trickier. Actually, TFHE do both operations at once using an operation called \textit{Blind Rotation}, which is the core of TFHE's bootstrapping algorithm. 
+
+Introduced in \cite{bibid}, the blind rotation takes advantage of the particular structure of the ring $\glweRing$. To explain this algorithm, we start by have a closer look to this ring.
+
+
+\TODO{DISCLAIMER: in the following, we make some oversimplifications to introduce more easily and naturally the blind rotation operation. }
+
+
+\paragraph{Fun with Rings}
+
+Let $v(X) = \sum_{i=0}^{N-1} v_i X^i$ be an element of the ring $\glweRing$, and let $\mu$ be an integer. Observe what is happening when we multiply this polynomial with the monomial $X^{-\mu}$:
+
+\begin{equation*}
+	X^{-\mu} \cdot v(X) = v_\mu + v_{\mu + 1} \cdot X + \dots + v_{n-1} X^{n-1-\mu} \textcolor{red}{-} v_0 X^{n - \mu} \textcolor{red}{-} \dots \textcolor{red}{-} v_{\mu - 1} X^{n-1}
+\end{equation*}
+
+For now, ignore the red minus signs. What we can take away from this is that the monomial multiplication simply performs a \textit{rotation} of the polynomial's coefficients. In the blind rotation, what we are really interested in is the degree-zero coefficient. If we want to rotate the polynomial such than the $\mu$-th coefficient is bringed into the degree-zero one, we just have to multiply the polynomial by the monomial $X^{-\mu}$ !
+
+But there's a problem here. When the coefficients are ``sent to the other side '' of the polynomial, they get an extra minus sign. So actually, a multiplication by $X^N$ does not yield the initial polynomial, but the opposite one, and one has to multiply instead by $X^{2N}$ to make a full lap. This is because $X$ has an order $2N$ in $\glweRing$. In the literature, this problem is referred to as \textit{the negacyclicity problem} and we dive deeper into it in Chapter \ref{sec;negacyclity}.
+
+For now, we introduce blind rotation without the complexity induced by the negacyclicity problem. So, we are gonna assume that the exponent of the monomial lives in $\lbrace 0, \dots, N-1 \rbrace$, and ignore these minus signs. As we are only interested in the value in the degre-zero coefficient, this won't be a problem for now.
+
+\paragraph{Constructing a rounding function}
+How can we use this property to construct a rounding function ? Suppose we have a plaintext space $\plaintextRing$ and a ciphertext space $\lweRing$. Let $\vec c$ be  a $\LWE$ ciphertext, and $\phi(\vec c)$ its noisy phase produced by the linear step of the decryption algorithm. We want to round $\phi(\vec c)$ to the closest plaintext in $\plaintextRing$ to retrieve the message $m$.
+
+To do so, we are going to use a specifically-crafted polynomial, called the \textit{accumulator polynomial} $acc(X)$. This polynomial is made of contiguous ``windows'' of size $\frac N p$ in which every coefficients are equal to each others. Coefficients of the window of index 0 have value 0, and so on. These windows are centered on the $p$ coefficients corresponding to the modswitched versions of the plaintext values.
+
+
+
+
+
+\begin{figure}[htbp]
+	\centering
+	\wrappedTorus{64}{4}{true} \\[1em] % Add some vertical space between them if necessary
+	\accumulator{4}{64}
+	\label{fig:illustration_accumulator}
+	\caption{Example of an accumulator polynomial with $p=4$ and $N=64$.}
+\end{figure}
+
+
+
+Our rounding procedure takes three steps:
+\begin{itemize}
+	\item Switching the modulus of $\mu$ to send it into $\Z_N$ to produce $\tilde mu = \rounding{\frac{\mu \cdot N}{q}}$.
+	\item Computing the product $X^{- \tilde \mu} \cdot acc(X)$.
+	\item Extracting the degree-zero coefficient to retrieve $v_{\tilde \mu}$.
+\end{itemize}
+
+If the noise $\tilde e$ in $\tilde \mu$ is smaller than $\frac{N}{p}$, we properly get $v_{\tilde \mu} = m$.
+
+
+
+Now that we have an intuition of what a working bootstrapping algorithm does look like, we can now introduce its homomorphic instantiation. 
+
+
+\subsection{The full algorithm}
+
+
+
+
+
 
 
 

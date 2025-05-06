@@ -1,0 +1,86 @@
+
+
+
+\newcommand{\accumulator}[2]{% (p, N)
+	\pgfmathsetmacro{\p}{#1}
+	\pgfmathsetmacro{\N}{#2}
+	\begin{tikzpicture}[x=1cm]
+		\def\boxwidth{4cm}
+		
+		% first half sector
+		\pgfmathsetmacro{\start}{0}
+		\pgfmathsetmacro{\endval}{int(\N * 0.5 / \p - 1)}
+		
+		% Compute centered color index
+		\pgfmathsetmacro{\colorIndex}{0}
+		
+		% Convert to hue [0,1]
+		\pgfmathsetmacro{\hue}{\colorIndex / \p}
+		% Set HSB color
+		\definecolor{mycolor}{hsb}{\hue,1,1}
+		
+
+		
+		\node[
+		draw,
+		fill=mycolor!50,
+		inner xsep=2pt, inner ysep=2pt,
+		text width=\boxwidth / 2,
+		align=center,
+		anchor=west
+		] at (0.5*\boxwidth, 0)
+		{$\dots + 0 \cdot X^{\endval}$};
+				
+		
+		
+		% Intermediate sectors
+		\foreach \i in {1,...,\numexpr\p-1} {
+			\pgfmathsetmacro{\start}{int(\N * (\i - 0.5) / \p)}
+			\pgfmathsetmacro{\endval}{int(\N * (\i + 0.5) / \p - 1)}
+
+			% Compute centered color index
+			\pgfmathsetmacro{\colorIndex}{\i}
+
+			% Convert to hue [0,1]
+			\pgfmathsetmacro{\hue}{\colorIndex / \p}
+			% Set HSB color
+			\definecolor{mycolor}{hsb}{\hue,1,1}
+			
+			\node[
+			draw,
+			fill=mycolor!50,
+			inner xsep=2pt, inner ysep=2pt,
+			text width=\boxwidth,
+			align=center,
+			anchor=west
+			] at ({\i*\boxwidth}, 0)
+			{$ \i \cdot X^{\start} + \dots + \i \cdot X^{\endval}$};
+		}
+		
+		% Last half sector
+		\pgfmathsetmacro{\start}{int(\N * (\p - 0.5) / \p)}
+		\pgfmathsetmacro{\endval}{\N - 1}
+		
+		% Compute centered color index
+		\pgfmathsetmacro{\colorIndex}{0}
+		
+		% Convert to hue [0,1]
+		\pgfmathsetmacro{\hue}{\colorIndex / \p}
+		% Set HSB color
+		\definecolor{mycolor}{hsb}{\hue,1,1}
+		
+		
+		\node[
+		draw,
+		fill=mycolor!50,
+		inner xsep=2pt, inner ysep=2pt,
+		text width=\boxwidth / 2,
+		align=center,
+		anchor=west
+		] at ({\p*\boxwidth}, 0)
+		{$0 \cdot X^{\start} + \dots$};
+		
+		
+	\end{tikzpicture}
+}
+

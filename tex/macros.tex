@@ -1,8 +1,7 @@
 % !TeX_ROOT=../thesis.tex
 
 \newcommand{\TODO}[1]{\todo[inline, color=orange!30]{\textbf{TODO:} #1}}
-
-
+\newcommand{\Question}[1]{\todo[inline, color=red!30]{\textbf{Question:} #1}}
 
 
 
@@ -16,8 +15,9 @@
 \newcommand{\unif}[1]{\mathcal U \left ( #1 \right )}
 
 
-% Problems
+% Problems / Ciphertexts
 \newcommand{\LWE}{\textsf{LWE}}
+\newcommand{\TrivialLWE}{\textsf{TrivialLWE}}
 \newcommand{\RLWE}{\textsf{RLWE}}
 \newcommand{\GLWE}{\textsf{GLWE}}
 \newcommand{\GGSW}{\textsf{GGSW}}
@@ -50,6 +50,7 @@
 \newcommand{\sumTFHEQuad}[4]{\texttt{SumTFHE}(#1, #2, #3, #4)}
 \newcommand{\clearMultTFHE}[2]{\texttt{ClearMultTFHE}(#1, #2)}
 
+\newcommand{\squarewithdot}{\tikz[baseline=-0.5ex]\draw (0,0) rectangle (0.3,0.3) (0.15,0.15) circle (0.05);}
 
 % other operations
 \newcommand{\decomp}[3]{\textsf{dec}^{(#1, #2)}(#3)}
