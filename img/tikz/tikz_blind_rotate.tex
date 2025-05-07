@@ -1,0 +1,57 @@
+\def\widthRectangle{1}
+\def\heightRectangle{2}
+
+
+\newcommand{\cmuxBlock}[5]{	%(x, y, lengthArrow, i, withchaining)
+	\pgfmathsetmacro{\x}{#1}
+	\pgfmathsetmacro{\y}{#2}
+	\pgfmathsetmacro{\lengthArrow}{#3}
+	\pgfmathsetmacro{\i}{#4}
+	\def\withchaining{#5}
+	
+	\draw (\x, \y) rectangle ++(\widthRectangle, \heightRectangle);
+	\node at (\x + 0.5 * \widthRectangle, \y + 0.5 * \heightRectangle) {$\CMUX$};
+
+	\draw[->] (\x - \lengthArrow, \y + 3 * \heightRectangle / 4) -- ++(\lengthArrow, 0);
+
+	\ifthenelse{\equal{\withchaining}{true}}{
+		\draw[->] (\x + \widthRectangle, \y + \heightRectangle / 2) -- ++(\lengthArrow, 0) -- ++(0, - \heightRectangle / 4) -- ++(\lengthArrow, 0);
+	}{
+		\draw[->] (\x + \widthRectangle, \y + \heightRectangle / 2) -- ++(\lengthArrow, 0);
+	}
+	
+	
+	\draw[->] (\x + \widthRectangle / 2, \y + \heightRectangle + \lengthArrow / 2) -- ++(0, -\lengthArrow / 2);
+	\node at (\x + \widthRectangle / 2 , \y + \heightRectangle + \lengthArrow / 2 + 0.3) {$\GGSW(s_\i)$};
+}
+
+
+\newcommand{\cmuxChain}[2]{ % N CMUXes left, lengthArrow
+	\pgfmathsetmacro{\n}{#1}
+	\pgfmathsetmacro{\lengthArrow}{#2}
+	
+	\pgfmathsetmacro{\widthPattern}{2 * \lengthArrow + \widthRectangle}
+	
+	\draw[->] (-\lengthArrow, \heightRectangle / 4) -- ++(\lengthArrow, 0);
+	\foreach \i in {0,...,\numexpr\n - 2}{
+		\cmuxBlock{\i * \widthPattern}{0}{\lengthArrow}{\i}{true}
+	}
+	\cmuxBlock{(\n - 1) * \widthPattern}{0}{\lengthArrow}{\numexpr\n - 1}{false}
+	
+	
+	\pgfmathsetmacro{\xDots}{\n * (\widthRectangle + 2 * \lengthArrow)}
+	\node at (\xDots, \heightRectangle / 2) {\huge $\dots$};
+	
+	
+	\draw[->] (\xDots + \lengthArrow, \heightRectangle / 4) -- ++(\lengthArrow, 0);
+	\cmuxBlock{\xDots + 2 * \lengthArrow}{0}{\lengthArrow}{n-1}{false}
+}
+
+
+
+
+\newcommand{\cmuxScratchpad}{
+	\begin{tikzpicture}
+		\cmuxChain{3}{1}
+	\end{tikzpicture}
+}

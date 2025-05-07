@@ -20,10 +20,12 @@
 \newcommand{\TrivialLWE}{\textsf{TrivialLWE}}
 \newcommand{\RLWE}{\textsf{RLWE}}
 \newcommand{\GLWE}{\textsf{GLWE}}
+\newcommand{\TrivialGLWE}{\textsf{TrivialGLWE}}
 \newcommand{\GGSW}{\textsf{GGSW}}
 
 % Classical Mathematical Operations
 \newcommand{\rounding}[1]{\left \lfloor #1 \right \rceil}
+\newcommand{\modulo}[2]{\left [ #1 \right ]_{#2}}
 \newcommand{\drawfrom}{\overset{\$}{\leftarrow}}
 
 
@@ -51,6 +53,12 @@
 \newcommand{\clearMultTFHE}[2]{\texttt{ClearMultTFHE}(#1, #2)}
 
 \newcommand{\squarewithdot}{\tikz[baseline=-0.5ex]\draw (0,0) rectangle (0.3,0.3) (0.15,0.15) circle (0.05);}
+
+% Bootstrapping operations
+\newcommand{\ModSwitch}{\texttt{ModSwitch}}
+\newcommand{\BlindRotate}{\texttt{BlindRotate}}
+\newcommand{\SampleExtract}{\texttt{SampleExtract}}
+\newcommand{\CMUX}{\texttt{CMUX}}
 
 % other operations
 \newcommand{\decomp}[3]{\textsf{dec}^{(#1, #2)}(#3)}

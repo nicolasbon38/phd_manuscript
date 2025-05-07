@@ -131,7 +131,7 @@ The plaintext space of TFHE is the \textit{discretized torus} $\plaintextTorus$.
 
 
 We need a way to encode plaintext values into the ciphertext space. To do so, let us consider a mapping $\rho: \plaintextRing \rightarrow \lweRing$ (in practice, $p \ll q$), defined as \[
-\rho: m  \mapsto \rounding{\frac{m q} {p}}.
+\rho: m  \mapsto \rounding{\frac{m \cdot q} {p}}.
 \]
 
 
@@ -496,10 +496,58 @@ Now that we have an intuition of what a working bootstrapping algorithm does loo
 \subsection{The full algorithm}
 
 
+Now that we have a good intuition of what is going to happen, we can detail the real bootstrapping algorithm. It can be broken down in three steps: \ModSwitch, \BlindRotate and \SampleExtract.
+
+We consider a $\LWE$ ciphertext $c = (a_0, \dots, a_{n-1}, b)$ that we want to bootstrap. It is encrypted under the $\LWE$ secret key $\lweSecretKey$. 
+
+The server requires a \textit{bootstrapping key}, that we denote by $\BSK$, defined by:
+
+\[
+	\BSK = \left \lbrace \GGSW_{\glweSecretKey}(s_i) \right \rbrace_{0 \le i < n}
+\]
+
+where $\glweSecretKey$ is a $\GLWE$ secret key, of shape $(k, N)$.
 
 
+\paragraph{\ModSwitch:}
+
+$c$ lives in $\lweRing$, but the polynomial of the $\GLWE$ ring are of degree $N$. Recall from last section that we would like the exponent of the monomial used in \BlindRotate to live in $\Z_{2N}$.
+
+Talking directly $q = 2N$ is not practical: there is no way to construct a secure $\LWE$ instance in the regime where the polynomial operations are fast enough. So we need to switch the modulus of $c$ to produce a new vector $\tilde c$ living in the right space. This is simply done by computing:
+
+\[
+	\forall~i \in \{0, \cdots, n-1\}, \tilde a_i = \modulo{\rounding{\frac{a_i \cdot 2N}{q}}}{2N} \text{ and: } \tilde b = \modulo{\rounding{\frac{b \cdot 2N}{q}}}{2N}
+\]
 
 
+This operation produces an extra noise in the ciphertext, that is called \textit{drift} in the literature. \cite{EC:BJSW24} provides an in-depth study of the behaviour of this noise, as well as alternative strategies to mitigate it.
 
 
+\paragraph{\BlindRotate:}
 
+In the previous paragraph, we introduced the rationale behind blind rotation. We use a polynomial called accumulator that we rotate using a multiplication by $X^{-\tilde \mu}$, where $\tilde \mu$ is the (noisy) phase resized in $\Z_{2N}$.
+
+How do we compute this phase homomorphically ? Recall that $\tilde \mu = \tilde b - \sum_{i=0}^{n-1} \tilde a_i \cdot s_i$. It would be quite easy to do using the encryptions of $\lweSecretKey$ provided in $\BSK$, but lifting it to the exponents is not doable. Instead, we use a \textit{chain of CMUXes}.
+
+This idea comes naturally if we rewrite the expression of the monomial $X^{-\tilde mu}$ as:
+
+\[
+	X^{-\tilde \mu} = X^{-\tilde b} \cdot \prod_{i=0}^{n-1} X^{\tilde a_i \cdot s_i} = X^{-\tilde b} \cdot \prod_{i=0}^{n-1} \begin{cases}
+		X^{\tilde a_i} \text{ if } s_i = 1\\
+		1 \text{ if } s_i = 0
+	\end{cases}
+\]
+
+
+This leads to this natural algorithm:
+
+
+\input{tex/algorithms/alg_blindrotate.tex}
+
+\TODO{Mettre une figure pour illusterer la blind rotation (s'inspirer de la prez de Loris aux JC2)}
+
+\begin{figure}
+	\centering
+	\cmuxScratchpad
+	\caption{coucou}
+\end{figure}
