@@ -1,7 +1,16 @@
+%!TEX root = ../thesis.tex
+
 \chapter{Overcoming the negacyclicity problem with odd plaintext modulus}
+\label{chap:negacyclicity}
+
+In Section \ref{sec:pbs}, we presented the algorithm of the PBS. But we hid something under the rug: the actual composition of the accumulator polynomial $acc(X)$. 
 
 
 \section{The original state of the art: the bit of padding}
+
+To avoid the negacyclicity problem, the first attempt has been to enforce the value of the Most Significant Bit (MSB) to zero. By doing this, the message is fixed in the first half of the torus. So during the blind rotation, the minus signs never reach the degree-zero coefficient.
+
+
 
 
 \section{A natural way of avoiding the problem: using odd moduli}

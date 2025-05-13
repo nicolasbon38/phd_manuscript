@@ -6,8 +6,8 @@
 			\begin{array}{l}
 				\lweSecretKey \text{: the input $\LWE$ secret key}\\
 				\lweSecretKey' \text{: the output $\LWE$ secret key}\\
-				\levelDecomp: \text{: the level of the decomposition}\\
-		         \baseDecomp: \text{: the base of the decomposition}
+				\levelDecomp \text{: the level of the decomposition}\\
+		         \baseDecomp \text{: the base of the decomposition}
 		  	\end{array}
 		  \right.$
 	}
@@ -16,7 +16,7 @@
 		$\left\{
 		\begin{array}{l}
 			c = (a_0, \dots, a_{n-1}, b) \text{: a ciphertext $\LWE_{\lweSecretKey}(m)$} \\
-			\KSK = \left\{ \left( \LWE_{\lweSecretKey'} (s_i \cdot \baseDecomp^0), \dots, \LWE_{\lweSecretKey'} (s_i \cdot \baseDecomp^{j-1}) \right) \right\}_{0 \le i < n} \text{: the keyswitching key}
+			\KSK = \left\{ \left( \LWE_{\lweSecretKey'} (s_i \cdot \baseDecomp^0), \dots, \LWE_{\lweSecretKey'} (s_i \cdot \baseDecomp^{\levelDecomp-1}) \right) \right\}_{0 \le i < n} \text{: the keyswitching key}
 		\end{array}
 			\right.$
 	}

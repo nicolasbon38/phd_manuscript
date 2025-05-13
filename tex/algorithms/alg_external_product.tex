@@ -1,0 +1,38 @@
+\begin{algorithm}
+	\caption{\texttt{External Product}}
+	\label{alg:external_product}
+	\KwContext{
+		$\left\{
+		\begin{array}{l}
+			\glweSecretKey \text{: the input $\GLWE$ secret key}\\
+			\levelDecomp \text{: the level of the decomposition}\\
+			\baseDecomp \text{: the base of the decomposition}
+		\end{array}
+		\right.$
+	}
+	
+	\KwIn{
+		$\left\{
+		\begin{array}{l}
+			C = (A_0, \dots, A_{k-1}, B) \text{: a ciphertext }\GLWE_{\glweSecretKey}(M_1) \\
+			CT = \left \lbrace \left ( \GLWE_{\glweSecretKey}\left (-S_\alpha \cdot M \cdot \frac{q}{B^j} \right) \right )_{0 \le j < \levelDecomp} \right \rbrace_{0\le \alpha \le k+1} \text{: a ciphertext } \GGSW_{\glweSecretKey}(M) 
+		\end{array}
+		\right.$
+	}
+	
+	\KwResult{
+		$C_{\textsf{out}}$ \text{: a ciphertext $\GLWE_{\glweSecretKey'}(M_1 \cdot M_2)$}
+	}
+	
+	
+	% Add vertical space and horizontal line
+	\vspace{0.5em} % adjust the space as needed
+	\hrule
+	\vspace{0.5em} % adjust the space as needed
+	
+	$C_{\textsf{out}} \gets \langle \rangle$
+	
+	BLABLA
+	
+	\Return{$C_{\textsf{out}}$}	
+\end{algorithm}
