@@ -1,60 +1,89 @@
-\def\widthRectangle{1}
-\def\heightRectangle{2}
-
-
-\newcommand{\cmuxBlock}[7]{	%(x, y, lengthArrow, labelSelector, withchaining, labelTop, labelBottom)
-	\pgfmathsetmacro{\x}{#1}
-	\pgfmathsetmacro{\y}{#2}
-	\pgfmathsetmacro{\lengthArrow}{#3}
-	\def\labelSelector{#4}
-	\def\withchaining{#5}
-	\def\labelTop{#6}
-	\def\labelBottom{#7}
+\makeatletter
+\newcommand{\cmuxBlock}[2]{%
+	% Parse numeric arguments manually
+	\cmuxParseNumbers#1\relax
+	% Parse label arguments manually
+	\cmuxParseLabels#2\relax
 	
-	\draw (\x, \y) rectangle ++(\widthRectangle, \heightRectangle);
-	\node at (\x + 0.5 * \widthRectangle, \y + 0.5 * \heightRectangle) {$\CMUX$};
-
-	\draw[->] (\x - \lengthArrow, \y + 3 * \heightRectangle / 4) -- ++(\lengthArrow, 0) node[midway, above] {\labelTop};
-
-	\ifthenelse{\equal{\withchaining}{true}}{
-		\draw[->] (\x + \widthRectangle, \y + \heightRectangle / 2) -- ++(\lengthArrow / 2, 0) -- ++(0, - \heightRectangle / 4) -- ++(\lengthArrow, 0) node[midway, below] {\labelBottom};
-	}{
-		\draw[->] (\x + \widthRectangle, \y + \heightRectangle / 2) -- ++(\lengthArrow, 0) node[midway, below] {};
-	}
+	% Derived coordinates
+	\pgfmathsetmacro{\xBlock}{\x + \lengthArrowLeft}
+	\pgfmathsetmacro{\yBlock}{\y}
 	
+	% Draw block
+	\draw (\xBlock, \yBlock) rectangle ++(\widthRectangle, \heightRectangle);
+	\node at (\xBlock + 0.5 * \widthRectangle, \yBlock + 0.5 * \heightRectangle) {$\CMUX$};
 	
-	\draw[->] (\x + \widthRectangle / 2, \y + \heightRectangle + \lengthArrow / 2) -- ++(0, -\lengthArrow / 2);
-	\node at (\x + \widthRectangle / 2 , \y + \heightRectangle + \lengthArrow / 2 + 0.3) {\labelSelector};
+	% Input arrows
+	\draw[->] (\x , \y + 3 * \heightRectangle / 4) -- ++(\lengthArrowLeft, 0) node[midway, above] {\labelTop};
+	\draw[->] (\x, \y + \heightRectangle / 4) -- ++(\lengthArrowLeft, 0) node[midway, below] {\labelBottom};
+	
+	% Output arrow
+	\draw[->] (\xBlock + \widthRectangle, \y + \heightRectangle / 2) -- ++(\lengthArrowRight, 0) node[midway, above] {\labelOutput};
+	
+	% Selector arrow
+	\draw[->] (\xBlock + \widthRectangle / 2, \yBlock + \heightRectangle + \lengthArrowTop) -- ++(0, -\lengthArrowTop);
+	\node at (\xBlock + \widthRectangle / 2 , \yBlock + \heightRectangle + \lengthArrowTop + 0.3) {\labelSelector};
 }
 
-
-\newcommand{\cmuxChain}[2]{ % N CMUXes left, lengthArrow
-	\pgfmathsetmacro{\n}{#1}
-	\pgfmathsetmacro{\nMinusOne}{int(\n - 1)}
-	\pgfmathsetmacro{\lengthArrow}{#2}
-	
-	\pgfmathsetmacro{\widthPattern}{1.5 * \lengthArrow + \widthRectangle}
-	
-	\draw[->] (-\lengthArrow, \heightRectangle / 4) -- ++(\lengthArrow, 0) node[midway, below] {$X^{a_0} \cdot acc(X)$};
-	\foreach \i in {0,...,\numexpr\n - 2}{
-		\cmuxBlock{\i * \widthPattern}{0}{\lengthArrow}{$\GGSW(s_\i)$}{true}{$acc(X)$}{$X^{a_\i \cdot s_\i} \cdot acc(X)$}
-	}
-	\cmuxBlock{(\n - 1) * \widthPattern}{0}{\lengthArrow}{$\GGSW(s_{\nMinusOne})$}{false}{$acc(X)$}{$X^{a_\i} \cdot acc(X)$}
-	
-	
-	\pgfmathsetmacro{\xDots}{\n * (\widthRectangle + 2 * \lengthArrow)}
-	\node at (\xDots, \heightRectangle / 2) {\huge $\dots$};
-	
-	
-	\draw[->] (\xDots + \lengthArrow, \heightRectangle / 4) -- ++(\lengthArrow, 0);
-	\cmuxBlock{\xDots + 2 * \lengthArrow}{0}{\lengthArrow}{$\GGSW(s_{n-1})$}{false}{$acc(X)$}{$X^{a_\i} \cdot acc(X)$}
+% Parse seven comma-separated numbers
+\def\cmuxParseNumbers#1,#2,#3,#4,#5,#6,#7\relax{%
+	\pgfmathsetmacro{\x}{#1}%
+	\pgfmathsetmacro{\y}{#2}%
+	\pgfmathsetmacro{\widthRectangle}{#3}%
+	\pgfmathsetmacro{\heightRectangle}{#4}%
+	\pgfmathsetmacro{\lengthArrowLeft}{#5}%
+	\pgfmathsetmacro{\lengthArrowRight}{#6}%
+	\pgfmathsetmacro{\lengthArrowTop}{#7}%
 }
 
+% Parse four comma-separated labels
+\def\cmuxParseLabels#1,#2,#3,#4\relax{%
+	\def\labelTop{#1}%
+	\def\labelBottom{#2}%
+	\def\labelOutput{#3}%
+	\def\labelSelector{#4}%
+}
+\makeatother
 
 
 
-\newcommand{\cmuxScratchpad}{
+
+%\newcommand{\cmuxChain}[2]{ % N CMUXes left, lengthArrow
+%	\pgfmathsetmacro{\n}{#1}
+%	\pgfmathsetmacro{\nMinusOne}{int(\n - 1)}
+%	\pgfmathsetmacro{\lengthArrow}{#2}
+%	
+%	\pgfmathsetmacro{\widthPattern}{1.5 * \lengthArrow + \widthRectangle}
+%	
+%	\draw[->] (-\lengthArrow, \heightRectangle / 4) -- ++(\lengthArrow, 0) node[midway, below] {$X^{a_0} \cdot acc(X)$};
+%	\foreach \i in {0,...,\numexpr\n - 2}{
+%		\cmuxBlock{\i * \widthPattern}{0}{\lengthArrow}{$\GGSW(s_\i)$}{true}{$acc(X)$}{$X^{a_\i \cdot s_\i} \cdot acc(X)$}
+%	}
+%	\cmuxBlock{(\n - 1) * \widthPattern}{0}{\lengthArrow}{$\GGSW(s_{\nMinusOne})$}{false}{$acc(X)$}{$X^{a_\i} \cdot acc(X)$}
+%	
+%	
+%	\pgfmathsetmacro{\xDots}{\n * (\widthRectangle + 2 * \lengthArrow)}
+%	\node at (\xDots, \heightRectangle / 2) {\huge $\dots$};
+%	
+%	
+%	\draw[->] (\xDots + \lengthArrow, \heightRectangle / 4) -- ++(\lengthArrow, 0);
+%	\cmuxBlock{\xDots + 2 * \lengthArrow}{0}{\lengthArrow}{$\GGSW(s_{n-1})$}{false}{$acc(X)$}{$X^{a_\i} \cdot acc(X)$}
+%}
+%
+%
+%
+%
+%\newcommand{\cmuxScratchpad}{
+%	\begin{tikzpicture}
+%		\cmuxChain{2}{1.8}
+%	\end{tikzpicture}
+%}
+
+
+
+
+\newcommand{\singleCmux}{
 	\begin{tikzpicture}
-		\cmuxChain{2}{1.8}
+		\cmuxBlock{0,0,1,2,3,3,1}{{$\vec C_0 = \GLWE(M_0)$},{$\vec C_1 = \GLWE(M_1)$},{$\vec C_b = \GLWE(M_b)$},{$\mat C_{sel} = \GGSW(b)$}} %(x, y, widthRectangle, heightRectangle, lengthArrrowLeft, lengthArrowRight, lengthArrowTop) (labels top, bottom, output, selector)
 	\end{tikzpicture}
 }

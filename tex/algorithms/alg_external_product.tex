@@ -14,14 +14,14 @@
 	\KwIn{
 		$\left\{
 		\begin{array}{l}
-			C = (A_0, \dots, A_{k-1}, B) \text{: a ciphertext }\GLWE_{\glweSecretKey}(M_1) \\
-			CT = \left \lbrace \left ( \GLWE_{\glweSecretKey}\left (-S_\alpha \cdot M \cdot \frac{q}{B^j} \right) \right )_{0 \le j < \levelDecomp} \right \rbrace_{0\le \alpha \le k+1} \text{: a ciphertext } \GGSW_{\glweSecretKey}(M) 
+		\mat C_1 = \left \lbrace \vec K_\alpha = \left ( \GLWE_{\glweSecretKey}\left (-S_\alpha \cdot M \cdot \frac{q}{B^j} \right) \right )_{0 \le j < \levelDecomp} \right \rbrace_{0\le \alpha \le k+1} \text{: a ciphertext } \GGSW_{\glweSecretKey}(M)\\
+		\vec C_2 = (A_0, \dots, A_{k-1}, B) \text{: a ciphertext }\GLWE_{\glweSecretKey}(M_1) \\
 		\end{array}
 		\right.$
 	}
 	
 	\KwResult{
-		$C_{\textsf{out}}$ \text{: a ciphertext $\GLWE_{\glweSecretKey'}(M_1 \cdot M_2)$}
+		$\vec C_{\textsf{out}}$ \text{: a ciphertext $\GLWE_{\glweSecretKey'}(M_1 \cdot M_2)$}
 	}
 	
 	
@@ -30,9 +30,9 @@
 	\hrule
 	\vspace{0.5em} % adjust the space as needed
 	
-	$C_{\textsf{out}} \gets \langle \rangle$
-	
-	BLABLA
-	
-	\Return{$C_{\textsf{out}}$}	
+	$\vec C_{\textsf{out}} \gets \innerProduct{\vec K_k}{\decomp{\levelDecomp}{\baseDecomp}{B}}$\\
+	\For{$\alpha \in \{0, \dots, k-1\}$}{
+		$\vec C_{\textsf{out}} \gets \vec C_{\textsf{out}} - \innerProduct{\vec K_\alpha}{\decomp{\levelDecomp}{\baseDecomp}{A_\alpha}}$
+	}
+	\Return{$\vec C_{\textsf{out}}$}	
 \end{algorithm}

@@ -14,10 +14,13 @@
 \usepackage{amsmath}
 \usepackage{amsthm}
 
+\usepackage{comment} % for commenting large sections of text
+
 \usepackage{todonotes}
 
 \usepackage{ifthen}
 \usepackage{tikz}
+\usepackage{xstring}
 \usepackage{xcolor}
 \usepackage[rgb]{xcolor}
 \usetikzlibrary{arrows.meta, positioning, fit}
@@ -119,7 +122,8 @@
 \input{tex/negacyclicity_and_oddness.tex}
 
 
-\chapter{A first application: Accelerating Boolean circuits evaluation with $p$-encodings}
+% Chapter on Boolean Functions
+\input{tex/p_encodings/main.tex}
 
 
 \chapter{Accelerating AES evaluation}

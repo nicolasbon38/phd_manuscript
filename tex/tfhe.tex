@@ -2,12 +2,10 @@
 
 \chapter{TFHE}
 
+\TODO{Ecrire une petite page qui présente TFHE rapidement, et notamment explique le "plan" ed la section et les features du bootstrapping}
 
+\section{Hardness Assumptions: $\LWE$ and $\GLWE$ problems}
 
-\section{Basics on $\LWE$ and $\GLWE$ Encryption}
-
-
-\subsection{Hardness assumptions}
 
 
 \paragraph{Original $\LWE$ problem}
@@ -45,7 +43,7 @@ Most implementations of TFHE select a uniform distribution on $\{0, 1\}$ for the
 
 
 
-\paragraph{Extension to the Polynomials: $\GLWE$}
+\paragraph{Extension to the Polynomials}
 
 
 Looking for more efficient solutions, $\LWE$ problem has been declined in a \textit{ring variant} in \cite{rlwe}, and further expanded in a multitude of variants since them. A generalized version over rings, named $\GLWE$ and used by TFHE, is presented below. It is very similar to the $\LWE$ one, but deals with polynomial values instead of integers:
@@ -224,13 +222,11 @@ It is not hard to see that both TFHE encryption modes are linearly homomorphic. 
 \paragraph{$\clearMultTFHE{c}{\lambda}$:} Let $c = (a_0, \dots, a_{n-1}, b)$ a $\LWE$ ciphertext encrypting a message $m \in \plaintextRing$ and $\lambda \in \plaintextRing$ a constant. Multiplying each coefficient by the constant yields a new ciphertext $c' = (\lambda \cdot a_0, \dots, \lambda \cdot a_{n-1}, \lambda \cdot b)$ encrypting the message $\lambda \cdot m$ with a larger noise $\lambda \cdot e$.
 
 
-
-\TODO{Revérifier que je ne dis pas de conneries, et que faire de ce paragraphe ?}
-We stress once again that the products between two elements of the torus is not well defined. Yet, it may be handy to be able to multiply two elements of $\plaintextRing$ regardless of the inherent torus structure of TFHE. To do so, it is necessary to \textit{lift} one of the terms to an external space (such as [...]) and run an external product. This requires to perform homomorphically the gadget decomposition introduced in Section \ref{external_products} which is not straightforward. This is called in the literature a \textit{circuit bootstrapping} (citer et faire le lien avec le packing ?)
-\TODO{Vérifier dans la littérature si le terme \textit{Internal Product} est adapté, et pourquoi ce terme existe ?}
+\medskip
+These notations will be used throughout this manuscript. However, sometimes when it is clear from the context that we are referring to homomorphic operations, we may use the classical $+$ and $\cdot$ symbols to lighten the formulas.
 
 
-These notations will be used througout this manuscript. However, sometimes when it is clear from the context that we are referring to homomorphic operations, we may use the classical $+$ and $\cdot$ symbols to lighten the formulas.
+
 
 
 \section{A first advanced operation: the Key Switching (and a motivation for gadget decomposition)}
@@ -298,7 +294,9 @@ Now, observe that instead of directly performing the product $a_i \cdot \LWE{\lw
 
 which yields the correct result. The point of doing this is that the noise grows only by a factor $\baseDecomp \cdot \levelDecomp$ instead of $a_i$ (at the cost of storing $\levelDecomp$ ciphertexts instead of one).
 
-\TODO{Vérifier l'argument avec une formule de bruit, et ajouter des références}
+\Question{Et-ce que ça vaut le coup d'écrire les formules de bruits précises ? Sachant que je le ferai probablement dans la section dédiée au paramétrage}
+
+
 Note that we present here a very simple case. A rigorous formalism of gadget decomposition is developed in \cite{EC:GenMicPol19}, and some more analysis can be found in \cite{AC:Joye21}.
 
 
@@ -357,7 +355,7 @@ We start by formalizing a bit more the notion of gadget decomposition: while sev
 	Let the module $\T_{q, N}[X]^{k+1}$ be the domain of $\GLWE$. Let the two positive integers $\levelDecomp$ and $\baseDecomp$ be the base of the gadget. The gadget is the list of $(k+1) \levelDecomp$ rows of the matrix $H \in \mathcal{M}_{(k+1)\levelDecomp, k+1}(\T_{q, N}[X])$ defined by:
 	
 	\[
-	H = 
+	\mat H = 
 	\left(
 	\begin{array}{c|c|c}
 		\baseDecomp^{-1} & \dots & 0 \\
@@ -374,16 +372,15 @@ We start by formalizing a bit more the notion of gadget decomposition: while sev
 	\]
 \end{definition}
 	
-\TODO{Lien avec l'algo de décomposition (cu sous la forme d'un produit matriciel ?)}
 
 
 Using this matrix, it is possible to define a new type of ciphertexts, called $\GGSW$ ciphertexts. We give their classical definition below:
 
 
 \begin{definition}($\GGSW$ ciphertexts)
-	Let $(\baseDecomp, \levelDecomp)$ an approximate decomposition base. A $\GGSW$ ciphertext $C$ encrypting a message $M \in \plaintextRingPoly$ under a GLWE secret key $\glweSecretKey =  (S_0, \dots, S_{k-1}) \in \B_{N, q}[X]^k$ has the form:
+	Let $(\baseDecomp, \levelDecomp)$ an approximate decomposition base. A $\GGSW$ ciphertext $\mat C$ encrypting a message $M \in \plaintextRingPoly$ under a GLWE secret key $\glweSecretKey =  (S_0, \dots, S_{k-1}) \in \B_{N, q}[X]^k$ has the form:
 	\begin{equation*}
-		C = Z + M \cdot H
+		\mat C = \mat Z + M \cdot \mat H
 	\end{equation*}
 	where each row of $Z$ is a valid $\GLWE$ ciphertext of 0 for the key $\glweSecretKey$. 
 	
@@ -396,22 +393,18 @@ In more recent works (for example \cite{AC:CLOT21} and its follow-ups), an alter
 	Let $(\baseDecomp, \levelDecomp)$ an approximate decomposition base. A $\GGSW$ ciphertext encrypting a message $M \in \plaintextRingPoly$ under a GLWE secret key $\glweSecretKey =  (S_0, \dots, S_{k-1}) \in \B_{N, q}[X]^k$ has the form:
 	
 	\begin{equation*}
-		\GGSW_{\glweSecretKey}(M) = \left \lbrace \left ( \GLWE_{\glweSecretKey}\left (-S_\alpha \cdot M \cdot \frac{q}{B^j} \right) \right )_{0 \le j < \levelDecomp} \right \rbrace_{0\le \alpha \le k+1}
+		\GGSW_{\glweSecretKey}(M) = \left \lbrace \left ( \GLWE_{\glweSecretKey}\left (-S_\alpha \cdot M \cdot \frac{q}{B^j} \right) \right )_{0 \le j < \levelDecomp} \right \rbrace_{0\le \alpha \le k}
 	\end{equation*}
 	
 	with $S_{k+1}$ fixed by convention to -1.
 \end{definition}
 
 
-These ciphertexts allow us to define an \textit{external product}. It is actually possible to multiply a $\GGSW$ ciphertext with a $\GLWE$ one to obtain another $\GLWE$:
+These ciphertexts allow us to define an \textit{external product}. It is actually possible to multiply a $\GGSW$ ciphertext with a $\GLWE$ one to obtain another $\GLWE$. We denote this operation by:
 
-\begin{definition}(External Product)
-	The \textit{External Product} $\boxdot$ is defined as:
-	\begin{align*}
-		\boxdot: & \GGSW \times \GLWE \rightarrow \GLWE\\
-		& (A, \vec b) \mapsto A \boxdot \vec b = TODO\\
-	\end{align*}
-\end{definition}
+\begin{equation*}
+		\boxdot: \GGSW \times \GLWE \rightarrow \GLWE
+\end{equation*}
 
 
 Algorithm \ref{alg:external_product} details this procedure:
@@ -419,74 +412,75 @@ Algorithm \ref{alg:external_product} details this procedure:
 \input{tex/algorithms/alg_external_product.tex}
 
 
-
-
 The line of work of \cite{chimera, AC:BCGGJ24} gives a nice mathematical overview of how these decompositions techniques can be interpreted as lifts from the $\Z$-module structure to the underlying ring. 
-\TODO{Etoffer ça}
 
+\TODO{Le key switching est un cas particulier d'un external product.}
 
+\TODO{Parler du bruit}
 
-\paragraph{CMUXes}
+\paragraph{CMUX}
 
 Beyond adding a new homomorphic capabilities in TFHE's arsenal, external products is more importantly the workhorse of the whole bootstrapping algorithm that we introduce in Section \ref{sec:pbs}. This is because it allows to construct a CMUX operation, defined like;
 
 \begin{definition}(CMUX)
-	Let $C_sel$ be a $\GGSW$ ciphertext encrypting a bit $b \in \B$. Let $C_0$ and $C_1$ be two $\GLWE$ ciphertexts. The CMUX operation allows to homomorphically select one of these two ciphertexts with respect to the value of the ``selector'' bit $b$ by computing:
+	Let $\mat C_{sel}$ be a $\GGSW$ ciphertext encrypting a bit $b \in \B$ (the \textit{selector}). Let $\vec C_0$ and $\vec C_1$ be two $\GLWE$ ciphertexts. The CMUX operation allows to homomorphically select one of these two ciphertexts with respect to the value of the ``selector'' bit $b$ by computing:
 	\begin{equation*}
-		C_b = C_sel \squarewithdot (C_1 - C_0) + C_0
+		\vec C_b = \mat C_{sel} \boxdot (\vec C_1 - \vec C_0) + \vec C_0
 	\end{equation*}
-	where $\squarewithdot$ denotes the external product, and $+$ the homomorphic sum of TFHE.
+	where $\boxdot$ denotes the external product, and $+$ the homomorphic sum of TFHE.
 \end{definition}
 
 
-\TODO{Ici mettre une figure}
+\begin{figure}
+	\centering
+	\singleCmux
+	\caption{Representation of a $\CMUX$ operator}
+	\label{fig:cmux}
+\end{figure}
 
-
-\TODO{ça permet de faire du VP}
+Informally, $\CMUX$ allows to homomophically select between two $\GLWE$ ciphertexts.
 
 
 \section{Programmable Bootstrapping}
 \label{sec:pbs}
 
 \subsection{An informal overview of the blind rotation}
+\label{sec:overview_blind_rotation}
 
-Recall Gentry's blueprint in Section \ref{sec:gentry_bootstrapping}. To be bootstrappable, a scheme requires to be able to evaluate its own decryption circuit using its homomorphic capabilities.
+Recall Gentry's blueprint introduced in Section \ref{sec:gentry_bootstrapping}. To be bootstrappable, a scheme requires to be able to evaluate its own decryption circuit using its homomorphic capabilities.
 
 In TFHE, for a $\LWE$ ciphertext $\vec c$ of form $(a_0, \dots, a_{n-1}, b)$, encrypted under a key $\lweSecretKey$, the decryption algorithm has two steps:
 \begin{itemize}
-	\item Computing the phase $\phi(\vec c) = b - \langle a, s \rangle$ (``the linear step'')
+	\item Computing the phase $\phi(\vec c) = b - \innerProduct{\vec a}{\lweSecretKey}$ (``the linear step'')
 	\item Rounding the phase to the closest plaintext value. (``the rounding step'')
 \end{itemize}
 
-Performing the first step homomorphically is quite simple to do (in fact, this is exactly what we do in the key-switching algorithm !). But performing the rounding is trickier. Actually, TFHE do both operations at once using an operation called \textit{Blind Rotation}, which is the core of TFHE's bootstrapping algorithm. 
+Performing the first step homomorphically is quite simple to do (in fact, this is exactly what we do in the key-switching algorithm !). But performing the rounding is trickier. Actually, TFHE do both operations at once using an operation called \textit{blind rotation}, which is the core of TFHE's bootstrapping algorithm. 
 
 Introduced in \cite{EC:DucMic15}, the blind rotation takes advantage of the particular structure of the ring $\glweRing$. To explain this algorithm, we start by have a closer look to this ring.
 
 
-\TODO{DISCLAIMER: in the following, we make some oversimplifications to introduce more easily and naturally the blind rotation operation. }
+\TODO{	DISCLAIMER: in the following, we make some oversimplifications to introduce more easily and naturally the blind rotation operation. In Section \ref{sec:pbs_algorithm}, we detail the actual full algorithm. 	}
 
 
 \paragraph{Fun with Rings}
 
-Let $v(X) = \sum_{i=0}^{N-1} v_i X^i$ be an element of the ring $\glweRing = \glweRingFull$, and let $\mu$ be an integer. Observe what happens when we multiply this polynomial with the monomial $X^{-\mu}$:
+Let $v(X) = \displaystyle \sum_{i=0}^{N-1} v_i X^i$ be an element of the ring $\glweRing = \glweRingFull$, and let $\mu$ be an integer. Observe what happens when we multiply this polynomial with the monomial $X^{-\mu}$:
 
 \begin{equation*}
 	X^{-\mu} \cdot v(X) = v_\mu + v_{\mu + 1} \cdot X + \dots + v_{n-1} X^{n-1-\mu} \textcolor{red}{-} v_0 X^{n - \mu} \textcolor{red}{-} \dots \textcolor{red}{-} v_{\mu - 1} X^{n-1}
 \end{equation*}
 
-For now, ignore the red minus signs. What we can take away from this is that the monomial multiplication simply performs a \textit{rotation} of the polynomial's coefficients. In the blind rotation, what we are really interested in is the degree-zero coefficient. If we want to rotate the polynomial such that the $\mu$-th coefficient is brought into the degree-zero one, we just have to multiply the polynomial by the monomial $X^{-\mu}$ !
+What we can take away from this is that the monomial multiplication simply performs a \textit{rotation} of the polynomial's coefficients (overlooking the red minus signs). In the blind rotation, what we are really interested in is the value of the degree-zero coefficient. If we want to rotate the polynomial such that the $\mu$-th coefficient is brought into the degree-zero one, we just have to multiply the polynomial by the monomial $X^{-\mu}$ !
 
-But there's a problem here. When the coefficients are ``sent to the other side '' of the polynomial, they get an extra minus sign. So actually, a multiplication by $X^N$ does not yield the initial polynomial, but rather the opposite one. To make a full lap, it requires to multiply instead by $X^{2N}$, because $X$ has order $2N$ in $\glweRing$. In the literature, this problem is referred to as \textit{the negacyclicity problem} and we dive deeper into it in Chapter \ref{chap:negacyclicity}.
+But there's a problem here. When the coefficients are ``sent to the other side '' of the polynomial, they get an extra minus sign. So actually, a multiplication by $X^N$ does not yield the initial polynomial, but rather the opposite one. To make a complete round trip, it requires to multiply instead by $X^{2N}$, because $X$ has order $2N$ in $\glweRing$. In the literature, this problem is referred to as \textit{the negacyclicity problem} and we dive deeper into it in Chapter \ref{chap:negacyclicity}.
 
-For now, we introduce blind rotation without the complexity induced by the negacyclicity problem. So, we assume that the exponent of the monomial lives in $\lbrace 0, \dots, N-1 \rbrace$. As we are only interested in the value in the degre-zero coefficient, we can safely overlook these minus signs.
+The goal here is to introduce blind rotation without the complexity induced by the negacyclicity problem. So for now, we assume that the exponent of the monomial lives in $\lbrace 0, \dots, N-1 \rbrace$. As we are only interested in the value in the degre-zero coefficient, we can safely overlook these minus signs as they can not reach it.
 
 \paragraph{Constructing a rounding function}
-How can we use this property to construct a rounding function ? Suppose we have a plaintext space $\plaintextRing$ and a ciphertext space $\lweRing$. Let $\vec c$ be  a $\LWE$ ciphertext, and $\phi(\vec c)$ its noisy phase produced by the linear step of the decryption algorithm. We want to round $\phi(\vec c)$ to the closest plaintext in $\plaintextRing$ to retrieve the message $m$.
+How can we use this property to construct a rounding function ? Suppose we have a plaintext space $\plaintextRing$ and a ciphertext space $\lweRing$. Let $\vec c$ be  a $\LWE$ ciphertext, and $\mu = \phi(\vec c) = m + e$ its noisy phase produced by the linear step of the decryption algorithm. We want to round $\mu$ to the closest plaintext in $\plaintextRing$ to retrieve the message $m$.
 
-To do so, we are going to use a specifically-crafted polynomial, called the \textit{accumulator polynomial} $acc(X)$. This polynomial is made of contiguous ``windows'' of size $\frac N p$ in which every coefficients are equal to each others. Coefficients of the window of index 0 have value 0, and so on. These windows are centered on the $p$ coefficients corresponding to the modswitched versions of the plaintext values.
-
-
-
+To do so, we are going to use a specifically tailored polynomial, called the \textit{accumulator polynomial} $\acc$. This polynomial is made of contiguous ``windows'' of size $\frac N p$ in which every coefficients are equal to each others. Coefficients of the window of index 0 have value 0, and so on. These windows are centered on the $p$ coefficients corresponding to the modswitched versions of the plaintext values. We illustrate such an accumulator on Figure \ref{fig:illustration_accumulator}.
 
 
 \begin{figure}[htbp]
@@ -494,7 +488,7 @@ To do so, we are going to use a specifically-crafted polynomial, called the \tex
 	\wrappedTorus{64}{4}{true} \\[1em] % Add some vertical space between them if necessary
 	\accumulator{4}{64}
 	\label{fig:illustration_accumulator}
-	\caption{Example of an accumulator polynomial with $p=4$ and $N=64$.}
+	\caption{Example of an accumulator polynomial with $p=4$ and $N=64$, to evaluate a simple rounding operation.}
 \end{figure}
 
 
@@ -506,15 +500,23 @@ Our rounding procedure takes three steps:
 	\item Extracting the degree-zero coefficient to retrieve $v_{\tilde \mu}$.
 \end{itemize}
 
-If the noise $\tilde e$ in $\tilde \mu$ is smaller than $\frac{N}{2p}$, we properly get $v_{\tilde \mu} = m$. 
+If the noise $\abs{\tilde e}$ in $\tilde \mu$ is smaller than $\frac{N}{2p}$, we properly get $v_{\tilde \mu} = m$. 
 
-This is the core idea of the bootstrapping algorithm. In the next section, we introduce its actual instantiation in the TFHE scheme.
+This is the core idea of the bootstrapping algorithm. But actually, the killer feature of TFHE is that you can transform this rounding operation into a look-up table evaluation ! This is why TFHE's bootstrapping is called \textit{programmable}.
+
+Imagine replacing the coefficient in the accumulator by the evaluation of a function $f:\plaintextRing \mapsto \plaintextRing$. 
+
+
+
+
+In the next section, we introduce its actual instantiation in the TFHE scheme, without the oversimplifications we made in this section.
 
 \subsection{The full algorithm}
+\label{sec:pbs_algorithm}
 
 TFHE's bootstrapping algorithm can be broken down into three steps: \ModSwitch, \BlindRotate~and \SampleExtract.
 
-We consider a $\LWE$ ciphertext $c = (a_0, \dots, a_{n-1}, b)$ that we want to bootstrap. It is encrypted under the $\LWE$ secret key $\lweSecretKey$. 
+We consider a $\LWE$ ciphertext $\vec c = (a_0, \dots, a_{n-1}, b)$ that we want to bootstrap. It is encrypted under the $\LWE$ secret key $\lweSecretKey$. 
 
 The server requires a \textit{bootstrapping key}, that we denote by $\BSK$, defined by:
 
@@ -527,9 +529,9 @@ where $\glweSecretKey$ is a $\GLWE$ secret key, of shape $(k, N)$.
 
 \paragraph{\ModSwitch:}
 
-$c$ lives in $\lweRing$, but the polynomial of the $\GLWE$ ring are of degree $N$. Recall from last section that we would like the exponent of the monomial used in \BlindRotate to live in $\Z_{2N}$.
+$c$ lives in $\lweRing$, but the polynomial of the $\GLWE$ ring are of degree $N$. Recall from last section that we would like the exponent of the monomial used in \BlindRotate to live in $\Z_{2N}$ (because $X$ has order $2N$ in $\glweRing$).
 
-Choosing directly $q = 2N$ is not practical: there is no way to construct a secure $\LWE$ instance with fast arithmetic with this constraint. So we need to switch the modulus of $c$ to produce a new vector $\tilde c$ living in the good space. This is simply done by computing:
+The simplest case would be to choose directly $q = 2N$. However it does not work in practice: there is no actual way to construct a secure $\LWE$ instance with fast arithmetic with this constraint. So we need to switch the modulus of $c$ to produce a new vector $\tilde c$ living in the right space. This is simply done by computing:
 
 \[
 	\forall~i \in \{0, \cdots, n-1\}, \tilde a_i = \modulo{\rounding{\frac{a_i \cdot 2N}{q}}}{2N} \text{ and: } \tilde b = \modulo{\rounding{\frac{b \cdot 2N}{q}}}{2N}
@@ -546,7 +548,7 @@ In the previous paragraph, we introduced the rationale behind blind rotation. We
 For now, we do not specify the actual formula of the accumulator. Several possibilities exist and depend of the countermeasure against the negacyclicity problem chosen. We elaborate further on the composition of this polynomial in Chapter \ref{chap:negacyclicity}.
 
 
-How do we compute this phase homomorphically ? Recall that $\tilde \mu = \tilde b - \sum_{i=0}^{n-1} \tilde a_i \cdot s_i$. For this, we use a \textit{chain of CMUXes}.
+How do we compute the product $X^{-\tilde \mu} \cdot \acc$ homomorphically ? Recall that $\tilde \mu = \tilde b - \innerProduct{\tilde{\vec a}}{\lweSecretKey}$. This operation can be carried out by \textit{a chain of $\CMUX$}.
 
 
 This idea comes naturally if we rewrite the expression of the monomial $X^{-\tilde \mu}$ as:
@@ -564,14 +566,14 @@ This leads to this natural algorithm:
 
 \input{tex/algorithms/alg_blindrotate.tex}
 
-\TODO{Fixer la figure ci dessus}
+\TODO{Fixer la figure de la chaine}
 
-\begin{figure}
-	\centering
-	\cmuxScratchpad
-	\caption{coucou}
-	\label{fig:cmux}
-\end{figure}
+%\begin{figure}
+%	\centering
+%	\cmuxScratchpad
+%	\caption{coucou}
+%	\label{fig:cmux}
+%\end{figure}
 
 
 \BlindRotate outputs a $\GLWE$ ciphertext encrypting the rotated accumulator under the $\GLWE$ key $\glweSecretKey$. The degree-zero coefficient of this polynomial encodes the rounded message. The problem is that we started with a $\LWE$ ciphertext, so if we want to chain bootstrappings we need to come back to $\LWE$ encryption.
@@ -584,8 +586,34 @@ This is done in two steps: the $\SampleExtract$ that we introduce in the followi
 
 The $\SampleExtract$ takes as input a $\GLWE$ ciphertext and extracts the degree-zero polynomial into a $\LWE$ ciphertext whose key is a \textit{flattened} version of the $\GLWE$ one. 
 
+\begin{definition} (Flattened $\GLWE$ key)
+	Let $\glweSecretKey = \left ( S_0 = \sum_{j=0}^{N-1} s_{0, j} X^j, \dots,  S_{k-1} = \sum_{j=0}^{N-1} s_{k-1, j} X^j\right ) \in \glweRing^k$. The \textit{flattenened} version of this key is a $\LWE$ secret key:
+	\[
+		\lweSecretKey =  (\bar s_0, \dots, \bar s_{kN-1}) \in \lweRing^{kN}
+	\] 
+	
+	such that $\bar s_{iN + j} = s_{i, j}$ for $0 \le i < k$ and $0 \le j < N$.
+\end{definition}
 
-\TODO{Finir ça}
+$\SampleExtract$ is actually as a simple rearrangement of the coefficients of the ciphertext: its computational cost is negligible and it does not add any noise in the ciphertexts.
+
+\TODO{Copier l'algo de Samuel}
+
+
+After its execution, we now have a $\LWE$ ciphertext but with smaller noise than the input. Now, we can closing the loop by coming back to the original key with a simple $\LWE$-to$\LWE$ keyswitching.
+
+
+\TODO{elaborate}
+
+
+
+
+
+\section{Performances of the PBS}
+\label{sec:pbs_performances}
+
+
+
 
 
 

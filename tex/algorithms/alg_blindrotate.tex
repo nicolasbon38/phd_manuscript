@@ -5,7 +5,7 @@
 		$\left\{
 		\begin{array}{l}
 			f: \Z_p \mapsto \Z_p \text{: a function on the plaintext space.}\\
-			acc(X) \in \glweRing \text{: an accumulator polynomial encoding the function } $f$.
+			\acc \in \glweRing \text{: an accumulator polynomial encoding the function } $f$.
 		\end{array}
 		\right.$
 	}
@@ -13,14 +13,14 @@
 	\KwIn{
 		$\left\{
 		\begin{array}{l}
-			\tilde c \text{: a modswitched $\LWE$ ciphertext}\\
+			\vec{\tilde c} \in \Z_{2N}^{n+1} \text{: a modswitched $\LWE$ ciphertext}\\
 			\BSK = \left \lbrace \GGSW_{\glweSecretKey}(s_i) \right \rbrace_{0 \le i < n}
 		\end{array}
 		\right.$
 	}
 	
 	\KwResult{
-		$C_{\textsf{out}} = GLWE_{\glweSecretKey}(acc(X) \cdot X^{-m})$
+		$\vec c_{\textsf{out}} = \GLWE_{\glweSecretKey}(acc(X) \cdot X^{-m})$
 	}
 	
 	
@@ -29,7 +29,7 @@
 	\hrule
 	\vspace{0.5em} % adjust the space as needed
 	
-	$C_{\textsf{out}} \gets \TrivialGLWE(acc(X) \cdot X^{-\tilde b})$\\
+	$C_{\textsf{out}} \gets \TrivialGLWE(\acc \cdot X^{-\tilde b})$\\
 	\For{$i \in \lbrace 0, \dots, n-1 \rbrace$}{
 		$C_{\textsf{out}} \gets \CMUX(C_{\textsf{out}}, X^{a_i} \cdot C_{\textsf{out}}, \BSK_i)$	
 	}

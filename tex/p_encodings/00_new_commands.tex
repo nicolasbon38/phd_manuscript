@@ -1,0 +1,19 @@
+\newcommand{\T}{\mathbb{T}}
+\newcommand{\B}{\mathbb{B}}
+\newcommand{\drawfrom}{\overset{\$}{\leftarrow}}
+\newcommand{\rounding}[1]{\left \lfloor #1 \right \rceil}
+\newcommand{\modulo}[2]{\left [ #1 \right ]_{#2}}
+\newcommand{\customnorm}[1]{\left \lVert #1 \right \rVert}
+
+\newcommand{\Encoding}{\mathcal{E}}
+\newcommand{\EncDef}[2]{\begin{cases} 0 \mapsto #1 \\ 1 \mapsto #2 \end{cases}}
+\newcommand{\EncDefZero}[1]{\begin{cases} 0 \mapsto #1 \\ 1 \mapsto \{0\} \end{cases}}
+\newcommand{\EncDefOne}[1]{\begin{cases} 0 \mapsto \{0\} \\ 1 \mapsto \{#1\} \end{cases}}
+
+\newcommand{\GroupP}{\langle \mathbb Z_p ; + \rangle}
+
+% commentaires
+\def\TODO#1{\todo[inline, color=orange!30]{\textbf{TODO:} #1}}
+\def\MR#1{\todo[inline, color=blue!15]{\textbf{Matthieu:} #1}}
+\def\DP#1{\todo[inline, color=red!15]{\textbf{David:} #1}}
+\def\NB#1{\todo[inline, color=yellow!15]{\textbf{Nicolas:} #1}}

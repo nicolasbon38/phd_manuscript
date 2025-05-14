@@ -1,0 +1,33 @@
+% !TeX_ROOT=../../thesis.tex
+
+\begin{comment}
+\section{Introduction}
+
+Homomorphic encryption (HE) is a cryptographic technique allowing the computation of operations on encrypted messages (which directly reflect on the original messages once decrypted), using only knowledge of public data. For example, an additive homomorphic encryption scheme is able to encrypt two messages $m_1$ and $m_2$ in ciphertexts $c_1$ and $c_2$ and to compute a third ciphertext $c_3$ from $c_1$ and $c_2$ that encrypts the sum $m_1 + m_2$, without knowledge of the secret key. 
+
+The security of these schemes typically relies on a small \emph{noise} introduced in the data when encrypting. The problem arising is that this noise is growing while homomorphic computations are carried out, which bury the original data into the noise and makes it unrecoverable at decryption. In 2009, Gentry \cite{gentry} introduced the operation of \emph{bootstrapping} to solve this problem. This operation resets the noise at a nominal level \emph{without decryption} allowing a potentially infinite amount of operations, making the construction of a scheme achieving \emph{Fully Homomorphic Encryption} (FHE) possible. This operation being extremely heavy and slow, it is considered as the main bottleneck for the development of schemes efficient enough to be used in practice.
+
+
+Currently, the most popular schemes in the FHE ecosystem are lattice-based and rely on the hardness of the Learning With Errors assumption \cite{Regev-LWE} and/or its ring variant  \RLWE \cite{EC:LyuPeiReg10}.  BFV \cite{C:Brakerski12}, BGV \cite{ITCS:BraGenVai12} and CKKS \cite{AC:CKKS17} are \emph{leveled} schemes, which means that they keep track of the ``level'' of noise in the data during the homomorphic evaluation. As soon as this level reaches a critical bound, no more computations can be performed. Some recent works (see e.g. \cite{EC:CHKKS18}, \cite{EC:CheChiSon19}, \cite{boostrap_ckks3}) propose a bootstrapping operation for these schemes to overcome this limit in the future. On the other hand, TFHE \cite{cryptoeprint:2018/421} is built on top of a powerful bootstrapping technique known to currently be the most efficient but limiting the precision of encrypted data.
+
+
+Each FHE scheme offers a set of basic homomorphic operations that can be used to build more complex algorithms. In general, these operations are homomorphic additions and multiplications, however some complex operations cannot be constructed only with these operations. TFHE offers homomorphic additions and multiplications by a plaintext as well, but its force lies in its operation of \emph{programmable bootstrapping} allowing the evaluation of encrypted look-up tables (LUT) while resetting the noise level. However, for performance issues, these look-up tables can only handle a small amount of bits as input (around 8 bits maximum) so the scheme is best suited for applications requiring a small precision.
+
+In particular, TFHE is the best option to evaluate Boolean circuits with encrypted inputs, but the performances of the existing frameworks are still limited. In \cite{cryptoeprint:2018/421}, the authors propose a strategy to evaluate Boolean functions called the \emph{gate bootstrapping}, in which they perform one bootstrapping for each bivariate Boolean gate of the underlying circuit. As a consequence, the conversion of the original Boolean circuit in a homomorphic circuit handling encrypted bits is straightforward, moreover the noise growth is contained thanks to the systematic use of bootstrapping. However, this approach is very expensive due to the high numbers of bootstrappings and makes it highly suboptimal for large circuits.
+
+The authors of \cite{AC:CLOT21} propose a different approach: by leveraging a newer version of the TFHE scheme supporting a new operation named \emph{TLWE ciphertexts multiplication}, Boolean circuits are evaluated with homomorphic sums for \texttt{XOR} gates and this new multiplication operation for \texttt{AND} gates. While this approach is clearly a progress from the vanilla framework, we note that a few bootstrappings are still required to control the noise growth and that this new operation of TLWE multiplications remains costly both in terms of performances and in terms of noise. Thus, we choose to stick to the first version of the TFHE scheme (while slightly modifying it) to keep the framework lighter and we tackle the performance issues of \cite{cryptoeprint:2018/421} with a different approach than the one of \cite{AC:CLOT21}.
+
+Our work introduces a new framework to homomorphically evaluate Boolean functions on encrypted data efficiently, i.e. by reducing the amount of necessary bootstrappings. Our approach introduces an \emph{intermediate homomorphic layer} which encodes bits on a small ring $\mathbb{Z}_p$ before encrypting them. This allows us to evaluate Boolean functions with one cheap homomorphic sum followed by one bootstrapping. After formalizing the underlying concept of $p$-\emph{encoding} and explaining our evaluation strategy, we investigate the issue of finding valid sets of encodings for a Boolean function. We characterize this problem and provide an exact constructive algorithm to solve it. We further provide a sieving heuristic finding solutions more efficiently but at the cost of loosing optimally. Since our method is only efficient for Boolean functions with limited number of inputs, we also propose a heuristic to decompose any Boolean circuit into Boolean functions which are efficiently evaluable using our approach. Finally, we apply our technique to various cryptographic primitives, namely the SIMON block cipher, the Trivium stream cipher, the Keccak permutation, the Ascon s-box and the AES s-box. Compared to previous works implementing the same primitives (for SIMON, Trivium and AES) our implementations achieve significant speedups.
+
+After some technical preliminaries on TFHE (Section \ref{sec:preliminaries}), we introduce a new concept of \emph{intermediate homomorphic layer} and explain how bits are encoded  in Section \ref{sec:homorphic_layer} and the algorithms to construct it in Sections \ref{sec:search}, \ref{sec:graphs}. Finally, we describe our modifications of the TFHE scheme in Section \ref{sec:TFHE_adaptation} and our experimental results in Section \ref{sec:implementations}.
+\end{comment}
+
+\TODO{Remanier l'introduction}
+
+
+
+
+
+
+
+

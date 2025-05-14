@@ -1,0 +1,13 @@
+\section{Conclusion}
+
+In this paper, we have proposed a new strategy to evaluate Boolean functions homomorphically using TFHE. Our technique relies on constructing an intermediate homomorphic layer between the Boolean space $\B$ of the plaintexts and the torus $\T_q$ on which ciphertexts live. We introduced a formal model for our technique and detailed algorithms to efficiently construct such layers and select appropriate parameters. We further extended our strategy to the case of arbitrary Boolean circuits by developing some heuristic to decompose a circuit into Boolean functions efficiently evaluable with our framework. We applied our framework to various cryptographic primitives, in particular to the challenging AES cipher. All the reported implementations outperform the state of the art. 
+
+We are currently working on a generalization of the ideas developed in this paper to the arithmetic case. We would also like to experiment with some more sophisticated bootstrapping techniques, such that the multi-value bootstrapping introduced in \cite{MVB} that would allow to evaluate several gadgets at once. Moreover, future work may be focused on the search algorithm (thet can probably be enhanced to scale better with the arity of the input function). Finally, more work on the efficient decomposition of Boolean circuits would be welcome: especially if one wants to evaluate deeper circuits.
+
+
+\section{Acknowledgment}
+
+This work was supported by the France 2030 ANR Project ANR-22-PECY-003 SecureCompute and by the ANR Project ANR-21-CE39-0012-06 SWAP.
+
+The authors would like to thank Sonia Belaïd for her precious help. Also, they thank Pascal Pailler and Samuel Tap for fruitful discussions about this work, as well as the developers of \texttt{tfhe-rs} for this awesome tool to develop FHE in practice.
+

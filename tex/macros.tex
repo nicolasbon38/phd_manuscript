@@ -4,6 +4,10 @@
 \newcommand{\Question}[1]{\todo[inline, color=red!30]{\textbf{Question:} #1}}
 
 
+% Setting bold for vectors
+\let\vec\mathbf
+%Setting \mathcal font for matrices
+\let\mat\mathcal
 
 % Classical Spaces
 \newcommand{\B}{\mathbb{B}}
@@ -27,7 +31,8 @@
 \newcommand{\rounding}[1]{\left \lfloor #1 \right \rceil}
 \newcommand{\modulo}[2]{\left [ #1 \right ]_{#2}}
 \newcommand{\drawfrom}{\overset{\$}{\leftarrow}}
-
+\newcommand{\innerProduct}[2]{\left \langle #1, #2 \right \rangle}
+\newcommand{\abs}[1]{\left \lvert #1 \right \rvert}
 
 
 % TFHE-specific notations
@@ -43,6 +48,7 @@
 \newcommand{\BSK}{\textsf{BSK}} 
 \newcommand{\KSK}{\textsf{KSK}} 
 % TODO : trouver une otation pl^us jolie pour BSK
+\newcommand{\acc}{\textsf{acc}(X)}
 
 
 %TFHE homomorphic operations
@@ -52,7 +58,6 @@
 \newcommand{\sumTFHEQuad}[4]{\texttt{SumTFHE}(#1, #2, #3, #4)}
 \newcommand{\clearMultTFHE}[2]{\texttt{ClearMultTFHE}(#1, #2)}
 
-\newcommand{\squarewithdot}{\tikz[baseline=-0.5ex]\draw (0,0) rectangle (0.3,0.3) (0.15,0.15) circle (0.05);}
 
 % Bootstrapping operations
 \newcommand{\ModSwitch}{\texttt{ModSwitch}}
