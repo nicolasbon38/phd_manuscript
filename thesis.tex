@@ -23,7 +23,8 @@
 \usepackage{xstring}
 \usepackage{xcolor}
 \usepackage[rgb]{xcolor}
-\usetikzlibrary{arrows.meta, positioning, fit}
+\usepackage{xparse} % for double default arguments in macros
+\usetikzlibrary{arrows.meta, positioning, fit, calc}
 
 
 \usepackage[algo2e]{algorithm2e} % for algorithms
@@ -135,6 +136,7 @@
 
 
 \chapter{Accelerating large look-up tables}
+\label{chap:larger_lut}
 
 
 \chapter{Practical solution to the problem of parameter selection}

@@ -14,15 +14,15 @@
 	\node at (\xBlock + 0.5 * \widthRectangle, \yBlock + 0.5 * \heightRectangle) {$\CMUX$};
 	
 	% Input arrows
-	\draw[->] (\x , \y + 3 * \heightRectangle / 4) -- ++(\lengthArrowLeft, 0) node[midway, above] {\labelTop};
-	\draw[->] (\x, \y + \heightRectangle / 4) -- ++(\lengthArrowLeft, 0) node[midway, below] {\labelBottom};
+	\draw[->] (\x , \y + 3 * \heightRectangle / 4) -- ++(\lengthArrowLeft, 0) node[midway, above] {\small \labelTop};
+	\draw[->] (\x, \y + \heightRectangle / 4) -- ++(\lengthArrowLeft, 0) node[midway, below] {\small \labelBottom};
 	
 	% Output arrow
-	\draw[->] (\xBlock + \widthRectangle, \y + \heightRectangle / 2) -- ++(\lengthArrowRight, 0) node[midway, above] {\labelOutput};
+	\draw[->] (\xBlock + \widthRectangle, \y + \heightRectangle / 2) -- ++(\lengthArrowRight, 0) node[midway, above] {\small \labelOutput};
 	
 	% Selector arrow
 	\draw[->] (\xBlock + \widthRectangle / 2, \yBlock + \heightRectangle + \lengthArrowTop) -- ++(0, -\lengthArrowTop);
-	\node at (\xBlock + \widthRectangle / 2 , \yBlock + \heightRectangle + \lengthArrowTop + 0.3) {\labelSelector};
+	\node at (\xBlock + \widthRectangle / 2 , \yBlock + \heightRectangle + \lengthArrowTop + 0.3) {\small \labelSelector};
 }
 
 % Parse seven comma-separated numbers
@@ -48,36 +48,39 @@
 
 
 
-%\newcommand{\cmuxChain}[2]{ % N CMUXes left, lengthArrow
-%	\pgfmathsetmacro{\n}{#1}
-%	\pgfmathsetmacro{\nMinusOne}{int(\n - 1)}
-%	\pgfmathsetmacro{\lengthArrow}{#2}
-%	
-%	\pgfmathsetmacro{\widthPattern}{1.5 * \lengthArrow + \widthRectangle}
-%	
-%	\draw[->] (-\lengthArrow, \heightRectangle / 4) -- ++(\lengthArrow, 0) node[midway, below] {$X^{a_0} \cdot acc(X)$};
-%	\foreach \i in {0,...,\numexpr\n - 2}{
-%		\cmuxBlock{\i * \widthPattern}{0}{\lengthArrow}{$\GGSW(s_\i)$}{true}{$acc(X)$}{$X^{a_\i \cdot s_\i} \cdot acc(X)$}
-%	}
-%	\cmuxBlock{(\n - 1) * \widthPattern}{0}{\lengthArrow}{$\GGSW(s_{\nMinusOne})$}{false}{$acc(X)$}{$X^{a_\i} \cdot acc(X)$}
-%	
-%	
-%	\pgfmathsetmacro{\xDots}{\n * (\widthRectangle + 2 * \lengthArrow)}
-%	\node at (\xDots, \heightRectangle / 2) {\huge $\dots$};
-%	
-%	
-%	\draw[->] (\xDots + \lengthArrow, \heightRectangle / 4) -- ++(\lengthArrow, 0);
-%	\cmuxBlock{\xDots + 2 * \lengthArrow}{0}{\lengthArrow}{$\GGSW(s_{n-1})$}{false}{$acc(X)$}{$X^{a_\i} \cdot acc(X)$}
-%}
-%
-%
-%
-%
-%\newcommand{\cmuxScratchpad}{
-%	\begin{tikzpicture}
-%		\cmuxChain{2}{1.8}
-%	\end{tikzpicture}
-%}
+\newcommand{\cmuxChain}{
+	\pgfmathsetmacro{\x}{0}
+	\pgfmathsetmacro{\y}{0}
+	\pgfmathsetmacro{\widthRectangle}{1}
+	\pgfmathsetmacro{\heightRectangle}{2}
+	\pgfmathsetmacro{\lengthArrowLeft}{3.2}
+	\pgfmathsetmacro{\lengthArrowRight}{1}
+	\pgfmathsetmacro{\lengthArrowTop}{0.5}
+	
+	\pgfmathsetmacro{\widthPattern}{\lengthArrowLeft + \widthRectangle + \lengthArrowRight}
+	
+	% First block
+	\cmuxBlock{\x,\y,\widthRectangle,\heightRectangle,\lengthArrowLeft, \lengthArrowRight, \lengthArrowTop}{{$X^{b - a_0} \cdot \acc$},{$X^b \cdot \acc$},{},{$\GGSW(s_0)$}}
+	% Increment the variable
+	\pgfmathparse{\x+\widthPattern}
+	\xdef\x{\pgfmathresult}
+	% Draw the connection
+	\draw (\x, \y + \heightRectangle/2) -- ++(0, - \heightRectangle/4);
+	
+	
+	% Second block
+	\cmuxBlock{\x,\y,\widthRectangle,\heightRectangle,\lengthArrowLeft, \lengthArrowLeft + 0.5, \lengthArrowTop}{{$X^{b - a_0 \cdot s_0 - a_1} \cdot \acc$},{$X^{b - a_0 \cdot s_0} \cdot \acc$},{$X^{b - a_0 \cdot s_0 - a_1 \cdot s_1} \cdot \acc$},{$\GGSW(s_1)$}}
+	
+	% Increment the variable
+	\pgfmathparse{\x+\widthPattern + \lengthArrowRight - 0.5}
+	\xdef\x{\pgfmathresult}
+	
+	\node at (\x, \y + \heightRectangle / 2) {\LARGE $[...]$};
+	
+}
+
+
+
 
 
 
@@ -85,5 +88,12 @@
 \newcommand{\singleCmux}{
 	\begin{tikzpicture}
 		\cmuxBlock{0,0,1,2,3,3,1}{{$\vec C_0 = \GLWE(M_0)$},{$\vec C_1 = \GLWE(M_1)$},{$\vec C_b = \GLWE(M_b)$},{$\mat C_{sel} = \GGSW(b)$}} %(x, y, widthRectangle, heightRectangle, lengthArrrowLeft, lengthArrowRight, lengthArrowTop) (labels top, bottom, output, selector)
+	\end{tikzpicture}
+}
+
+
+\newcommand{\blindRotatePicture}{
+	\begin{tikzpicture}
+		\cmuxChain
 	\end{tikzpicture}
 }

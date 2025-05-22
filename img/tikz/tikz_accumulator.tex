@@ -1,11 +1,13 @@
 
 
 
-\newcommand{\accumulator}[2]{% (p, N)
+\newcommand{\accumulator}[3]{% (p, N, with_f)
 	\pgfmathsetmacro{\p}{#1}
 	\pgfmathsetmacro{\N}{#2}
+	\def\withf{#3}
 	\begin{tikzpicture}[x=1cm]
-		\def\boxwidth{4cm}
+
+		\def\boxwidth{4.2cm}
 		
 		% first half sector
 		\pgfmathsetmacro{\start}{0}
@@ -20,16 +22,28 @@
 		\definecolor{mycolor}{hsb}{\hue,1,1}
 		
 
+		\ifthenelse{\equal{\withf}{true}}{
+			\node[
+			draw,
+			fill=mycolor!50,
+			inner xsep=2pt, inner ysep=2pt,
+			text width=\boxwidth / 2,
+			align=center,
+			anchor=west
+			] at (0.5*\boxwidth, 0)
+			{\small $\dots + f(0) X^{\endval}$};
+		}{
+			\node[
+			draw,
+			fill=mycolor!50,
+			inner xsep=2pt, inner ysep=2pt,
+			text width=\boxwidth / 2,
+			align=center,
+			anchor=west
+			] at (0.5*\boxwidth, 0)
+			{$\dots + 0 \cdot X^{\endval}$};
+		}
 		
-		\node[
-		draw,
-		fill=mycolor!50,
-		inner xsep=2pt, inner ysep=2pt,
-		text width=\boxwidth / 2,
-		align=center,
-		anchor=west
-		] at (0.5*\boxwidth, 0)
-		{$\dots + 0 \cdot X^{\endval}$};
 				
 		
 		
@@ -46,15 +60,27 @@
 			% Set HSB color
 			\definecolor{mycolor}{hsb}{\hue,1,1}
 			
-			\node[
-			draw,
-			fill=mycolor!50,
-			inner xsep=2pt, inner ysep=2pt,
-			text width=\boxwidth,
-			align=center,
-			anchor=west
-			] at ({\i*\boxwidth}, 0)
-			{$ \i \cdot X^{\start} + \dots + \i \cdot X^{\endval}$};
+			\ifthenelse{\equal{\withf}{true}}{
+				\node[
+				draw,
+				fill=mycolor!50,
+				inner xsep=2pt, inner ysep=2pt,
+				text width=\boxwidth,
+				align=center,
+				anchor=west
+				] at ({\i*\boxwidth}, 0)
+				{\small $ f(\i) X^{\start} + \dots + f(\i) X^{\endval}$};
+			}{
+						\node[
+					draw,
+					fill=mycolor!50,
+					inner xsep=2pt, inner ysep=2pt,
+					text width=\boxwidth,
+					align=center,
+					anchor=west
+					] at ({\i*\boxwidth}, 0)
+					{$ \i \cdot X^{\start} + \dots + \i \cdot X^{\endval}$};
+			}
 		}
 		
 		% Last half sector
@@ -69,16 +95,27 @@
 		% Set HSB color
 		\definecolor{mycolor}{hsb}{\hue,1,1}
 		
-		
-		\node[
-		draw,
-		fill=mycolor!50,
-		inner xsep=2pt, inner ysep=2pt,
-		text width=\boxwidth / 2,
-		align=center,
-		anchor=west
-		] at ({\p*\boxwidth}, 0)
-		{$0 \cdot X^{\start} + \dots$};
+		\ifthenelse{\equal{\withf}{true}}{
+			\node[
+			draw,
+			fill=mycolor!50,
+			inner xsep=2pt, inner ysep=2pt,
+			text width=\boxwidth / 2,
+			align=center,
+			anchor=west
+			] at ({\p*\boxwidth}, 0)
+			{\small $f(0) X^{\start} + \dots$};
+		}{
+					\node[
+			draw,
+			fill=mycolor!50,
+			inner xsep=2pt, inner ysep=2pt,
+			text width=\boxwidth / 2,
+			align=center,
+			anchor=west
+			] at ({\p*\boxwidth}, 0)
+			{$0 \cdot X^{\start} + \dots$};
+		}
 		
 		
 	\end{tikzpicture}

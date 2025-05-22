@@ -1,28 +1,28 @@
 \begin{algorithm}
-	\caption{\texttt{PackingKeySwitch}}
+	\caption{$\PackingKeySwitch$}
 	\label{alg:packing_keyswitching}
 	\KwContext{
 		$\left\{
-		\begin{array}{l}
-			\lweSecretKey \text{: the input $\LWE$ secret key}\\
-			\lweSecretKey' \text{: the output $\LWE$ secret key}\\
-			\levelDecomp \text{: the level of the decomposition}\\
-			\baseDecomp \text{: the base of the decomposition}
-		\end{array}
+		\begin{aligned}
+			&\lweSecretKey \text{: the input $\LWE$ secret key}\\
+			&\glweSecretKey' \text{: the output $\GLWE$ secret key}\\
+			&\levelDecomp \text{: the level of the decomposition}\\
+			&\baseDecomp \text{: the base of the decomposition}
+		\end{aligned}
 		\right.$
 	}
 	
 	\KwIn{
 		$\left\{
-		\begin{array}{l}
-			\left \lbrace c_i = \LWE_{\lweSecretKey}(m_i) \right \rbrace_{0 \le i < \alpha} \text{: a list of $ \alpha~\LWE$ ciphertexts to be packed} \\
-			\KSK = \left\{ \left( \LWE_{\lweSecretKey'} (s_i \cdot \baseDecomp^0), \dots, \LWE_{\lweSecretKey'} (s_i \cdot \baseDecomp^{\levelDecomp-1}) \right) \right\}_{0 \le i < n} \text{: the keyswitching key}
-		\end{array}
+		\begin{aligned}
+			&\left \lbrace \vec c_i = \LWE_{\lweSecretKey}(m_i) \right \rbrace_{0 \le i < \alpha} \text{: a list of $ \alpha~\LWE$ ciphertexts to be packed, with $\alpha \le N$} \\
+			&\KSK = \left\{ \left( \GLWE_{\glweSecretKey'} (s_i \cdot \baseDecomp^0), \dots, \GLWE_{\glweSecretKey'} (s_i \cdot \baseDecomp^{\levelDecomp-1}) \right) \right\}_{0 \le i < n} \text{: the keyswitching key}
+		\end{aligned}
 		\right.$
 	}
 	
 	\KwResult{
-		$C_{\textsf{out}}$ \text{: a $\GLWE$ ciphertext encrypting the list of messages $\lbrace m_i \rbrace_{0 \le i < \alpha}$}
+		$\vec C_{\textsf{out}}$ \text{: a $\GLWE$ ciphertext encrypting the list of messages $\lbrace m_i \rbrace_{0 \le i < \alpha}$}
 	}
 	
 	
@@ -31,11 +31,11 @@
 	\hrule
 	\vspace{0.5em} % adjust the space as needed
 	
-	$C_{\textsf{out}} \gets 0$
+	$\vec C_{\textsf{out}} \gets 0$\\
 	\For{$k \in \lbrace 0, \dots, \alpha-1 \rbrace$}{
-		$C_{k} \gets \texttt{Keyswitch}(c_k, \KSK)$\\
-		$C_{\textsf{out}} \gets C_{\textsf{out}} + X^k \cdot C_{k}$
+		$\vec C_{k}' \gets \KeySwitch(\vec c_k, \KSK)$\\
+		$\vec C_{\textsf{out}} \gets \vec C_{\textsf{out}} + X^k \cdot \vec C_{k}'$
 	}
 	
-	\Return{$C_{\textsf{out}}$}	
+	\Return{$\vec C_{\textsf{out}}$}	
 \end{algorithm}

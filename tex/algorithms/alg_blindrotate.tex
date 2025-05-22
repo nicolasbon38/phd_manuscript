@@ -1,26 +1,28 @@
 \begin{algorithm}
-	\caption{\texttt{BlindRotate}}
+	\caption{$\BlindRotate$}
 	\label{alg:blind_rotate}
 	\KwContext{
 		$\left\{
-		\begin{array}{l}
-			f: \Z_p \mapsto \Z_p \text{: a function on the plaintext space.}\\
-			\acc \in \glweRing \text{: an accumulator polynomial encoding the function } $f$.
-		\end{array}
+		\begin{aligned}
+			&\lweSecretKey \textit{: a $\LWE$ secret key}\\
+			&\glweSecretKey \textit{: a $\GLWE$ secret key}\\
+			&f: \Z_p \mapsto \Z_p \text{: a function on the plaintext space.}\\
+			&\acc \in \glweRing \text{: an accumulator polynomial encoding the function $f$}.
+		\end{aligned}
 		\right.$
 	}
 	
 	\KwIn{
 		$\left\{
-		\begin{array}{l}
-			\vec{\tilde c} \in \Z_{2N}^{n+1} \text{: a modswitched $\LWE$ ciphertext}\\
-			\BSK = \left \lbrace \GGSW_{\glweSecretKey}(s_i) \right \rbrace_{0 \le i < n}
-		\end{array}
+		\begin{aligned}
+			&\vec{\tilde c} = (\tilde a_0, \dots, \tilde a_{n-1}, b) \in \Z_{2N}^{n+1} \text{: a modswitched $\LWE$ ciphertext, with $\tilde \mu = \tilde b - \innerProduct{\vec{\tilde a}}{\lweSecretKey}$}\\
+			&\BSK = \left \lbrace \GGSW_{\glweSecretKey'}(s_i) \right \rbrace_{0 \le i < n}
+		\end{aligned}
 		\right.$
 	}
 	
 	\KwResult{
-		$\vec c_{\textsf{out}} = \GLWE_{\glweSecretKey}(acc(X) \cdot X^{-m})$
+		$\vec c_{\textsf{out}} = \GLWE_{\glweSecretKey'}(X^{\tilde \mu} \cdot \acc)$
 	}
 	
 	
@@ -29,10 +31,10 @@
 	\hrule
 	\vspace{0.5em} % adjust the space as needed
 	
-	$C_{\textsf{out}} \gets \TrivialGLWE(\acc \cdot X^{-\tilde b})$\\
+	$\vec C_{\textsf{out}} \gets \TrivialGLWE(\acc \cdot X^{-\tilde b})$\\
 	\For{$i \in \lbrace 0, \dots, n-1 \rbrace$}{
-		$C_{\textsf{out}} \gets \CMUX(C_{\textsf{out}}, X^{a_i} \cdot C_{\textsf{out}}, \BSK_i)$	
+		$\vec C_{\textsf{out}} \gets \CMUX(\vec C_{\textsf{out}}, X^{\tilde a_i} \cdot \vec C_{\textsf{out}}, \BSK_i)$	
 	}
 	
-	\Return{$C_{\textsf{out}}$}	
+	\Return{$\vec C_{\textsf{out}}$}	
 \end{algorithm}

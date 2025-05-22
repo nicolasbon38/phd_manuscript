@@ -1,0 +1,92 @@
+
+
+% TikZ gauge macro
+\NewDocumentCommand{\verticalgauge}{O{0.3} O{4} m}{%
+	% #1 = scale, #2 = height, #3 = level (0–100)
+	\begin{tikzpicture}[scale=#1]
+		\def\gaugewidth{1}
+		\def\gaugeheight{#2}
+		\pgfmathsetmacro\level{#3}
+		
+		% Normalized RGB [0,1]
+
+	 % Compute RGB manually based on piecewise logic
+	\pgfmathsetmacro\rval{
+		\level < 20 ? 0 :
+		(\level < 80 ? (\level - 20)/60 * 100: 100)
+	}
+	\pgfmathsetmacro\bval{
+		\level < 20 ? 100 :
+		(\level < 80 ? (80 - \level)/60 * 100 : 0)
+	}
+	
+		\pgfmathsetmacro\fillheight{\level/100 * \gaugeheight}
+		
+		% Draw outline
+		\draw[thick] (0,0) rectangle (\gaugewidth,\gaugeheight);
+		
+		% Draw fill with dynamic color
+		\fill[opacity=0.7, red!\rval!blue] (0,0) rectangle (\gaugewidth,\fillheight);
+		
+		% Optional ticks
+		\foreach \y in {0,0.25,...,1} {
+			\draw (-0.4,\gaugeheight*\y) -- (0,\gaugeheight*\y);
+		}
+		
+%		 DEBUG: print RGB values
+%		 \node at (0.5, \gaugeheight + 0.3) {\tiny R=\rval, B=\bval};
+		
+	\end{tikzpicture}%
+}
+
+
+
+
+% Custom command to place a slash and label on an arrow
+\newcommand{\arrowlabel}[4]{%
+	\draw[thick] ($(#1)!0.5!(#2) + (0,-0.2)$) -- ++(0.2,0.4);
+	\node[rotate=45] at ($(#1)!0.5!(#2) + (0.5, 0.9)$) {#3};
+	\node at ($(#1)!0.5!(#2) + (0, -1)$) {#4};
+}
+
+\begin{tikzpicture}[
+	block/.style={draw, rectangle, minimum width=2cm, minimum height=1cm, align=center},
+	wire/.style={->, thick},
+	]
+	
+	\pgfmathsetmacro\blockSpacing{4}
+	% Block positions
+	\node[block] (ks) at (0, 0) {$\KeySwitch$};
+	\node[block] (ms) at (\blockSpacing, 0) {$\ModSwitch$};
+	\node[block] (br) at (2 * \blockSpacing, 0) {$\BlindRotate$};
+	\node[block] (se) at (3 * \blockSpacing, 0) {$\SampleExtract$};
+	\node[block] (dp) at (1.5 * \blockSpacing, -3.5) {Linear Operations};
+	
+	% Empty nodes in the corner to help positioning
+	\node[] (seCorner) at (3 * \blockSpacing, -3.5){};!
+	\node[] (swCorner) at (0, -3.5){};!
+	
+	% Connections
+	\draw[wire] (ks.east) -- (ms.west);
+	\draw[wire] (ms.east) -- (br.west);
+	\draw[wire] (br.east) -- (se.west);
+	\draw[wire] (se.south) |- (dp.east);
+	\draw[wire] (dp.west) -| (ks.south);
+	
+	% Slashes and labels on arrows
+	\arrowlabel{ks.east}{ms.west}{$\LWE_{\lweSecretKey}(n)$}{\verticalgauge{70}}
+	\arrowlabel{ms.east}{br.west}{$\LWE_{\lweSecretKey}(n) \left (\Z_{2N} \right )$}{\verticalgauge{95}}
+	\arrowlabel{br.east}{se.west}{$\GLWE_{\glweSecretKey'}(k,N)$}{\verticalgauge{20}}
+	\arrowlabel{seCorner}{dp.east}{$\LWE_{\bar{\lweSecretKey}'}(k \cdot N)$}{\verticalgauge{20}}
+	\arrowlabel{dp.west}{swCorner}{$\LWE_{\bar{\lweSecretKey}'}(k \cdot N)$}{\verticalgauge{60}}
+	
+	% Keys
+	\node (ksk) at ([yshift=1cm]ks.north) {$\KSK_{\bar{\lweSecretKey}' \rightarrow \lweSecretKey}$};
+	\draw[wire] (ksk) -- (ks);
+	
+	\node (bsk) at ([yshift=1cm]br.north) {$\BSK$};
+	\draw[wire] (bsk) -- (br);
+	
+\end{tikzpicture}
+
+

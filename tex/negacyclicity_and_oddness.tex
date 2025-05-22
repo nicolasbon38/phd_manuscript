@@ -11,8 +11,9 @@ In this chapter, we formalize the negacyclicity problem. We then present the cla
 
 
 
-\paragraph{What is negacyclicity ?}
+\section{Basics on negacyclicity}
 
+\paragraph{What is negacyclicity ?}
 
 Let $v(X)$ be a polynomial of the ring $\glweRing$, denoted by $v(X) = \sum_{k=0}^{N-1} v_k X^k$. Recall how a multiplication by $X$  in this ring ``rotates'' the coefficients of the polynomial: \[X \cdot v(X) = - v_{N - 1} + v_0 \cdot X \dots + v_{N - 2} X^{N - 1}~.\]
 
@@ -33,7 +34,7 @@ Some functions interact naturally very well with the blind rotation algorithm: t
 
 
 \begin{definition} (Negacyclic Function)
-	Let $p$ be an even integer, and $p'$ another one of arbitrary parity. A function $f : \Z_p \mapsto \Z_{p'}$ is negacyclic if and only if it satisfies the following property:
+	Let $p$ and $p'$ be two positive integers, with $p$ even. A function $f : \Z_p \mapsto \Z_{p'}$ is negacyclic if and only if it satisfies the following property:
 	
 	\[
 		\forall x \in \Z_p, f\left (\modulo{x + \frac p 2}{p} \right ) = \modulo{-f(x)}{p'}
@@ -42,23 +43,28 @@ Some functions interact naturally very well with the blind rotation algorithm: t
 	\label{def:negacyclic_function}
 \end{definition}
 
-With such functions, the accumulator is quite simple to build:
+
+With such functions, the accumulator is quite simple to build: intuitively we fill it with the values of the upper half of the torus. By the negacyclic property, the minus signs get cancelled when the rotation occurs.
 
 \begin{definition} (Negacyclic Accumulator)
-	Let us consider an even plaintext modulus $p$. Let $f:\Z_p \mapsto \Z_{p'}$ be a negacyclic function. Then, the accumulator $\acc$, defined by:
+Let $p$ and $p'$ be two positive integers, with $p$ even. Let $f:\Z_p \mapsto \Z_{p'}$ be a negacyclic function. Let $N$ be a power of two. Then, the accumulator $\acc$, defined by:
 	
 	\[
-		TODO
+		\acc^{\textsf{negacyclic}} = X^{\frac{-N}{2p}} \cdot \sum_{j=0}^{N / p - 1} X^j \cdot \sum_{i=0}^{p/2} f(i) X^{i \frac{N}{p}}
 	\]
 	
 	is a valid accumulator for the blind rotation.
 \end{definition}
 
-The proof that it works is quite simple blah blah blah.
+\TODO{Write a small proof}
+
+This construction is merely theoretical. Indeed, in practical setting, restricting the functions to be evaluated by PBS only to negacyclic function greatly limits the capability of the scheme. Thankfully, some countermeasures against the negacyclicity problem exist, allowing to evaluate \textit{any} function in the PBS.
 
 
+\section{The classical countermeasure: the bit of padding}
 
-\paragraph{The classical countermeasure: the bit of padding}
+The first countermeasure, that already appeared in the original TFHE paper, ...
+
 
 - works in a even plaintext space
 - expliquer comment ça marche
@@ -67,7 +73,7 @@ The proof that it works is quite simple blah blah blah.
 
 
 
-\paragraph{A new solution: the odd plaintext modulus}
+\section{A new solution: the odd plaintext modulus}
 
 - copy paste section 6.1 of BPR23
 

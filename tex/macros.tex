@@ -38,7 +38,7 @@
 % TFHE-specific notations
 \newcommand{\lweSigma}{\sigma_{\LWE}}
 \newcommand{\glweSigma}{\sigma_{\GLWE}}
-\newcommand{\baseDecomp}{B}
+\newcommand{\baseDecomp}{\mathfrak{B}}
 \newcommand{\levelDecomp}{\ell}
 
 
@@ -47,7 +47,7 @@
 
 \newcommand{\BSK}{\textsf{BSK}} 
 \newcommand{\KSK}{\textsf{KSK}} 
-% TODO : trouver une otation pl^us jolie pour BSK
+% TODO : trouver une otation plus jolie pour BSK
 \newcommand{\acc}{\textsf{acc}(X)}
 
 
@@ -60,13 +60,16 @@
 
 
 % Bootstrapping operations
-\newcommand{\ModSwitch}{\texttt{ModSwitch}}
-\newcommand{\BlindRotate}{\texttt{BlindRotate}}
-\newcommand{\SampleExtract}{\texttt{SampleExtract}}
-\newcommand{\CMUX}{\texttt{CMUX}}
+\newcommand{\ModSwitch}{\texttt{ModSwitch}~}
+\newcommand{\BlindRotate}{\texttt{BlindRotate}~}
+\newcommand{\SampleExtract}{\texttt{SampleExtract}~}
+\newcommand{\KeySwitch}{\texttt{KeySwitch}~}
+\newcommand{\PackingKeySwitch}{\texttt{PackingKeySwitch}~}
+\newcommand{\CMUX}{\texttt{CMUX}~}
 
 % other operations
-\newcommand{\decomp}[3]{\textsf{dec}^{(#1, #2)}(#3)}
+\newcommand{\decomp}[3]{\textbf{\textsf{dec}}^{(#1, #2)}(#3)}
+
 
 % TFHE-related spaces\\
 \newcommand{\plaintextTorus}{\mathbb{T}_p}

@@ -1,0 +1,47 @@
+\begin{algorithm}
+	\caption{$\SampleExtract$}
+	\label{alg:sample_extract}
+	\KwContext{
+		$\left\{
+		\begin{aligned}
+			&\glweSecretKey' = (S_0', \dots, S_{k-1}') \text{: the input } \GLWE \text{ secret key}\\
+			&\bar \lweSecretKey' = (\bar{s_0}, \dots, \bar{s_{kN-1}}) \text{: the output } \LWE \text{ secret key}\\
+			&\forall\ 0 \le i < k,\ S_i = \textstyle\sum_{j=0}^{N-1} \bar{s_{iN+j}} X^j\\
+			&M = \textstyle\sum_{i=0}^{N-1} m_i \cdot X^i \text{: a polynomial message}\\
+			&\forall 0 \le i < k, A_i = \textstyle\sum_{j=0}^{N-1} a_{i, j} X^j\\
+			&B = \textstyle\sum_{j=0}^{N-1} b_j X^j			
+		\end{aligned}
+		\right.$
+	}
+	
+	\KwIn{
+		$\left\{
+		\begin{aligned}
+			&\vec C = (A_0, \dots, A_{k-1}, B) \text{: a ciphertext $\GLWE_{\glweSecretKey}(M)$}\\
+			&\alpha \in \{0, \dots, N-1\} \text{: the index of the coefficient to be extracted}
+		\end{aligned}
+		\right. $
+	}
+	
+	\KwResult{
+		$\vec c_{\textsf{out}}$ \text{: a ciphertext $\LWE_{\bar{lweSecretKey'}}(m_\alpha)$}
+	}
+	
+	
+	% Add vertical space and horizontal line
+	\vspace{0.5em} % adjust the space as needed
+	\hrule
+	\vspace{0.5em} % adjust the space as needed
+	
+	$b' \gets b_\alpha$\\*
+	\For{$0 \le i < k$}{
+		\For{$0 \le j \le \alpha$}{
+			$a'_{i \cdot N + j} = a_{i, \alpha - j}$
+		}
+		\For{$\alpha + 1 \le j < N$}{
+			$a'_{i \cdot N + j} \gets - a_{i, N + \alpha - j}$
+		}
+	}
+	$\vec c_{\textsf{out}} \gets (a'_0, \dots, a'_{k \cdot N - 1}, b')$
+	
+\end{algorithm}
