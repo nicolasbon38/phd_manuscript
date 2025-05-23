@@ -36,7 +36,7 @@ Regev proved that the search and decisional problems are reducible to each other
 The hardness of this problem depends on the parameters $q$, $n$, $\chi_s$ and $\chi_e$, and so does the security of the schemes built upon it. There is not yet in the literature simple guidelines to construct secure instances of the problem. Common practice in the field is to derive an approximate concrete security level $\lambda$ for a given parameter set with a tool named \texttt{lattice-estimator} \cite{lattice-estimator}. Users can input concrete values and distributions for the parameters, and the tool evaluates the security of the underlying $\LWE$ instance by running simulations of attacks of the literature.
 
 In Definition \ref{def:LWE}, we did not precise the shapes of the distributions $\chi_s$ and $\chi_e$ (beyond the fact they yields small values). Several distributions are possible: a discrete Gaussian with a small variance, a uniform distribution restricted on a small interval, or a binomial. The choice of the right distribution depends of the considered use-case, each possibilities offering different trade-offs in matter of security and efficiency.
-\TODO{Trouver des référenes, par ex : eprint/2024/1979 ou eprint/21/1358 or eprint 2019/389}
+\TODO{Trouver des référenes, par ex : eprint/2024/1979 ou eprint/21/1358 or eprint 2019/389, liste de travaux de Rachel Player}
 
 Most implementations of TFHE select a uniform distribution on $\{0, 1\}$ for the secret, and a Gaussian with a small variance $\lweSigma$ for the noise. We will use those distributions in this thesis, and will use the notation $\LWE_{(q, n, \sigma)}$ for these instances.
 
@@ -407,6 +407,8 @@ The line of work of \cite{chimera, AC:BCGGJ24} gives a nice mathematical overvie
 \TODO{Le key switching est un cas particulier d'un external product.}
 
 \TODO{Parler du bruit}
+\TODO{Vérifier que toutes les décompositions et leurs définitions sont cohérentes entre ellesx}
+
 
 \paragraph{CMUX}
 

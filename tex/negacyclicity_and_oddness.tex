@@ -3,7 +3,7 @@
 \chapter{Overcoming the negacyclicity problem with odd plaintext modulus}
 \label{chap:negacyclicity}
 
-In Section \ref{sec:pbs}, we presented the algorithm of the PBS. But we hid something under the rug: the actual composition of the accumulator polynomial $\acc$. This is because its definition depends on the countermeasure picked against the negacyclicity problem (whom we had a glimpse on  in Section \ref{sec:overview_blind_rotation}. 
+In Section \ref{sec:pbs}, we presented the algorithm of the PBS. But we hid something under the rug: the actual composition of the accumulator polynomial $\acc$. This definition depends on the countermeasure picked against the negacyclicity problem (whom we had a glimpse on  in Section \ref{sec:overview_blind_rotation}. 
 
 
 In this chapter, we formalize the negacyclicity problem. We then present the classical countermeasure (the strategy of the padding bit), and our technique of odd moduli, which is a building block for the rest of the works presented in this thesis. We finish by going through several others works that propose different countermeasures.
@@ -17,7 +17,7 @@ In this chapter, we formalize the negacyclicity problem. We then present the cla
 
 Let $v(X)$ be a polynomial of the ring $\glweRing$, denoted by $v(X) = \sum_{k=0}^{N-1} v_k X^k$. Recall how a multiplication by $X$  in this ring ``rotates'' the coefficients of the polynomial: \[X \cdot v(X) = - v_{N - 1} + v_0 \cdot X \dots + v_{N - 2} X^{N - 1}~.\]
 
-In TFHE's blind rotation, the polynomial multiplication in the blind rotation is actually done by $X^{-\Tilde{\mu}}$, with $\Tilde{\mu} = \rounding{\frac{\mu \cdot 2N}{q}}$, which lives in $\{0, \dots, 2N - 1\}$. This leads to two problems:
+In TFHE's blind rotation, the polynomial multiplication in the blind rotation is actually done by $X^{-\Tilde{\mu}}$, which lives in $\{0, \dots, 2N - 1\}$. This leads to two problems:
 
 \begin{itemize}
 	\item A coefficient $v_j$ can be brought in first place by two differents rotations: the one induced by the polynomial multiplication by $X^{\modulo{-j}{2N}}$ and the one by $X^{[-j + N]_{2N}}$.
@@ -50,7 +50,7 @@ With such functions, the accumulator is quite simple to build: intuitively we fi
 Let $p$ and $p'$ be two positive integers, with $p$ even. Let $f:\Z_p \mapsto \Z_{p'}$ be a negacyclic function. Let $N$ be a power of two. Then, the accumulator $\acc$, defined by:
 	
 	\[
-		\acc^{\textsf{negacyclic}} = X^{\frac{-N}{2p}} \cdot \sum_{j=0}^{N / p - 1} X^j \cdot \sum_{i=0}^{p/2} f(i) X^{i \frac{N}{p}}
+		\acc^{\textsf{negacyclic}} = X^{\frac{-2N}{2p}} \cdot \sum_{j=0}^{2N / p - 1} X^j \cdot \sum_{i=0}^{p/2 - 1} f(i) X^{i \frac{2N}{p}} \mod (X^N + 1)
 	\]
 	
 	is a valid accumulator for the blind rotation.
@@ -63,14 +63,33 @@ This construction is merely theoretical. Indeed, in practical setting, restricti
 
 \section{The classical countermeasure: the bit of padding}
 
-The first countermeasure, that already appeared in the original TFHE paper, ...
+The first countermeasure, that already appeared in the original TFHE paper, is called the \textit{bit of padding}. It works in even plaintext space.
+
+The idea can be summed up by "if we are always in the first half of the torus, the minis signs cannot hurt us''. This is equivalent to forcing the MSB of the message to be zero. The adventage of this method is that it relaxes the negacyclicity constraint and makes the bootstrapping able to evaluate any function (not only the negacyclic one). The drawback is that any linear function can break it by propagating a carry in the MSB. So, when constructing homomorphic circuits one needs to keep track of the maximal value that each homomorphic operation can yield and make sure that it will not propagate a carry into the MSB. This often leads to extra bootstrapping to clear the MSB. In Chapter ]\ref{chap:p_encodings}, we will show how this method makes the evaluation of Bollean circuit very inefficient, and what we can do to improve that.
 
 
-- works in a even plaintext space
-- expliquer comment ça marche
-- donner la tête de l'accumulateur
-- mais contraintes sur les circuits homomorphes que l'on peut évaluer
+In the following, we give the definition of the accumulator $\acc$ in those cases:
 
+\begin{definition}(Bit-of-Padding accumulator)
+	TOWRITE
+	\[
+		\acc^{\textsf{bit-of-padding}} = X^{\frac{-N}{2p}} \cdot \sum_{j=0}^{N / p - 1} X^j \cdot \sum_{i=0}^{p - 1} f(i) X^{i \frac{N}{p}} \mod (X^N + 1)
+	\]
+\end{definition}
+
+
+
+\TODO{FAIRE UNE JIOLIE FIGURE}
+
+
+\TODO{
+
+		- works in a even plaintext space
+		- expliquer comment ça marche
+		-  donner la tête de l'accumulateur
+		- mais contraintes sur les circuits homomorphes que l'on peut évaluer
+
+}
 
 
 \section{A new solution: the odd plaintext modulus}
