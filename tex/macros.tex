@@ -87,3 +87,15 @@
 % environments
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}[section]
+\theoremstyle{property}
+\newtheorem{property}{Property}[section]
+\theoremstyle{lemma}
+\newtheorem{lemma}{Lemma}[section]
+\theoremstyle{theorem}
+\newtheorem{theorem}{Theorem}[section]
+
+% Macros for the p-encodings section
+\newcommand{\Encoding}{\mathcal{E}}
+\newcommand{\EncDef}[2]{\begin{cases} 0 \mapsto #1 \\ 1 \mapsto #2 \end{cases}}
+\newcommand{\EncDefZero}[1]{\begin{cases} 0 \mapsto #1 \\ 1 \mapsto \{0\} \end{cases}}
+\newcommand{\EncDefOne}[1]{\begin{cases} 0 \mapsto \{0\} \\ 1 \mapsto \{#1\} \end{cases}}

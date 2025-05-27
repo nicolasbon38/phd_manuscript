@@ -1,6 +1,6 @@
 % !TeX_ROOT=../thesis.tex
 
-\chapter{TFHE}
+\chapter{Presentation of the TFHE Scheme}
 
 \TODO{Ecrire une petite page qui présente TFHE rapidement, et notamment explique le "plan" ed la section et les features du bootstrapping}
 
@@ -129,7 +129,7 @@ We need a way to encode plaintext values into the ciphertext space. To do so, le
 
 
 The image of this mapping only reaches $p$ elements in $\lweRing$, forming the set $\left \{ \rounding{\frac {k q}{p}} \mid k \in \plaintextRing \right \}$. These elements are distributed around $\lweRing$ and form what we refer to as \emph{sectors of $\lweRing$}, defined as: \[
-\left\{ \left( \frac{(2k - 1)q}{2p}, \frac{(2k + 1)q}{2p} \right) \middle| k \in \mathbb{Z} \right\}
+\left\{ \left( \frac{(2k - 1)q}{2p}, \frac{(2k + 1)q}{2p} \right) ~\middle|~ k \in \mathbb{Z} \right\}
 \]
 
 To encode a given plaintext element into the ciphertext space, we use the corresponding center of sector. However, decoding is more permissive: every elements of a sector are decoded by the corresponding plaintext element. This will be useful to remove the noise in ciphertexts.
@@ -636,7 +636,7 @@ One key aspect of TFHE is \textit{the degradation of the speed of the bootstrapp
 
 \begin{figure}
 	\centering
-	\includegraphics[width=0.8\linewidth]{img/timings_pbs_precisions.png}
+	\includegraphics[width=0.8\linewidth]{img/to_harmonize/timings_pbs_precisions.png}
 	\label{fig:PBS_perfs}
 	\caption{TODO: remove the legend "CJP21". Maybe redraw it to have a taller figure}
 \end{figure}

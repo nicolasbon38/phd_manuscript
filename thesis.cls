@@ -264,3 +264,12 @@
   \@afterindentfalse
   \secdef\@chapter\@schapter}
 \makeatother
+
+
+%%% Header of chapter + sections at the top of each page
+\fancyhead{}              % Clear all header fields
+\fancyhead[LO,RE]{\leftmark} % Chapter name on Outside header (Left on Odd, Right on Even)
+\fancyhead[LE,RO]{}       % Clear Inside headers
+\fancyfoot{}              % Optional: clear footers if undesired
+
+

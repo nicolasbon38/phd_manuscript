@@ -24,11 +24,11 @@ However, these problems can be circumvented for even and odd values of $p$. Reca
 \begin{figure}
     \begin{subfigure}{0.49\linewidth}
         \centering
-        \includegraphics[width=0.5\linewidth]{images/busy_sectors_2.png}
+        \includegraphics[width=0.5\linewidth]{img/to_harmonize/busy_sectors_2.png}
     \end{subfigure}\hspace{1em}% Adjust the margin width as needed
     \begin{subfigure}{0.49\linewidth}% Specify the width here
         \centering
-        \includegraphics[width=0.5\linewidth]{images/busy_sectors.png}
+        \includegraphics[width=0.5\linewidth]{img/to_harmonize/busy_sectors.png}
     \end{subfigure}
     \caption{Distribution of the values of $\mu$ across $\Z_{q}$ for $p = 6$ and $p = 5$: the colored parts show the dense spots where the value has a high probability to lie in. The width of these sectors depends on $\sigma$ (the standard deviation of the error distribution $\chi$ of TFHE). Note that this repartition looks the same for $\Tilde{\mu}$ in $\Z_{2N}$.}    
     \label{fig:density_of_phase}
@@ -82,13 +82,13 @@ This is where the parity of $p$ plays a part: if $p$ is even, then $\modulo{
 \begin{figure}
   \begin{subfigure}{0.49\linewidth}
     \    \centering
-    \includegraphics[width=0.5\linewidth]{images/torus_p_even.png}
+    \includegraphics[width=0.5\linewidth]{img/to_harmonize/torus_p_even.png}
     \caption{With $p$ even, the dense spots of each half of the torus are aligned.}
     \label{fig:torus_p_even}
   \end{subfigure}\hspace{1em}% Adjust the margin width as needed
   \begin{subfigure}{0.49\linewidth}
     \centering
-    \includegraphics[width=0.5\linewidth]{images/torus_p_odd.png}
+    \includegraphics[width=0.5\linewidth]{img/to_harmonize/torus_p_odd.png}
     \caption{With $p$ odd, the dense spots face empty spots, close to the bounds of the $p$-sectors.}
   \end{subfigure}
   \caption{}
@@ -97,7 +97,15 @@ This is where the parity of $p$ plays a part: if $p$ is even, then $\modulo{
 
 
 
-That is why we select only odd values for $p$ in our framework. We will see in Section \ref{sec:parametrization} how this change impacts the parametrization of the scheme.
+That is why we select only odd values for $p$ in our framework. 
+
+
+We will see in Section \ref{sec:parametrization} how this change impacts the parametrization of the scheme.
+
+\TODO{Ecrire que ça ne chanre rien au paramétrage, avec une référence sur la bonne section}
+
+
+
 
 
 

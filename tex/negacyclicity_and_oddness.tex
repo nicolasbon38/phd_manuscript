@@ -1,14 +1,13 @@
 %!TEX root = ../thesis.tex
 
-\chapter{Overcoming the negacyclicity problem with odd plaintext modulus}
+\chapter[The Negacyclicity Problem]{Overcoming the negacyclicity problem with odd plaintext modulus}
 \label{chap:negacyclicity}
 
-In Section \ref{sec:pbs}, we presented the algorithm of the PBS. But we hid something under the rug: the actual composition of the accumulator polynomial $\acc$. This definition depends on the countermeasure picked against the negacyclicity problem (whom we had a glimpse on  in Section \ref{sec:overview_blind_rotation}. 
+\TODO{Ecrire plus ici}
+In Section \ref{sec:pbs}, we presented the algorithm of the PBS. But we have hidden something under the rug: the actual composition of the accumulator polynomial $\acc$. This definition depends on the countermeasure picked against the negacyclicity problem (that we briefly introduced in Section \ref{sec:overview_blind_rotation}). 
 
 
-In this chapter, we formalize the negacyclicity problem. We then present the classical countermeasure (the strategy of the padding bit), and our technique of odd moduli, which is a building block for the rest of the works presented in this thesis. We finish by going through several others works that propose different countermeasures.
-
-
+In this chapter, we formalize the negacyclicity problem. We then present the classical countermeasure (the strategy of the padding bit), and our technique of odd plaintext modulus, which is a foundational block for the following contributions presented in this thesis. We finish by going through several others works that propose different countermeasures.
 
 
 \section{Basics on negacyclicity}
@@ -25,7 +24,7 @@ In TFHE's blind rotation, the polynomial multiplication in the blind rotation is
 \end{itemize}
 
 
-As the actual value of $\tilde{\mu}$ is encrypted, this is not possible to predict beforehand whether this undesirable minus sign will appear or not. So, the accumulator polynomial has to be constructed in such a way that this problem is neutralized.
+As the actual value of $\tilde{\mu}$ is encrypted, this is not possible to predict beforehand whether this undesirable minus sign will appear or not. So a countermeasure needs to be implemented into the scheme to neutralize the negacyclicity problem. The most frequent strategy is to develop encodings for the LUT $f$ in the accumulator specifically tailored to handle this issue.
 
 
 \paragraph{The ideal case}
@@ -44,37 +43,49 @@ Some functions interact naturally very well with the blind rotation algorithm: t
 \end{definition}
 
 
-With such functions, the accumulator is quite simple to build: intuitively we fill it with the values of the upper half of the torus. By the negacyclic property, the minus signs get cancelled when the rotation occurs.
+With such functions, the accumulator is quite simple to build: intuitively we only fill it with the values of the first half of the torus (so the $f(x)$ with $x \in \left [0, \frac p 2 - 1 \right ]$). By the negacyclic property, the minus signs get cancelled when the rotation occurs. We give an explicit formula for this accumulator in Definition \ref{def:negacyclic_accumulator}
 
 \begin{definition} (Negacyclic Accumulator)
-Let $p$ and $p'$ be two positive integers, with $p$ even. Let $f:\Z_p \mapsto \Z_{p'}$ be a negacyclic function. Let $N$ be a power of two. Then, the accumulator $\acc$, defined by:
+		\label{def:negacyclic_accumulator}
+		Let $p$ and $p'$ be two positive integers, with $p$ \textbf{even}. Let $f:\Z_p \mapsto \Z_{p'}$ be a negacyclic function. Let $N$ be a power of two. Then, the accumulator $\acc$, defined by:
 	
 	\[
 		\acc^{\textsf{negacyclic}} = X^{\frac{-2N}{2p}} \cdot \sum_{j=0}^{2N / p - 1} X^j \cdot \sum_{i=0}^{p/2 - 1} f(i) X^{i \frac{2N}{p}} \mod (X^N + 1)
 	\]
 	
 	is a valid accumulator for the blind rotation.
+	\TODO{Dire quelque chose surl'encodage dans les MSB, (que veut dire f(i) en fait)}
+
 \end{definition}
 
 \TODO{Write a small proof}
 
-This construction is merely theoretical. Indeed, in practical setting, restricting the functions to be evaluated by PBS only to negacyclic function greatly limits the capability of the scheme. Thankfully, some countermeasures against the negacyclicity problem exist, allowing to evaluate \textit{any} function in the PBS.
+This construction is merely theoretical. Indeed, in practical setting, restricting the functions to be evaluated by PBS only to negacyclic function greatly limits the capability of the scheme. In order to be able to evaluate \textit{any} function in the PBS, more sophisticated techniques are required. We introduce the first example of such technique in the next section.
 
 
 \section{The classical countermeasure: the bit of padding}
 
-The first countermeasure, that already appeared in the original TFHE paper, is called the \textit{bit of padding}. It works in even plaintext space.
+The first countermeasure, that already appeared in the original TFHE paper, is called the \textit{bit of padding}. As in the ideal case presented in the previous section, it works in an even plaintext space.
 
-The idea can be summed up by "if we are always in the first half of the torus, the minis signs cannot hurt us''. This is equivalent to forcing the MSB of the message to be zero. The adventage of this method is that it relaxes the negacyclicity constraint and makes the bootstrapping able to evaluate any function (not only the negacyclic one). The drawback is that any linear function can break it by propagating a carry in the MSB. So, when constructing homomorphic circuits one needs to keep track of the maximal value that each homomorphic operation can yield and make sure that it will not propagate a carry into the MSB. This often leads to extra bootstrapping to clear the MSB. In Chapter ]\ref{chap:p_encodings}, we will show how this method makes the evaluation of Bollean circuit very inefficient, and what we can do to improve that.
+The idea is to ensure that the message stays in the first half of the torus all along the computations. An equivalent way of presenting it is to force the Most Significant Bit (MSB) of the message to zero. By doing this, $\tilde{\mu}$ lives in $\{0, \dots, N - 1\}$, so the arising minus signs never reach the degree-zero coefficient.
 
+The advantage of this method is that it relaxes the negacyclicity constraint and makes the bootstrapping able to evaluate any function (not only the negacyclic one). However, this construction is rather fragile: any linear function can break it by propagating a carry into the MSB. 
+
+To avoid this, when evaluating an homomorphic circuit, the program needs to keep track of the maximal value that each homomorphic operation can yield and make sure that it will never propagate a carry into the MSB. This often leads to extra bootstrapping to contril the growth of the message and eliminate the overflows. 
+
+In Chapter \ref{chap:p_encodings}, we will demonstrate how this method makes the evaluation of Boolean circuit very inefficient, and what we can do to improve that.
 
 In the following, we give the definition of the accumulator $\acc$ in those cases:
 
 \begin{definition}(Bit-of-Padding accumulator)
-	TOWRITE
+	Let $p$ and $p'$ be two positive integers, with $p$ \textbf{even}. Let $f: \Z_p \mapsto \Z_{p'}$ be a function. Let $N$ be a power of two. Then, the accumulator $acc(X)$:
 	\[
 		\acc^{\textsf{bit-of-padding}} = X^{\frac{-N}{2p}} \cdot \sum_{j=0}^{N / p - 1} X^j \cdot \sum_{i=0}^{p - 1} f(i) X^{i \frac{N}{p}} \mod (X^N + 1)
 	\]
+	
+	is a valid accumulator for the blind rotation.
+	
+	\TODO{Dire quelque chose surl'encodage dans les MSB, (que veut dire f(i) en fait)}
 \end{definition}
 
 
@@ -82,27 +93,137 @@ In the following, we give the definition of the accumulator $\acc$ in those case
 \TODO{FAIRE UNE JIOLIE FIGURE}
 
 
-\TODO{
 
-		- works in a even plaintext space
-		- expliquer comment ça marche
-		-  donner la tête de l'accumulateur
-		- mais contraintes sur les circuits homomorphes que l'on peut évaluer
-
-}
-
+The drawbacks of the bit-of-padding padding makes very challenging the development of homomorphic applications. A vast literature on how to circumvent this problem exist and is introduced in Section \ref{sec:soa_against_negacyclicity}. In this thesis, we focus on a method we introduced in \cite{TCHES:BonPoiRiv24}: \textit{the odd plaintext modulus}.
 
 \section{A new solution: the odd plaintext modulus}
 
-- copy paste section 6.1 of BPR23
+Negacyclicity has a quite different effect depending of the parity of the plaintext modulus $p$. Recall that $\mu = m + e \in \Z_q$, with $e$ sampled from a small centered Gaussian. The use of a small error makes that $\mu$ does not take all the values of $\Z_q$ with the same probability: in particular, the densest parts in terms of probability over $\Z_q$ are the one close to the ``unscrambled'' values of $m$, namely $\left \{ \rounding{\frac {k q}{p}} ~\middle |~ k \in \Z_p \right \}$. We illustrate this distribution on Figure \ref{fig:density_of_phase}. We call these sections of the torus the \emph{dense spots}.
+
+
+\begin{figure}[h]
+	\centering
+	\begin{minipage}{0.47\textwidth}
+		\centering
+		\includegraphics[width=0.8\textwidth]{img/to_harmonize/busy_sectors_2.png}
+	\end{minipage}
+	\hspace{0.04\textwidth}
+	\begin{minipage}{0.47\textwidth}
+		\centering
+		\includegraphics[width=0.8\textwidth]{img/to_harmonize/busy_sectors.png}
+	\end{minipage}
+	\caption{Distribution of the values of $\mu$ across $\mathbb{Z}_q$ for $p = 6$ and $p = 5$: the colored parts show the dense spots where the value has a high probability to lie in. The width of these sectors depends on $\sigma$ (the standard deviation of the error distribution $\chi$ of TFHE). Note that this repartition looks similar for $\Tilde{\mu}$ in $\mathbb{Z}_{2N}$.}
+	\label{fig:density_of_phase}
+\end{figure}
+
+
+When we transpose these dense spots into $\Z_{2N}$, they become the sectors close to $\left \{ \rounding{\frac{k \cdot 2N}{p}} \mid k \in \Z_p \right \}$. 
+
+Let $k \in \Z_p$, the multiplication $X^{- \frac{k \cdot 2N}{p}} \cdot v(X)$ yields the same degree-zero coefficient as the multiplication  $X^{\modulo{- \frac{k \cdot 2N}{p} + N}{2N}} \cdot v(X)$, up to the minus sign. For the sake of clarity, we write the exponent of the latter in a slightly different manner: 
+\[\modulo{
+	\frac{
+		-k \cdot 2N
+	}
+	{
+		p
+	}
+	+ N
+}{2N} = 
+\modulo{
+	\frac{
+		(-k + \frac p 2 ) \cdot 2N
+	}
+	{p}
+}
+{2N}\]
+
+
+This is where the parity of $p$ plays a part: if $p$ is even, then $\modulo{
+	\frac{
+		(-k + \frac p 2 ) \cdot 2N
+	}
+	{p}
+}
+{2N}$ is a dense spot as well. So, the rotations by these two values will happen with high probability and they will both yield the same coefficient $v_{\frac{k \cdot 2N}{p}}$ (up to the minus sign for one of them). Thus, when evaluating a function $f$ with a PBS, the calls $f(k)$ and $f(k + \frac p 2)$ will produce the same output (one again, up to the minus sign), which is a collision constraining the definition of $f$. On the other hand, let us consider an odd value for $p$. Then, $\modulo{
+	\frac{
+		(-k + \frac p 2 ) \cdot 2N
+	}
+	{p}
+}{2N}$ is no longer a dense spot, as it lies exactly halfway between the two dense spots $\modulo{
+	\frac{
+		(-k + \frac {p-1} {2} ) \cdot 2N
+	}
+	{p}
+}{2N}$ and $\modulo{
+	\frac{
+		(-k + \frac {p+1} {2} ) \cdot 2N
+	}
+	{p}
+}{2N}$. As a consequence, collision never occurs. Figure \ref{fig:torus_p_even_vs_odd} illustrates this phenomenon.
+
+
+\begin{figure}
+	\begin{minipage}{0.49\linewidth}
+		\    \centering
+		\includegraphics[width=0.5\linewidth]{img/to_harmonize/torus_p_even.png}
+		\caption{With $p$ even, the dense spots of each half of the torus are aligned.}
+		\label{fig:torus_p_even}
+	\end{minipage}\hspace{1em}% Adjust the margin width as needed
+	\begin{minipage}{0.49\linewidth}
+		\centering
+		\includegraphics[width=0.5\linewidth]{img/to_harmonize/torus_p_odd.png}
+		\caption{With $p$ odd, the dense spots face empty spots, close to the bounds of the $p$-sectors.}
+	\end{minipage}
+	\caption{}
+	\label{fig:torus_p_even_vs_odd}
+\end{figure}
 
 
 
-\paragraph{A tour of other solutions}
+So, we chose to select only odd values for the plaintext modulus. 
+
+We will see in Section \ref{sec:parametrization} how this change impacts the parametrization of the scheme.
+\TODO{Ecrire que ça ne change rien au paramétrage, avec une référence sur la bonne section}
+
+
+We present in Definition \ref{def:odd_accumulator} the formula for the accumulator in this case. Note that because $N$ is a power of two and $o$ an odd value, some rounding is required in the quotient $\frac N p$, but we omit it to keep notations lighter, (or )equivalently, the division operator is assumed to include rounding).
+
+\begin{definition}(Odd-case Accumulator)
+	Let $p$ and $p'$ be two integers, with $p$ \textbf{odd}. Let $f: \Z_p \mapsto \Z_{p'}$ a function, and $N$ a power of two. Then, the accumulator $\acc \in \glweRing$ has the form:
+	\[
+		\acc = X^{- \frac {N} {2p}} \cdot \sum_{j=0}^{N/p - 1} X^j  \cdot \left ( \sum_{i=0}^{\frac{p-1}{2}} f(i) X^{i \frac{2N}{p}} + \sum_{i=0}^{\frac{p-1}{2} - 1} -f \left (i + \frac{p+1}{2} \right ) X^{i \frac{2N}{p} + \frac N p} \right )
+	\]
+\end{definition}
+
+
+
+Let us explain the structure of this accumulator. The polynomial has degree $N$ and is made of $p$ distinct windows of width $\frac{N}{p}$. Each of these windows has constant coefficient value $f(k)$, for $k \in \{0, \dots, p-1\}$.
+For $0 \le \alpha \le \frac{p-1}{2}$, the range of degrees whose coefficients are $f(\alpha)$ is $\left [ \alpha \frac{2N}{p} - \frac{N}{2p}~;~ \alpha \frac{2N}{p} + \frac{N}{2p} \right ]$. Now, for $\frac{p+1}{2} \le \beta \le p-1$, we can write $\beta = \alpha + \frac{p+1}{2}$, with $0 \le \alpha < \frac{p-1}{2}$. This time, the range of spanned degrees is $\left [ \alpha \frac{2N}{p} + \frac{N}{2p} ~;~ (\alpha + 1) \frac{2N}{p} - \frac{N}{2p} \right ]$. Thus, the values $k \in \{0, \dots, p-1\}$ spans the entire space $[0; N)$ without overlap. The values over $\frac{p+1}{2}$ gets negated by the negacyclicity, so the underlying coefficient is also negated to compensate this effect. We illustrate this construction on Figure \ref{fig:accumulator_odd}.
+\TODO{Est-ce que ke paragraphe ci-dessus n'est pas trop lourd ?}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{img/to_harmonize/accumulator_odd.png}
+	\caption{Illustration of the construction of the accumulator. On top is the ring $\Z_{2N}$ splitted in windows. Below is a representation of the polynomial $v$, with its version once rotated by a multiplication by $X^N$. On the figure, $p$ = 5.}
+	\label{fig:accumulator_odd}
+\end{figure}
+
+\TODO{Aussi rapatrier le reste de la section sur l'implem ?}
+
+
+\paragraph{Exception for $p=2$:} TOWRITE
+
+
+
+
+
+
+\section{A tour of other solutions}
+\label{sec:soa_against_negacyclicity}
 
 - Schild
 - Le WoPBS (mais peut-être le présenter plus longuement dans le papier LUT)
-
+- Clet
 
 
 

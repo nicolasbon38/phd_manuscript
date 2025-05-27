@@ -27,12 +27,15 @@
 \usetikzlibrary{arrows.meta, positioning, fit, calc}
 
 
+
 \usepackage[algo2e]{algorithm2e} % for algorithms
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \algnewcommand{\LineComment}[1]{\State{\color{gray} \(\triangleright\) #1}}
 \usepackage{listings}
-
+\usepackage{graphicx}
+\usepackage{caption}  % for \captionof if needed
+\usepackage{float}    % optional, for [H] positioning
 % --------------------------------------
 
 \definecolor{maincolor}{RGB}{36, 56, 141}
@@ -124,7 +127,7 @@
 
 
 % Chapter on Boolean Functions
-\input{tex/p_encodings/main.tex}
+\input{tex/p_encodings/main_p_encodings.tex}
 
 
 \chapter{Accelerating AES evaluation}

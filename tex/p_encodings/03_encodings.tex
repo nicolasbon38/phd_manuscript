@@ -1,14 +1,15 @@
 \section{Boolean Encoding over $\Z_p$ and Homomorphic Evaluation Strategy Between $\B$ and $\Z_p$}
-\label{sec:homorphic_layer}
+\label{sec:p_encodings_homorphic_layer}
 
-To evaluate Boolean functions in TFHE, one could use the vanilla TFHE with $p=2$. The problem is that the only evaluable function would be the \texttt{XOR} operation. To evaluate the other operators, the solution of \cite{cryptoeprint:2018/421} which is also implemented in the \texttt{tfhe-rs} library \cite{tfhe-rs} is to take a larger $p$, specifically $p=8$. This allows all the operations of the Boolean algebra to be carried out, however the negacyclicity problem introduced in Section \ref{sec:bootstrapping} arises because $8$ is even. Their solution to this issue is to keep a \emph{bit of padding} fixed to zero, i.e., the values in $\Z_p$ have their most significant bit fixed to zero. This restriction has a heavy impact on performances, because it requires a bootstrapping after each Boolean gate to make sure no data ever overflows in the most significant bit.
+To evaluate Boolean functions in TFHE, one could use the vanilla TFHE with $p=2$. The problem is that the only evaluable function would be the \texttt{XOR} operation. To evaluate the other operators, the solution of \cite{JC:CGGI20} which is also implemented in \texttt{tfhe-rs} library \cite{tfhe-rs} \footnote{more precisely, in the \texttt{boolean} crate} is to take a larger $p$, specifically $p=8$. This allows all the operations of the Boolean algebra to be carried out using the \textit{bit-of-padding} method, that we presented in Chapter \ref{chap:negacyclicity}. This has a heavy impact on performances, because it requires a bootstrapping after each Boolean gate to make sure no data ever overflows into the MSB.
 
-Our solution makes use of \emph{odd} values for $p$, which allows us to remove this constraint of padding and to perform more operations without bootstrapping. To do so, we had to slightly adapt the bootstrapping procedure of TFHE to support odd moduli. We explain this tweak in Section  \ref{sec:TFHE_adaptation}.
-
-Moreover, the PBS described in Section \ref{sec:bootstrapping} takes only one input and so can only evaluate univariate functions. The common solution to evaluate multivariate functions is to concatenate several input ciphertexts into one by shifting the MSB of each input and to sum them all. The problem is that the number of message bits cannot grow too much because the other parameters of the \LWE problem must grow accordingly, degrading the performances. As a consequence, the performances quickly degrades as the arity of the function increases. Our approach consists in removing the padding bit and using a combination of homomorphic additions before a PBS to evaluate a function for \emph{any} number of inputs with the cost of a single PBS.
+By using \emph{odd} values for $p$, we remove this constraint of padding and can perform more operations without bootstrapping.
 
 
-To this purpose, we propose a construction in which we embed Boolean values in $\Z_p$ for well-chosen values of $p$, forming an ``intermediate homomorphic layer'' between $\B$ and $\Z_q$. In the following, we explain how we define such a layer, and we describe our new strategy to evaluate Boolean functions in a more efficient way without considering the circuit representation of the function.
+Moreover, the classical construction of the PBS of TFHE (introduced in Section \ref{sec:pbs_algorithm}) takes only one input and so can only evaluate univariate functions. The common solution to evaluate multivariate functions is to concatenate several input ciphertexts into one by shifting the bits of each input and to sum them all. The problem is that the number of message bits cannot grow too much because the other parameters of the underlying $\LWE$ and $\GLWE$ instance must grow accordingly, degrading the performances. As a consequence, the performances quickly degrades as the arity of the function increases. Our approach consists in removing the padding bit and using a combination of homomorphic additions before a PBS to evaluate a function for \emph{any} number of inputs with the cost of a single PBS.
+
+
+To this purpose, we propose a construction in which we embed Boolean values in $\Z_p$ for well-chosen values of $p$, forming an ``intermediate homomorphic layer'' between $\B$ and $\Z_q$. In the following, we explain how we define such a layer, and we describe our new strategy to evaluate Boolean functions in a more efficient way without considering the circuit representation of the function. Note that we generalize this construction to arithmetic spaces in Chapter \ref{chap:hyppogriph}.
 
 
 \subsection{Encoding of $\B$ over $\Z_p$}
@@ -16,7 +17,7 @@ To this purpose, we propose a construction in which we embed Boolean values in $
 To represent Boolean values over $\Z_p$, we use a mapping function that we call a \emph{$p$-encoding}:
 
 \begin{definition}[$p$-encoding]
-    A \emph{$p$-encoding} is a function $\Encoding: \mathbb B \mapsto 2^{\mathbb Z_p}$ that maps the Boolean space to a subset of the discretized torus. A $p$-encoding is \emph{valid} if and only if:
+    A \emph{$p$-encoding} is a function $\Encoding: \B \mapsto 2^{\Z_p}$ that maps the Boolean space to a subset of the discretized torus. A $p$-encoding is \emph{valid} if and only if:
     \begin{equation}
         \begin{cases}
             \Encoding(0) \cap \Encoding(1) = \emptyset~\text{ and}\\
@@ -31,8 +32,7 @@ To represent Boolean values over $\Z_p$, we use a mapping function that we call 
 
 \begin{figure}
   \centering
-    \includegraphics[scale=0.2]{images/encoding_example_double.png}
-
+    \includegraphics[scale=0.2]{img/to_harmonize/encoding_example_double.png}
   \caption{Representation of two valid $p$-encodings. The green part represents $\Encoding(1)$,  and the red part $\Encoding(0)$. Note that the relaxed negacyclity is respected by the $p$-encoding on the right-hand figure as $p$ is even.}
   \label{fig:encodings}
 \end{figure}
@@ -67,7 +67,7 @@ Let $c$ be a ciphertext encoding a bit $b$ under a $p$-encoding $\Encoding$, whe
 
 
 
-Our goal is to represent the Boolean function we want to evaluate with a sum of $p$-encodings (we define what we mean by ``sum of $p$-encoding'' in Section \ref{sec:new_strategy}).  When sums are carried out on ciphertexts (and so homomorphically on the underlying $p$-encodings), the sets $\Encoding(0)$ and $\Encoding(1)$ of the $p$-encodings may move, grow, shrink, but they should never overlap as it would result in a loss of information. As we removed the need of a bit of padding, we do not need to track a potential overflow of data (informally we say that ciphertexts are free to ``go around the torus''). After the sum, the encoding of the result can be reset to a canonical one with a PBS to allow further computation. Or, if the homomorphic computation is over, the result can be recovered by decrypting the ciphertext and checking in which partition the decrypted value lies.
+Our goal is to represent the Boolean function we want to evaluate with a sum of $p$-encodings (we define what we mean by ``sum of $p$-encoding'' in Section \ref{sec:p_encodings_new_strategy}).  When sums are carried out on ciphertexts (and so homomorphically on the underlying $p$-encodings), the sets $\Encoding(0)$ and $\Encoding(1)$ of the $p$-encodings may move, grow, shrink, but they should never overlap as it would result in a loss of information. As we removed the need of a bit of padding, we do not need to track a potential overflow of data (informally we say that ciphertexts are free to ``loop around the torus''). After the sum, the encoding of the result can be reset to a canonical one with a PBS to allow further computation. Or, if the homomorphic computation is over, the result can be recovered by decrypting the ciphertext and checking in which partition the decrypted value lies.
 
 
 The next subsection explains in further details the process of evaluating Boolean functions on with $p$-encodings.
@@ -75,7 +75,7 @@ The next subsection explains in further details the process of evaluating Boolea
 
 
 \subsection{A New Strategy for Homomorphic Boolean Evaluation}
-\label{sec:new_strategy}
+\label{sec:p_encodings_new_strategy}
 
 
 
@@ -131,7 +131,7 @@ Figure \ref{fig:operations} further illustrates this construction for these two 
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{images/operators.png}
+    \includegraphics[width=\textwidth]{img/to_harmonize/operators.png}
     \caption{Starting from two canonical encodings, we produce two new $p$-encodings corresponding to the results of the $\&$ and the $\oplus$ operations.}
     \label{fig:operations}
 \end{figure}
@@ -172,7 +172,7 @@ Of course, for a given $p_{in}$ and a given $f$, such a gadget may not exist. In
     \item Splitting the function into a graph of subfunctions, and evaluating each one with a gadget.
 \end{itemize}
 
-The question of constructing valid gadgets for a given $f$ is treated in Section \ref{sec:search}. The question of efficiently splitting a function is treated in Section \ref{sec:graphs}.
+The question of constructing valid gadgets for a given $f$ is treated in Section \ref{sec:p_encodings_search}. The question of efficiently splitting a function is treated in Section \ref{sec:p_encodings_graphs}.
 
 
 \paragraph{Example:} We illustrate our approach with a simple working example: let $f$ be a basic multiplexing function, such that  $$
@@ -181,7 +181,7 @@ f(a, b, c) = \begin{cases}
     b \text{ if } c = 0
 \end{cases}
 $$
-Instead of leveraging its Boolean representation $f(a, b, c) = a \& c \oplus b \& \Bar{c}$, which would cost 3 PBS with the approach of \cite{cryptoeprint:2018/421}, our strategy consists in constructing a gadget and apply it to the inputs $a$, $b$ and $c$, which takes only one PBS. Here is the step-by-step procedure:
+Instead of leveraging its Boolean representation $f(a, b, c) = a \& c \oplus b \& \Bar{c}$, which would cost 3 PBS with the approach of \cite{JC:CGGI20}, our strategy consists in constructing a gadget and apply it to the inputs $a$, $b$ and $c$, which takes only one PBS. Here is the step-by-step procedure:
 
 \begin{enumerate}
     \item Encrypting the bits with the $7$-encodings:\[\Encoding_a = \Encoding_b = \EncDefOne{1} \text{ and } \Encoding_c = \EncDefOne{2}\].
@@ -194,14 +194,14 @@ A visualization of this procedure can be found in Figure \ref{fig:illustration}.
 
 \begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{images/illustration_framework.png}
+    \includegraphics[width=\linewidth]{img/to_harmonize/illustration_framework.png}
     \caption{Illustration of an execution of the framework for the multiplexing function.}
     \label{fig:illustration}
 \end{figure}
 
 
 \subsection{Encoding Switching}
-\label{encoding_switching}
+
 
 To apply a gadget to a given ciphertext, it has to be encrypted under the right encoding. Thus, we need a method to homomorphically switch the encoding of a ciphertext. This allows as well to plug the output of any gadget on the input of any other one, and so to evaluate a chain of gadgets as long as we want. In the following, we explore different possibilities of encoding switching. Let us begin with some trivial cases:
 
@@ -256,4 +256,3 @@ These techniques are powerful because they do not require any bootstrapping, so 
 
 
 
- See Sections \ref{sec:bootstrapping} and \ref{sec:accumulator} for a more in-depth insight on the actual procedure of programmable bootstrapping.

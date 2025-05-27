@@ -1,0 +1,44 @@
+% !TeX_ROOT=../../thesis.tex
+
+%%%% 2. PACKAGES %%%%
+%\usepackage{subcaption}
+%\usepackage{multirow}
+%\usepackage{todonotes}
+%\usepackage{wrapfig}
+%\usepackage{tikz}
+
+%%% Custom header %%%
+%\input{tex_files/ZZ_header}
+
+
+
+%%%% 6. ABSTRACT %%%%
+%\begin{abstract}
+%We propose a new framework to homomorphically evaluate Boolean functions using the Torus Fully Homomorphic Encryption (TFHE) scheme. Compared to previous approaches focusing on Boolean gates, our technique can evaluate more complex Boolean functions with several inputs using a single bootstrapping. This allows us to greatly reduce the number of bootstrapping operations necessary to evaluate a Boolean circuit compared to previous works, thus achieving significant improvements in terms of performances. We define theoretically our approach which consists in adding an intermediate homomorphic layer between the plain Boolean space and the ciphertext space. This layer relies on so-called $p$-encodings embedding bits into $\mathbb{Z}_p$. We analyze the properties of these encodings to enable the evaluation of a given Boolean function and provide a deterministic algorithm (as well as an efficient heuristic) to find valid sets of encodings for a given function. We also propose a method to decompose any Boolean circuit into Boolean functions which are efficiently evaluable using our approach. We apply our framework to homomorphically evaluate various cryptographic primitives, and in particular the AES cipher.  Our implementation results show significant improvements compared to the state of the art.
+%\end{abstract}
+
+
+%%%%% 7. PAPER CONTENT %%%%
+%\input{00_new_commands.tex}
+%\input{01_introduction}
+%\input{02_preliminaries_on_tfhe}
+%\input{03_encodings}
+%\input{04_truth_table_algorithm}
+%\input{07_graphs}
+%\input{05_adaptation_tfhe}
+%\input{06_implementations}
+%\input{08_aes}
+%\input{09_conclusion}
+
+
+
+\chapter[Acceleration of Homomorphic Boolean Functions]{A first application: Accelerating Boolean circuits evaluation with $p$-encodings}
+\label{chap:p_encodings}
+
+\TODO{repasser sur l'intro}
+
+%\input{tex/p_encodings/01_introduction.tex}
+\input{tex/p_encodings/02_preliminaries_on_tfhe}
+\input{tex/p_encodings/03_encodings.tex}
+\input{tex/p_encodings/04_truth_table_algorithm}
+
