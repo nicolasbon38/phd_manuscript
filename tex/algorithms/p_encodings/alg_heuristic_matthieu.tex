@@ -1,0 +1,37 @@
+\begin{algorithm}
+	 \caption{Sample a solution $\vec d$ in $\Z$ for a function $f$ and returns a possible value for $p$.}
+	\label{alg:heuristic_matthieu}
+	
+	\KwIn{
+		$\left\{
+		\begin{aligned}
+				&\{\mat{C}_i\}_{1 \le i \le n} \text{: The lines of the matrix of constraints $\mat C$ of the function $f$ }\\
+			    &P \text{: The set of possible values for $p$ to be tested}\\
+			    &D \text{: The set of possible values in $\Z$ to assign to the $d_i$'s. (large primes)}
+		\end{aligned}
+		\right.$
+	}
+	
+	\KwResult{
+ 		$p$ such that it is possible to evaluate $f$ using a modulus smaller or equal than $p$.
+	}
+	
+	
+	% Add vertical space and horizontal line
+	\vspace{0.5em} % adjust the space as needed
+	\hrule
+	\vspace{0.5em} % adjust the space as needed
+	
+	$\vec{d} \drawfrom D$ \Comment*[r]{Sample random prime values in $\Z$}
+	$\vec r = C \times \vec{d}$  \Comment*[r]{$\vec r$ is the right member of the system}
+	\For {$p \in P$}{
+	    \uIf{$0 \in [\Vec{r}]_p$}{
+	        $P \gets P \setminus \{p\}$ \Comment*[r]{If this value of $p$ divides one of the coordinates of $\vec r$, then it will not work}
+		}
+	}
+	\uIf{$\mid P \mid > 0$}{
+	  \Return{$\min(P)$} \Comment*[r]{Returns the smallest possible value for $p$, if any.}
+	 }
+	
+	\Return{$\bot$}	
+\end{algorithm}

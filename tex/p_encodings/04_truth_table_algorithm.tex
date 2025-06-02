@@ -135,62 +135,9 @@ $j$ values already computed at higher depth for $\vec{d}$ and the matrix of cons
 \end{theorem}
 
 
-
-\TODO{Harmoniser l'algorithme suivant (commenté)}
-%\begin{algorithm}
-%    \caption{Recursive function \texttt{search} that adds an element to the vector $\vec{d}$}
-%    \label{alg:add_element}
-%    \begin{algorithmic}
-%    \Require \\
-%    $\vec{d}:= (d_i)_{1 \le i \le j}$  \Comment{The vector of values for the inputs already computed}  \newline
-%    $\{C_i \vert i \in \{0, \dots, \ell-1\}\}$   \Comment{The matrices of constraints, pre-computed}  \newline
-%    $p \in \N^*$ \Comment{the modulus of the input encodings}    \newline
-%    $\ell \in \N^*$ \Comment{The target number of encodings required}
-%    \Ensure $f$ is evaluable using the encodings $\vec{d}$.
-%    \If{$j = \ell$}
-%        \State{\Return $\Vec{d}$}    \Comment{Base case of recursion when a complete solution has been found}
-%    \Else
-%        \State{$\mathcal P \gets \texttt{get\_possible\_values}(\vec{d}, C_{j + 1}, p)$}      \Comment{Retrieving the set of }
-%        \State{} \hfill {possible values for $d_k$.}
-%        \For{$x \in \mathcal{P}$}
-%            \State{$\vec{d} \gets (\vec{d} \vert \vert x)$}     \Comment{Affecting one of the possible value to $d_k$}
-%            \State{$\vec d_{sol} \gets \texttt{search}(\vec{d}, C, p, \ell)$}  \Comment{Recursively calling the algorithm} %with one more input}
-%            \If {$\vec d_{sol} \ne \bot$}
-%                \State{\Return $\vec d_{sol}$}  \Comment{If a final solution has been found, }
-%        \State{} \hfill {propagating it to the higher level}
-%            \Else
-%                \State{$\vec{d} \gets \vec{d}[:j+1]$}   \Comment{If the previous call failed, we remove }
-%        \State{} \hfill { the last value and try an other one.}
-%            \EndIf
-%        \EndFor
-%        \State{\Return{$\bot$}}         \Comment{If all of the possibilities have been tested }
-%        \State{} \hfill { and none of them work, we need to backtrack}
-%    \EndIf
-%    \end{algorithmic}
-%\end{algorithm}
+\input{tex/algorithms/p_encodings/alg_add_element.tex}
 
 
-
-%\begin{algorithm}
-%    \caption{Function \texttt{get\_possible\_values} that builds the set of possible values for the next slot of $\vec{d}$ given the slots already filled in.}
-%    \label{alg:get_possible_values}
-%    \begin{algorithmic}
-%        \Require \\
-%        $\vec{d}:= (d_i)_{\{1 \le i \le j\}}$  \Comment{The set of values for the inputs already computed. Note that $d_1$ is fixed to $1$}  \newline
-%        $C_{j + 1}$   \Comment{The matrix of constraints of this step, pre-computed}  \newline
-%        $p \in \N^*$ \Comment{the modulus of input encoding}    \newline
-%        \Ensure The set $S$ contains only values suitable for the $j+1$-th slot of $\vec{d}$.
-%        \State{$\bar S \gets \{\}$} \Comment{$\bar S$ is the set of forbidden values for $d_{j+1}$}
-%        \For {$c \in C_{j+1}$}
-%            % \State{$\bar c \gets (- c[-1] \cdot c[0], -c[-1] \cdot c[1], \dots)$}
-%            % \State{$\bar C \gets \bar C \cup \{\bar c\}$}
-%            \State{$\bar c \gets c[j+1]$} \Comment{We retrieve the $(j+1)$th coefficient of the inequation $c$}
-%            \State{$\bar S \gets \bar S \cup \{\modulo{- \bar c \cdot \sum_{k=1}^{j} c_k \cdot d_k}{p}$\}} \Comment{We compute the value forbidden by $c$}
-%        \EndFor
-%    \State{$S \gets \Z_p \setminus \bar S$}
-%    \State{\Return $S$}
-%    \end{algorithmic}
-%\end{algorithm}
 
 \paragraph{Optimizations:} Several optimizations are possible to improve the performances of the search. First, in Algorithm \ref{alg:get_possible_values}, one can check the size of the set $\bar S$ at each iteration and stop as soon as the size of the set is $p$. Such a set means that a dead-end has been reached and that no value will be returned by the function. Then, one can leverage symmetries existing in the table but also in the function. For example, if we consider the function $f: (x, y) \longrightarrow x \oplus y$, the two variables $x$ and $y$ have symmetric roles. Thus, if the pair of encodings $(\Encoding_x, \Encoding_y)$ is valid, then the pair $(\Encoding_y, \Encoding_x)$ is valid as well. As a consequence, one can arbitrarily set $d_x \le d_y$ and removing half the possibilities for $(x, y)$.
 
@@ -272,28 +219,8 @@ To reduce the amount of samples required to find a solution, we want to avoid sa
 
 
 
-%\begin{algorithm}
-%    \caption{Sample a solution $\vec d$ in $\Z$ for a function $f$ and returns a possible value for $p$.}
-%    \label{alg:heuristic_matthieu}
-%    \begin{algorithmic}
-%    \Require \\
-%    $\{C_i\}_{1 \le i \le n}$ \Comment{The lines of the matrix of constraints $C$ of the function $f$ } \newline
-%    $P$ \Comment{The sets of possible values for $p$ to be tested} \newline
-%    $D$ \Comment{The sets of possible values in $\Z$ to assign to the $d_i$'s. All these elements are big primes}
-%    \Ensure $f$ is possible to evaluate using a modulus smaller or equal than $p$.
-%    \State{$\vec{d} \drawfrom D$} \Comment{Sample random prime values in $\Z$ and assign it to $\Vec{d} = (d_1, \dots, d_l)$}
-%    \State{$\vec r = C \times \vec{d}$}  \Comment{$\vec r$ is the right member of the system}
-%    \For {$p \in P$}
-%        \If{$0 \in [\Vec{r}]_p$}          \Comment{If $p$ divides one of the coordinates of $\vec r$}
-%            \State{$P \gets P \setminus \{p\}$} \Comment{This value of $p$ is incorrect}
-%        \EndIf
-%    \EndFor
-%    \If{$\mid P \mid > 0$}
-%        \State{\Return{$\min(P)$}} \Comment{Returns the smallest possible value for $p$, if any.}
-%    \EndIf   
-%    \end{algorithmic}
-%\end{algorithm}
-
+\input{tex/algorithms/p_encodings/alg_heuristic_matthieu.tex}
+\TODO{Harmoniser ci-dessus}
 
 Running this algorithm several times and keeping the smallest returned value for $p$, one gets an upper bound on the minimum $p$ required to evaluate a function with our framework. Note that, on the contrary of the deterministic search algorithm, this heuristic does not require a prime $p$.
 

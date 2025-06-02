@@ -20,12 +20,30 @@
 \section{The bootstrapping : breakthrough construction}
 \label{sec:gentry_bootstrapping}
 
-\TODO{Ici, citer le papier original de gentry et le blueprint de bootstrapping}
 
 In 2009, Craig Gentry publishes the breakthrough paper \textit{Fully Homomorphic Encryption using Ideal Lattices} \cite{STOC:Gentry09}. In this work, he introduces the first ever fully homomorphic encryption scheme. Its main idea is the \textit{bootstrappability} of a scheme.
 
-Bootstrapability is the ability of a scheme to evaluate homomorphically its own decryption circuit.
+Bootstrappability is the ability of a scheme to evaluate homomorphically its own decryption circuit. Gentry shows that if a scheme achieves bootstrappability, then it achieves fully homomorphic encryption. Building on this theoretical result, he constructs a lattice-based bootstrappable scheme and demonstrates the first ever example of fully homomorphic scheme.
 
+Since this foundational work, lattice-based constructions have remained the only serious candidate for fully homomorphic encryption. 
+
+Such homomorphic schemes work by injecting some small random noise in the plaintext data before encryption. Its role is to ensure security, relying on computational hardness assumptions such as Learning With Errors (LWE) (we explain it further in Section \ref{sec:hardness_assumptions}). Because the noise is small, it can be easily removed during decryption by a simple rounding operation. 
+
+Gentry's original scheme offered homomorphic additions and multiplications. However, because the plaintext messages are noisy, these operations increase the noise in the ciphertexts. So, if too much operations are performed, the noise gets so large that it becomes preponderant and blows the meaningful information contained in the ciphertexts.
+
+This is where bootstrappability comes in. It gives access to an operation (the \textit{bootstrapping}) that decrypts homomorphically the noisy ciphertexts. But how can this help to achieve FHE ?
+
+Imagine the server has a ciphertext $\vec c_1$ encrypting the (noisy) message $m +e_1$ under the secret key $\vec s_1$, where $m$ is the plain message and $e_1$ denotes the noise. Let us say that $\vec c_1$ is the result of a large number of homomorphic operations, so the noise $e_1$ is rather large. If we want to keep computing without losing information, we need to reduce the noise by a bootstrapping. 
+
+To do so, the client needs to give to the server a \textit{bootstrapping key} $\BSK$. In order to create it, the client can treat the secret key $s_1$ as a message and encrypt it under another secret key $s_2$ to produce $\BSK = \texttt{Enc}_{s_2}(s_1)$. Now, if the server computes \textit{homomorphically} the decryption of $c_1$ using $\BSK$, it retrieves an encryption $c_2$ of the same message under the secret key $s_2$. But because, decryption removes noise, $e_1$ disappears and the ciphertext is fresh again !
+
+Actually, \textit{all} the noise does not get removed (this would be a shame, because the security of the encryption relies on the presence of noise in the ciphertexts). As there is some noise in the encryption in $\BSK$, the result $c_2$ carries some noise $e_2$. But if things are well dimensioned, it is possible to get $e_2 \ll e_1$ and so gain some room for further computations.
+
+
+Gentry's original scheme was merely theoretical, because the homomorphic operations and in particular the bootstrapping were extremely slow (and the size of the objects were extremely large). But since then, significant improvements have been achieved in FHE efficiency. Modern schemes are on the verge of being usable in practice for some use-cases. In the next section, we give a tour of the modern schemes and libraries that makes the FHE landcape as of today.
+
+
+\TODO{Faire une figure}
 
 
 \section{Current landscape of the FHE schemes and libraries}

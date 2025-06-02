@@ -1,0 +1,60 @@
+\newcommand{\symcolor}{MediumRed}
+\newcommand{\fhecolor}{MediumGreen}
+
+\pgfmathsetmacro{\sizenode}{1}
+\pgfmathsetmacro{\sizeindice}{0.5 * \sizenode}  % Compute value dynamically
+
+
+% Define the custom command
+\newcommand{\imageinbox}[5]{
+	% Draw the colored box
+	\node[draw=#3, very thick, inner sep=4pt] (#5) at (#4) {
+		\includegraphics[width=\sizenode cm]{assets/#1} % Main image
+	};
+	
+	
+	% Overlay the smaller image in the lower right corner
+	\node[anchor=south west, inner sep=0pt] at ($(#5.south east) + (-0.3, -0.2)$) {
+		\includegraphics[width=\sizeindice cm]{assets/#2} % Smaller image
+	};
+}
+
+\newcommand{\encryptedvalue}[4]{
+	\imageinbox{#1}{cadenas.png}{#2}{#3}{#4}
+}
+
+
+
+\newcommand{\operatorwithimage}[5]{
+	\node [draw=#1, very thick, rectangle, minimum width=\sizenode cm, minimum height=\sizenode cm] (#2) at (#3) {
+		\begin{tabular}{c}
+			#4 \\
+			\includegraphics[width=\sizeindice cm]{assets/#5}
+		\end{tabular}
+	};
+}
+
+
+\newcommand{\homomorphicoperator}[4]{
+	\node [draw=#1, rectangle, very thick, pattern={Lines[angle=45, line width=1mm, distance=3mm]}, pattern color=\fhecolor!50, minimum width=\sizenode cm, minimum height=\sizenode cm] (#2) at (#3) {#4};
+}
+
+
+% define the nodes
+
+\newcommand{\encsym}[1]{\operatorwithimage{\symcolor}{enc_sym}{#1}{$\textsf{Enc}_{\textsf{Sym}}$}{red_key.png}}
+\newcommand{\encfhe}[1]{\operatorwithimage{\fhecolor}{enc_fhe}{#1}{$\textsf{Enc}_{\textsf{FHE}}$}{green_key.png}}
+\newcommand{\decfhe}[1]{\operatorwithimage{\fhecolor}{dec_fhe}{#1}{$\textsf{Dec}_{\textsf{FHE}}$}{green_key.png}}
+
+\newcommand{\fheneuralnetwork}[1]{\homomorphicoperator{\fhecolor}{fhe_neural_network}{#1}{
+	\includegraphics[width=\sizenode cm]{assets/neural_network.png}
+}}
+\newcommand{\transciphering}[1]{\homomorphicoperator{\fhecolor}{transciphering}{#1}{$\textsf{Dec}_{\textsf{Sym}}^{(\textsf{FHE})}$}}
+
+
+
+\newcommand{\encrypteddata}[1]{\encryptedvalue{data.png}{\symcolor}{#1}{data_sym}}
+\newcommand{\fhedata}[1]{\encryptedvalue{data.png}{\fhecolor}{#1}{data_fhe}}
+\newcommand{\encryptedkey}[1]{\encryptedvalue{red_key.png}{\fhecolor}{#1}{encrypted_key}}
+
+

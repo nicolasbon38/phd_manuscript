@@ -3,7 +3,7 @@
 
 %\subsubsection{Reminders on AES and Choice of an Alternative Representation}
 
-AES \cite{aes-original}, or Advanced Encryption Standard, stands as one of the most widely used and trusted encryption algorithms in the world of computer security. Its standardization occured in 2001 when it was adopted by NIST to replace the obsolete DES (Data Encryption Standard). Implementing this primitive in FHE is known as particularly tricky and only few attempts have been made \cite{C:GenHalSma12}, \cite{PKC:CorLepTib14}, \cite{trama-aes}.
+AES \cite{aes-original}, or Advanced Encryption Standard, stands as one of the most widely used and trusted encryption algorithms in the world of computer security. Its standardization occured in 2001 when it was adopted by NIST to replace the obsolete DES (Data Encryption Standard). Implementing this primitive in FHE is known as particularly tricky and only few attempts have been made \cite{C:GenHalSma12}, \cite{PKC:CorLepTib14}, \cite{DBLP:conf/wahc/TramaCBS23}.
 
 A round of AES can be decomposed into 4 steps:
 \begin{enumerate}
@@ -26,11 +26,11 @@ We thus need to leverage an alternative representation of the s-box. A well know
 \end{enumerate}
 
 
-To design our implementation of AES, we will use the strategy we introduced for Keccak (Section \ref{sec:keccak}) and ASCON (Section \ref{sec:ascon}) and that is illustrated on Figure \ref{fig:layout_spn}. The steps \texttt{ShiftRows}, \texttt{MixColumns}, \texttt{AddRoundKeys} only involves \texttt{XOR} operators, so we will carry them out with $p=2$. Same things with the steps 1. and 3. of the circuit of \texttt{SubBytes} of \cite{boyar}. The only part remaining is the Step 2. of the \texttt{SubBytes}, that is a non-linear circuit. We evaluate this circuit using gadgets and the approach introduced in Section \ref{sec:graphs}. A layer of encoding switching allows to link both parts.
+To design our implementation of AES, we will use the strategy we introduced for Keccak (Section \ref{sec:keccak}) and ASCON (Section \ref{sec:ascon}) and that is illustrated on Figure \ref{fig:layout_spn}. The steps \texttt{ShiftRows}, \texttt{MixColumns}, \texttt{AddRoundKeys} only involves \texttt{XOR} operators, so we will carry them out with $p=2$. Same things with the steps 1. and 3. of the circuit of \texttt{SubBytes} of \cite{boyar}. The only part remaining is the Step 2. of the \texttt{SubBytes}, that is a non-linear circuit. We evaluate this circuit using gadgets and the approach introduced in Section \ref{sec:p_encodings_graphs}. A layer of encoding switching allows to link both parts.
 
- In particular, \texttt{MixColumns} can be reduced to a serie of \texttt{XOR} (in our implementation, we use the circuit designed in \cite{mixcol}). 
+ In particular, \texttt{MixColumns} can be reduced to a serie of \texttt{XOR} (in our implementation, we use the circuit designed in \cite{EPRINT:Maximov19}). 
 
-In the following, we focus on the implementation of the non-linear layer using the approach by graphs of Section \ref{sec:graphs}.
+In the following, we focus on the implementation of the non-linear layer using the approach by graphs of Section \ref{sec:p_encodings_graphs}.
 
 
 \subsubsection{Homomorphization of the S-box}
@@ -41,7 +41,7 @@ We start from the circuit representation given in the work of \cite{boyar}. This
 
 Each of the $18$ outputs $(z_0, \dots, z_{17})$ are isolated from each other and the circuits $(\mathcal{A}_0, \dots, \mathcal{A}_{17})$ generating them are separated. Of course, some intermediary values are used in several circuits, but for now we ignore this and we considerate the $18$ problems as independent from each other. 
 
-Then, for each circuit $\mathcal{A}_i$, we run the algorithm explained in Section \ref{sec:graphs} to produce an efficient graph. We merge all those graphs and run everything for a total of 36 PBS to evaluate the full circuit $\mathcal{A}$, with a global $p = 11$. This allows a relatively quick bootstrapping.
+Then, for each circuit $\mathcal{A}_i$, we run the algorithm explained in Section \ref{sec:p_encodings_graphs} to produce an efficient graph. We merge all those graphs and run everything for a total of 36 PBS to evaluate the full circuit $\mathcal{A}$, with a global $p = 11$. This allows a relatively quick bootstrapping.
 
 Recall that the \texttt{SubBytes} step is made of 16 s-boxes. So, we can derive that one execution of the \texttt{SubBytes} step takes $16 \times 36 = 576$ PBS. 
 
@@ -52,14 +52,14 @@ The outputs of this step would be encoded with $p=2$, allowing the \texttt{XOR} 
 In terms of performances, with a set of parameters ensuring a security level of $\lambda=128$ bits and an error probability $\epsilon=2^{-40}$, a PBS takes $17$ ms on our hardware. The total runtime of the whole implementation on one thread is $135$ s. We note that the $16$ evaluations of s-boxes in \texttt{SubBytes} can be parallelized, as well as each of the $128$ encoding switchings before \texttt{SubBytes}. Moreover, within each s-box, we can locally apply our strategy of parallelization introduced in Section \ref{sec:parallelization}.
 
 
-We compare favorably to previous works of \cite{C:GenHalSma12} and \cite{PKC:CorLepTib14}, who report timings of respectively 18~minutes and 5~minutes for a full AES, Once again, authors do not mention the value of $\epsilon$. The more recent work of \cite{trama-aes}, also proposes an implementation of \texttt{AES-128} using a completely different technique called the \emph{tree-bootstrapping}. On a similar experimental setup, but with a failure probability $\epsilon=2^{-23}$, they claim an execution in $270$~s on one thread. We ran again our code with an other set of parameters tailored for the same $\epsilon$ and obtained a full run in $103$~s.  Note that in our implementation, we used the mode restrictive set of parameters $\texttt{PBS}_{(11, 4)}$ for every bootstrapping (even the ones that should be performed with $\texttt{PBS}_{(2, 1}$. We also derived the theoretical timing that could have been achieved if we had implemented this with two server keys (one for each set of parameters). This theoretical timing should be of $105$ s with $\epsilon=2^{-40}$, we added it in Table \ref{tab:concrete_perfs}.
+We compare favorably to previous works of \cite{C:GenHalSma12} and \cite{PKC:CorLepTib14}, who report timings of respectively 18~minutes and 5~minutes for a full AES, Once again, authors do not mention the value of $\epsilon$. The more recent work of \cite{DBLP:conf/wahc/TramaCBS23}, also proposes an implementation of \texttt{AES-128} using a completely different technique called the \emph{tree-bootstrapping}. On a similar experimental setup, but with a failure probability $\epsilon=2^{-23}$, they claim an execution in $270$~s on one thread. We ran again our code with an other set of parameters tailored for the same $\epsilon$ and obtained a full run in $103$~s.  Note that in our implementation, we used the mode restrictive set of parameters $\texttt{PBS}_{(11, 4)}$ for every bootstrapping (even the ones that should be performed with $\texttt{PBS}_{(2, 1}$. We also derived the theoretical timing that could have been achieved if we had implemented this with two server keys (one for each set of parameters). This theoretical timing should be of $105$ s with $\epsilon=2^{-40}$, we added it in Table \ref{tab:concrete_perfs}.
 
 
 \subsection{Summary of Applications}
 \label{sec:tables_perfs}
 
 
-We summarize hereafter the parameters and performances of our implementations of cryptographic primitives. Table~\ref{tab:parameters} gives an overview of the TFHE parameters used for each value of $p$ in these examples. They all meet the required level of security of $2^{128}$ and the error probability $\epsilon=2^{-40}$. It also shows the associated $p$ and the norm of $\vec d$, denoted by $\mathcal{N}_{\vec d}$ (that corresponds to $\mathcal{N}_{\vec d} = \lceil \log_2(\customnorm{\vec d}) \rceil$) that are the input of the parameter selection algorithm. To allow the comparison with the strategy of gate bootstrapping, we also included the set of parameters hardcoded in \texttt{tfhe-rs} to evaluate boolean operators. Table \ref{tab:complexity_primitives} shows the complexity of the cryptographic primitives expressed in PBS with our framework. It can be compared with Table \ref{tab:gates}, that illustrates the number of PBS required with the naive strategy of gate bootstrapping. Finally, Table \ref{tab:concrete_perfs} shows the concrete performance achieved by our implementations on our machine, as well as the comparison with other works and with the gate bootstrapping. For more information about an implementation or a comparison, the reader is referred to the related section.
+We summarize hereafter the parameters and performances of our implementations of cryptographic primitives. Table~\ref{tab:parameters} gives an overview of the TFHE parameters used for each value of $p$ in these examples. They all meet the required level of security of $2^{128}$ and the error probability $\epsilon=2^{-40}$. It also shows the associated $p$ and the norm of $\vec d$, denoted by $\mathcal{N}_{\vec d}$ (that corresponds to $\mathcal{N}_{\vec d} = \lceil \log_2(\norm{\vec d}) \rceil$) that are the input of the parameter selection algorithm. To allow the comparison with the strategy of gate bootstrapping, we also included the set of parameters hardcoded in \texttt{tfhe-rs} to evaluate boolean operators. Table \ref{tab:complexity_primitives} shows the complexity of the cryptographic primitives expressed in PBS with our framework. It can be compared with Table \ref{tab:gates}, that illustrates the number of PBS required with the naive strategy of gate bootstrapping. Finally, Table \ref{tab:concrete_perfs} shows the concrete performance achieved by our implementations on our machine, as well as the comparison with other works and with the gate bootstrapping. For more information about an implementation or a comparison, the reader is referred to the related section.
 
 \newcommand{\PBS}{\mathsf{PBS}}
 
@@ -94,7 +94,7 @@ We summarize hereafter the parameters and performances of our implementations of
 
     \medskip 
     
-    \caption{Sets of TFHE parameters for each PBS used in our implementations, with the constraints used to generate the sets, and the performances. Each setting is referenced as \texttt{$\PBS_{(p, \mathcal{N}_d)}$} with $\mathcal{N}_d = \lceil \log_2(\customnorm{d})\rceil$. All this parameters ensure a level of security $\lambda=128$ bits and a failure probability of bootstrapping of $\epsilon=2^{-40}$. $q$ is always fixed to $2^{32}$. \texttt{$\PBS_{gate}$} refers to the naive case of the gate bootstrapping implemented in \cite{tfhe-rs} and is used to estimate the timings of the naive strategy in Table \ref{tab:concrete_perfs}.}
+    \caption{Sets of TFHE parameters for each PBS used in our implementations, with the constraints used to generate the sets, and the performances. Each setting is referenced as \texttt{$\PBS_{(p, \mathcal{N}_d)}$} with $\mathcal{N}_d = \lceil \log_2(\norm{d})\rceil$. All this parameters ensure a level of security $\lambda=128$ bits and a failure probability of bootstrapping of $\epsilon=2^{-40}$. $q$ is always fixed to $2^{32}$. \texttt{$\PBS_{gate}$} refers to the naive case of the gate bootstrapping implemented in \cite{tfhe-rs} and is used to estimate the timings of the naive strategy in Table \ref{tab:concrete_perfs}.}
     \label{tab:parameters}
 \end{table}
 
@@ -158,7 +158,7 @@ We summarize hereafter the parameters and performances of our implementations of
         \hline
         \multirow{2}{*}{\ref{sec:aes}} & One evaluation of the AES s-box & 115 (\cite{boyar})\\
         \cline{2-3}
-        & A full run of \texttt{AES-128}  & 23360 (\cite{boyar}, \cite{mixcol})\\
+        & A full run of \texttt{AES-128}  & 23360 (\cite{boyar}, \cite{EPRINT:Maximov19})\\
         \hline
     \end{tabular}
     \medskip
@@ -177,7 +177,7 @@ We summarize hereafter the parameters and performances of our implementations of
     \hline
         \multirow{3}{*}{One full run of SIMON} & Gate Bootstrapping & 174 s\\
         \cline{2-3}
-        & \cite{cryptoeprint:2023/480} $\dagger$ & 128 s\\
+        & \cite{DBLP:conf/fps/BendoukhaSSQS22} $\dagger$ & 128 s\\
         \cline{2-3}
          & Our work (Section \ref{sec:simon}) & 10 s \\
          \hline
@@ -206,7 +206,7 @@ We summarize hereafter the parameters and performances of our implementations of
         \cline{2-3}
         & \cite{PKC:CorLepTib14} $\dagger$ & 5 min\\
         \cline{2-3}
-        & \cite{trama-aes} & 270 s\\
+        & \cite{DBLP:conf/wahc/TramaCBS23} & 270 s\\
         \cline{2-3}
         & Our work (Section \ref{sec:aes}) & 103 s\\
     \hline

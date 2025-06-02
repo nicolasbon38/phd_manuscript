@@ -1,0 +1,231 @@
+\section{Building Blocks of \hippo}
+\label{sec:previous-blocks}
+
+
+In this section, we present the two approaches from \cite{DBLP:conf/wahc/TramaCBS23} and \cite{TCHES:BonPoiRiv24} that we use as building blocks for our new algorithm.  \cite{DBLP:conf/wahc/TramaCBS23} is simply recalled, while \cite{TCHES:BonPoiRiv24} is generalized beyond just the Boolean case. We also formally present some advanced homomorphic primitives used in these works that we reuse as well.
+
+\subsection{The ``Full-LUT'' Approach}
+
+In the ``Full-LUT'' approach of~\cite{DBLP:conf/wahc/TramaCBS23}, AES is evaluated entirely with TFHE's programmable bootstrapping, encoding exclusively all operations within LUTs. To meet the performance constraints of the bootstrapping algorithm, this method operates on elements in $\Z_{16}$, ensuring efficient computation.
+
+\subsubsection{AES Subroutines as LUTs}
+
+The \SubBytes step, which involves the evaluation of an Sbox, is inherently a LUT operation and is therefore naturally implemented in FHE using a PBS. However, it must be evaluated over $\Z_{16}$ rather than $GF(256)$ for efficiency reasons. Converting the other AES steps into LUT evaluations also requires additional effort.
+
+In particular, in the original AES design \cite{aes-original}, the \MixColumns step is computed using a series of XOR operations and multiplications in $GF(256)$. Unfortunately, TFHE’s native cleartext-ciphertext multiplication cannot directly handle these $GF(256)$ multiplications because of the polynomial nature of the elements of this field. As a result, \MixColumns must be reformulated as a LUT evaluation.
+
+Additionally, the \AddRoundKey step, which uses XOR as its key operation, presents its own challenges because XOR is a bivariate operation that requires two inputs. Classical bootstrapping, which operates on single inputs, is insufficient for this purpose. To address this, the authors utilize a specialized bootstrapping method that supports operations on multiple encrypted inputs.
+
+\subsubsection{LUTs Evaluation} 
+Since the AES evaluation involves computing an 8-bit Sbox, a straightforward solution would be to work with 8-bit messages. With such messages, the homomorphic Sbox evaluation would require only one bootstrapping per byte. However, processing messages with more bits significantly slow down the bootstrapping process. For example, with 8-bit inputs, TFHE parameters result in bootstrapping times of approximately 1.5 seconds per byte on a standard laptop, making direct evaluation of the 8-bit Sbox (and other LUTs) infeasible.
+
+To address this issue, the authors of~\cite{DBLP:conf/wahc/TramaCBS23} propose a decomposition approach and demonstrate that the optimal representation of 8-bit inputs for their purpose is in $\Z_{16}$. Specifically, a message $M \in \{0, \cdots, 255\}$ is split into two 4-bit chunks (or \emph{nibbles}) $h$ and $l$ such that $M = 16h+l$. The encryption of $M$ is then represented as a vector containing the encryptions of $h$ and $l$ with the same key $sk$: $C=(c_0,c_1) \in \mathrm{LWE}_{sk}(h) \times \mathrm{LWE}_{sk}(l)$. 
+
+However, bootstrapping these decomposed inputs requires a method capable of handling multiple encrypted inputs. The authors explore several approaches for this, namely the chain-based method and the tree-based method \cite{TCHES:GuiBorAra21}. Their analysis concludes that the Tree-Based Method (TBM) is the most suitable for their needs. They also relies on the Multi-Value Bootstrapping (MVB) to produce several outputs for the cost of one PBS. We provide details about TBM and MVB in the following:
+
+\paragraph{Multi-Value Bootstrapping from \cite{RSA:CarIzaMol19}.}
+\label{primitive:mvb}
+%
+Multi-Value Bootstrapping (MVB) is a technique that enables the evaluation of $k$ distinct Look-Up Tables $(f_i)_{1 \le i \le k}$ on a single encrypted input, using only one $\sf{BlindRotate}$. This method is based on the factorization of the accumulator polynomials $acc_i(X)$ associated with each function $f_i$. Specifically, each accumulator polynomial is expressed as: 
+$$
+    acc_i(X) = \sum_{j=0}^{N-1} \alpha_{i,j} X^j, \quad \alpha_{i,j} \in \mathbb{Z}_q.
+$$
+The factorization then splits it into two parts: 
+$$
+    acc_i(X) = v_0(X) \cdot v_i(X) \mod (X^N + 1),
+$$
+where $v_0(X)$ is a common factor shared across all accumulators:
+$$
+    v_0(X) = \frac{1}{2} \cdot (1 + X + \dots + X^{N-1}),
+$$
+and $v_i(X)$ is a distinct factor specific to each function $f_i$:
+$$
+    v_i(X) = \alpha_{i, 0} + \alpha_{i, N-1} + (\alpha_{i, 1} - \alpha_{i, 0}) \cdot X + \dots + (\alpha_{i, N-1} - \alpha_{i, N-2}) \cdot X^{N-1}.
+$$
+This factorization is made possible thanks to the identity:
+$$
+(1 + X + \dots + X^{N-1}) \cdot (1-X) \equiv 2 \mod (X^N + 1).
+$$
+By leveraging this factorization and as illustrated on Figure~\ref{fig:mvb}, multiple LUTs can be evaluated on a single encrypted input by performing the following steps:
+\begin{enumerate}
+\item Computing a $\sf{BlindRotate}$ operation on an accumulator polynomial initialized with the value of $v_0$.
+\item Then multiplying with \texttt{ClearMultTFHE} the obtained rotated polynomial by each $v_i(X)$ corresponding to the LUT of $f_i$ to obtain the respective $acc_i(X)$.
+\end{enumerate}
+Finally, at the cost of a single $\sf{BlindRotate}$ and $k$ cleartext-ciphertext GLWE multiplications, one can obtain the evaluation of $k$ different LUTs on one single encrypted input. Moreover, this specific choice of factorization allows for a very-low norm for the vectors $v_i$'s (which in practice are very sparse), and so a very-low noise expansion.
+
+\TODO{Refaire ma propre figure}
+\begin{figure}
+    \centering
+%    \includegraphics[width=0.8\textwidth]{figures/mvb.pdf}
+    \caption{Difference between classic bootstrapping of several LUTs on a single input (a) and the use of MVB (b). Pink arrows represent cleartext-ciphertext RLWE multiplications. Figure extracted from \cite{DBLP:conf/wahc/TramaCBS23}.)}
+    \label{fig:mvb}
+\end{figure}
+
+This MVB primitive thus allows significant speed-ups in the implementation of \cite{DBLP:conf/wahc/TramaCBS23}, in particular in the evaluation of the Sbox or in the multiplications in $GF(256)$ that occur during the \MixColumns step. Indeed, since each byte is decomposed into two nibbles $h$ and $l$, the LUT corresponding, for instance, to the Sbox must also be decomposed into two tables: one providing the most significant nibble and one providing the least significant nibble. That is to say: 
+$$
+\texttt{tab}_{\textsc{msn}}[i] = \left\lfloor \frac{\texttt{Sbox}[i]}{16} \right\rfloor \quad \text{and} \quad \texttt{tab}_{\textsc{lsn}}[i] = \texttt{Sbox}[i] \mod 16.
+$$
+Each of these tables must be evaluated on an 8-bit payload ciphertext. 
+%\SB{à préciser plus tard: Thus the MVB can be used to factorize the blind rotations on the first level of the trees.}
+
+
+
+\begin{comment}
+In \cite{DBLP:conf/wahc/TramaCBS23}, the proposed approach involved evaluating AES entirely using TFHE's Programmable Bootstrapping. Consequently, every operation had to be converted into a Look-Up Table (LUT) evaluation. This introduced two key challenges:
+
+\paragraph{Expressing an AES round as a sequence of Look-Up Table evaluation --} The \SubBytes step (evaluation of an Sbox) being already a Look-Up Table, it is naturally implemented in FHE using a PBS. However, expressing the other steps as table indirections requires more work. Indeed, in the original AES design \cite{rijndael}, the \MixColumns step is performed with several XOR and multiplications in $GF(256)$. The naive TFHE's cleartext-ciphertext multiplication cannot be used to perform the multiplications in $GF(256)$ because of the polynomial nature of the elements of this field. As the other steps of an AES round, it has to be turned into a Look-Up Table evaluation.
+Moreover, as the XOR (the key operation of the \AddRoundKey step) is a bivariate operation (it takes two inputs), a classical bootstrapping is not sufficient. The authors have to perform bootstrapping with a method that allows bootstrapping on several encrypted inputs.
+This work of rewriting the AES also came with some small optimizations, especially in the \MixColumns computation. See \cite{DBLP:conf/wahc/TramaCBS23} for more details.
+
+\paragraph{Finding the right tools} 
+Since the AES evaluation includes evaluation of an 8-bit Sbox, a trivial solution would be to work with 8-bit messages. Indeed, with such messages, the homomorphic Sbox evaluation only requires one bootstrapping per byte. But, as introduced in \autoref{sec:preliminaries_tfhe}, manipulating messages of more bits requires larger parameters, significantly slowing down the bootstrapping evaluation. And with basis 256 inputs (that is to say, bytes), TFHE parameters do not allow a fast bootstrapping (about 1.5 seconds on a laptop).
+Thus, directly evaluating the 8-bit Sbox (and other LUTs) with basis 256 TFHE parameters is not an option. Some sort of slicing has to be done, and in the paper the authors show that the optimal basis of representation of 8-bit inputs is $\mathbb{Z}_{16}$. That is to say, for a message $M \in \{0, \cdots, 255\}$, they decompose it into two 4-bit chunks (also called "nibbles") $h$ and $l$ such that $M = 16h+l$. Then the encryption of $M$ is the vector containing the encryptions of $h$ and $l$, namely $C=(c_0,c_1) \in \mathrm{LWE}_k(h) \times \mathrm{LWE}_k(l)$.
+But to perform bootstrapping on these decomposed inputs, once again a method allowing to bootstrap on several encrypted inputs was needed. In their work, the authors discuss several methods (namely the new WoP-PBS \cite{WoPPBS}, the p-encoding method \cite{TCHES:BonPoiRiv23}, the chain-based method and the tree-based method \cite{Guimaraes_Borin_Aranha_2021}). Finally, their study show that for their purpose, the Tree-Based Method (TBM) is the best option.
+\smallskip
+
+It is easy to understand that this implementation requires to evaluate a lot of LUTs, that take as inputs \textit{several} limbs of data in $\mathbb Z_{16}$. The vanilla PBS provided by TFHE needs some tweaks to be able to do so. As a consequence, the paper relies on two important primitives (that we also make use in our implementation): the \textit{Multi-Value Bootstrapping}(MBV) and the \textit{Tree-based Bootstrapping} (TBM). We present them in the following:
+
+
+
+
+\begin{primitive}[Multi-Value Bootstrapping \cite{carpov_mvb}]
+    The Multi-Value Bootstrapping allows to evaluate $k$ different LUTs $(f_i)_{1 \le i \le k}$ on a \textit{single} input at the cost of a single bootstrapping. To do so, MVB factors the accumulators $acc_i(X)$, associated with the function $f_i$, into a product of two polynomials $v_0$ and $v_i$, where $v_0$ is a common factor to every $acc_i(X)$.
+    
+    In practice, we have:
+    $$
+        (1 + X + \dots + X^{N-1}) \cdot (1-X) \equiv 2 \mod (X^N + 1)
+    $$
+    
+    Now, by writing $acc_i(X)$ in the form $acc_i(X) = \sum_{j=0}^{N-1} \alpha_{i, j} X^j$ with $\alpha_{i, j} \in \Z_q$, we get from the previous equation:
+    
+    \begin{align*}
+        acc_i(X) &= \frac 1 2 \cdot (1 + X + \dots + X^{N-1}) \cdot (1 - X) \cdot acc_i(X) \mod (X^N + 1)\\
+        &= v_0 \cdot v_i \mod (X^N+1)    
+    \end{align*}
+
+    
+    where:
+
+    \begin{align*}
+        v_0 &= \frac 1 2 \cdot (1 + X + \dots + X^{N-1})\\
+        v_i &= \alpha_{i, 0} + \alpha_{i, N-1} + (\alpha_{i, 1} - \alpha_{i, 0}) \cdot X + \dots + (\alpha_{i, N-1} - \alpha_{i, N-2}) \cdot X^{N-1}
+    \end{align*}
+    
+    This factorization makes it possible to compute many LUTs using a unique bootstrapping. Indeed, it is enough to initialize the accumulator polynomial with the value of $v_0$ during bootstrapping. Then, after the $\sf{BlindRotate}$ operation, one has to multiply the obtained $v_0(X)$ by each $v_i$ corresponding to the LUT of $f_i$ to get $acc_i(X)$. Thus, at the cost of a single $\sf{BlindRotate}$ and $k$ cleartext-ciphertext GLWE multiplications, one can obtain the evaluation of $k$ different LUTs on one single encrypted input.     
+    \label{primitive:mvb}
+\end{primitive}
+
+
+
+This primitive thus allows significant speed-ups in the implementation of \cite{DBLP:conf/wahc/TramaCBS23},  in particular in the evaluation of the Sbox or in the multiplications in $GF(256)$ that occur during the \MixColumns step. Indeed, with each byte $M$ being decomposed into two nibbles $h$ and $l$, the LUT corresponding for instance to the Sbox must also be decomposed into two tables: one giving the most significant nibble and one giving the least significant nibble. That is to say: $\texttt{tab}_{\textsc{msn}}[i]= \floor\frac{\texttt{Sbox}[i]}{16}\floor$ and $\texttt{tab}_{\textsc{lsn}}[i]= \texttt{Sbox}[i]\pmod{16}$. Each of these tables must be evaluated on an 8-bit payload ciphertext. 
+Thus the MVB can be used to factorize the blind rotations on the first level of the trees.\\
+\todo{TODO: Dans la partie implémentation, éclaircir le $\frac 1 2$ et la répartition du scaling}
+\todo{Nicolas: il vaut mieux parler de l'optimisation de l'arbre après la définition du TBM à mon avis} \SB{je suis d'accord avec Nicolas, en parler dans le dernier paragraphe de cette sous-section}
+
+The second one is the Tree-based Bootstrapping:
+
+\end{comment}
+
+\paragraph{Tree-Based Method from \cite{DBLP:conf/wahc/TramaCBS23}.}
+\label{prim:tbb}
+
+Let $B, B', d \in \mathbb N^*$. The Tree-Based Method (TBM) allows to evaluate a LUT $f: \Z_{B^d} \mapsto \Z_ {B'}$ with a large input size $B^d$, by processing $d$ limbs of data in $\Z_B$. We consider input messages that are written as:
+$$
+    m = \sum_{i=0}^{d-1} m_i B^i, \quad \text{with } m_i \in \mathbb{Z}_B,
+$$
+and that are represented by $d$ ciphertexts $(c_0, c_1, \dots, c_{d-1})$ corresponding to the $d$ message components $(m_0, m_1, \dots, m_{d-1})$. 
+%
+To evaluate $f$, we encode a LUT for $f$ using $B^{d-1}$ accumulators, each represented by a polynomial $acc_i(X)$. These accumulators encode the functions:
+%
+    \begin{align*}
+        f_i: \Z_B &\rightarrow \Z_{B'}\\
+             x &\mapsto f(i + x \cdot B^{d-1})
+    \end{align*}
+%
+Next, we apply a $\sf{BlindRotate}$ and a $\sf{SampleExtract}$ to each accumulator $acc_i(X)$, using $c_{d-1}$ as the selector. This operation produces $B^{d-1}$ LWE ciphertexts, each encrypting $f (i + m_{d-1} \cdot B^{d-1})$ for $i \in \Z_{B^{d-1}}$.
+%    
+Finally, a $\sf{Keyswitch}$ operation from LWE to GLWE aggregates these ciphertexts into $B^{d-2}$ GLWE encryptions, representing the LUT of $h$, defined as:
+    \begin{align*}
+        h &: (\Z_{B})^{d-1} \mapsto \Z_B' \\
+          & (a_0, \dots, a_{d-1}) \mapsto f \circ g(a_0, \dots, a_{d-2}, m_{d-1})
+    \end{align*}
+using the bijection $g$, which reverses the decomposition:
+    \begin{align*}
+        g: (\Z_B)^d &\rightarrow \Z_{B^d} \\
+           (a_0, \dots, a_{d-1}) &\mapsto \sum_{i=0}^{d-1} a_i \cdot B^i
+    \end{align*} 
+
+This process is repeated iteratively, using the next ciphertext at each step, until a single LWE ciphertext encrypting $f(m_0, \dots, m_{d-1})$ is obtained.  
+
+\TODO{Refaire ma propre figure}
+\begin{figure}
+    \centering
+%    \includegraphics[width=0.8\textwidth]{figures/tree_method.pdf}
+    \caption{Illustration of the tree-based method on messages  $m_1 = 1, m_2=2$ in the space  $\mathbb{Z}_4$. The corresponding ciphertexts are $c_1 \in \mathrm{}(m_1)$ and $c_2 \in \mathrm{LWE}(m_2)$. We apply the addition in $\mathbb{Z}_4$ via programmable bootstrapping. Red arrows indicate bootstrappings. (Figure inspired by \cite{DBLP:conf/wahc/TramaCBS23}.)}
+    \label{fig:my_label}
+\end{figure}
+
+In the implementation described in \cite{DBLP:conf/wahc/TramaCBS23}, this primitive is employed to evaluate an 8-bit LUT by dividing it into two limbs of 4 bits each, which they determined to be optimal for their specific setting. 
+%
+To further enhance the performance of the TBM, the blind rotations for the accumulators $acc_i(X)$ of \emph{the first layer of the tree} can be performed simultaneously using the MVB technique (as discussed in~\cite{TCHES:GuiBorAra21}). 
+
+Finally, the ``full-LUT'' approach facilitates efficient computation of the Sbox through the Tree-Based Method, as opposed to directly evaluating the corresponding Boolean circuit. However, this approach also requires LUT-based computation of XOR operations and other intermediary steps, which is notably slower when operating in $\Z_{16}$ compared to binary messages. Consequently, our new method \hippo{} proposed in this paper strategically applies LUT evaluation exclusively where it is most effective and yields the best performance, namely for the evaluation of the Sbox.
+
+\subsection{Generalization of the ``p-encodings'' Approach}
+
+The work of \cite{TCHES:BonPoiRiv24} takes an orthogonal approach compared to the previous one. In this method, data is encrypted bit per bit and only Boolean operations are performed. It leverages the fact that, in the plaintext space $\Z_2$, the \texttt{SumTFHE} operation actually performs a XOR. Thus, the linear operations \MixColumns and \AddRoundKey can be efficiently performed with minimal cost, using only the homomorphic sum of TFHE. Specifically, they leverage on the circuit representation of \MixColumns proposed in~\cite{EPRINT:Maximov19}.
+%
+Furthermore, because operations are performed on individual bits, the \ShiftRows transformation can be evaluated for free, as it merely involves rearranging the ciphertexts.
+
+Evaluating \SubBytes is trickier. Using $p=2$, it is impossible to perform a bivariate Boolean gate other than XOR. Thus, evaluating the boolean circuit of the Sbox cannot be done. To deal with this problem, the authors introduced the notion of $p$-encoding, that embeds the bits into a larger space $\Z_p$ with $p > 2$.  
+
+In this work, we now generalize this notion beyond the Boolean case by defining the $(o, p)$- encoding construction. Informally, instead of embedding the Boolean space in $\Z_p$, we embed any space $\Z_o$ in $\Z_p$ (with $o < p$). So, what was called $p$-encoding in \cite{TCHES:BonPoiRiv24} corresponds to a $(2, p)$-encoding in this work.
+%
+Definition \ref{def:encoding} formalizes this generalization\footnote{
+$(o, p)$-encodings being simply a change of encoding in the plaintext space, they have no impact on the ciphertext structure nor on the bootstrapping procedure.}: 
+
+\begin{definition}[$(o, p)$-encoding]
+    Let $\Z_o$ be the message space. A \emph{$(o, p)$-encoding} is a function $\Encoding: \Z_o \mapsto 2^{\Z_p}$ that maps each element of $\Z_o$ to a subset of the discretized torus $\Z_p$. A $(o, p)$-encoding is \emph{valid} if and only if:
+    \begin{equation}
+        \begin{cases}
+            \forall (i, j) \in \Z_o^2, i \ne j, \Encoding(i) \cap \Encoding(j) = \emptyset~\text{ and}\\
+            \text{if $p$ is even:} ~\forall \:x \in \mathbb Z_p, \forall i \in \Z_o: x \in \Encoding(i) \iff \left [ x + \frac p 2 \right ]_p \in \Encoding([-i]_o)
+        \end{cases}
+    \label{def:validity}
+    \end{equation}
+    The latter property is a direct consequence of the negacyclicity problem, which we discussed extensively in Chapter \ref{chap:negacyclicity}.
+    \label{def:encoding}
+\end{definition}
+
+In this work, we focus exclusively on cases where $p=2$ or $p$ is an odd prime. As a result, a lot of the subleties of negacyclicity can be overlooked. Furthermore, among the various types of $(o, p)$-encodings, one particular class proves especially useful for our purposes: the \textit{canonical} $(o, p)$-encoding.
+
+\begin{definition}[canonical $(o, p)$-encoding]
+\label{def:canonical-encoding}
+    A $(o, p)$-encoding $\Encoding$ is said \textit{canonical} if and only if it verifies: 
+    \begin{align*}
+    \Encoding: \Z_o &\rightarrow \Z_p\\
+    x &\mapsto x
+    \end{align*}
+    (with $o < p$). Informally, we simply embed a smaller space into a larger one, without altering the order of the elements.
+\end{definition}
+
+
+In \cite{TCHES:BonPoiRiv24}, the Boolean space is used (so $o=2$). The \SubBytes circuit is evaluated using $(2,11)$-encoding, while the rest is evaluated with a $(2, 2)$-encoding (\ie~the trivial encoding of TFHE). Consequently, an \textit{Encoding Switching} operation is required. This operation can be straightforwardly performed using a PBS.
+
+\begin{definition}[Encoding Switching]
+ \label{def:encoding-switching}
+    Let $c$ be a ciphertext encrypting a message $m \in \Z_o$ under the $(o, p)$-encoding $\Encoding$. Its encoding can be switched to the $(o, p')$-encoding $\Encoding'$ by applying a PBS on $c$ evaluating the function:
+    
+    \begin{align*}
+        \texttt{Cast}_{\Encoding \mapsto \Encoding'}: \Z_p &\rightarrow \Z_{p'}\\
+        x &\mapsto x'
+    \end{align*}
+    where $x'$ is defined as $\forall i \in \Z_o, x \in \Encoding(i) \implies x' \in \Encoding'(i)$.
+\end{definition}
+
+It remains to explain how the \SubBytes circuit is evaluated in \cite{TCHES:BonPoiRiv24}. The authors use a circuit representation for the Sbox (the one of \cite{boyar}), and decompose it into so-called \textit{gadgets}, which are smaller subcircuits evaluable in one single bootstrapping if the inputs are provided under the right $p$-encodings. This makes the evaluation of the circuit of the Sbox much faster than with the naive approach of ``gate bootstrapping'' %(\todo{citation --> dans fregata \cite{ISC:WWLLL23}, les auteurs implémentent aussi l'AES avec le "classic gate bootstrapping" pour comparaison, et ça leur prend plus d'une heure. On peut peut-être donner ces chiffres ici ?}\RS{Oui bonne idée}) 
+where every logic gate is evaluated with a bootstrapping. As an order of magnitude, the authors of \cite{ISC:WWLLL23} have also implemented the AES with the ``gate bootstrapping'' approach and report a sequential evaluation timing of more than an hour on a standard laptop.
+
+
+Manipulating the data bit-per-bit makes the evaluation of the linear part blazingly fast, however the circuit decomposition into gadgets is less efficient (even if better than gate bootstrapping).
+

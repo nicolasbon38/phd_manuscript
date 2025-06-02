@@ -1,0 +1,89 @@
+\begin{algorithm}[h]
+	\caption{Recursive function \texttt{search} that adds an element to the vector $\vec{d}$}
+	\label{alg:add_element}
+	
+	\KwIn{
+		$\left\{
+		\begin{aligned}
+			&\vec{d} = (d_i)_{1 \le i \le j}  \text{: vector of values already computed} \\
+			&\vec{\mat{C}} = \{ \mat{C}_i \mid i \in \{0, \dots, \ell-1\} \} \text{: pre-computed constraint matrices} \\
+			&p \in \mathbb{N}^* \text{: modulus of the input encodings} \\
+			&\ell \in \mathbb{N}^* \text{: target number of encodings required}
+		\end{aligned}
+		\right.$
+	}
+	
+	\KwResult{
+		$\vec{d}$: \text{a list of encodings such that $f$ is evaluable}
+	}
+	
+		% Add vertical space and horizontal line
+	\vspace{0.5em} % adjust the space as needed
+	\hrule
+	\vspace{0.5em} % adjust the space as needed
+	
+	
+	
+	\uIf{$j = \ell$}{
+		\Return{$\vec{d}$} \Comment*[r]{Base case: full solution found}
+	}
+	\Else{
+		$\mathcal{P} \gets \texttt{get\_possible\_values}(\vec{d}, \mat{C}_{j+1}, p)$ \Comment*[r]{Compute possible values for $d_k$}
+		\For{$x \in \mathcal{P}$}{
+			$\vec{d} \gets (\vec{d} \,\|\, x)$ \Comment*[r]{Append $x$ to current vector}
+			$\vec{d}_{\text{sol}} \gets \texttt{search}(\vec{d}, \vec{\mat{C}}, p, \ell)$ \Comment*[r]{Recursive call}
+			\uIf{$\vec{d}_{\text{sol}} \ne \bot$}{
+				\Return{$\vec{d}_{\text{sol}}$} \Comment*[r]{Propagate valid solution}
+			}
+			\Else{
+				$\vec{d} \gets \vec{d}[:j+1]$ \Comment*[r]{Backtrack}
+			}
+		}
+		\Return{$\bot$} \Comment*[r]{All possibilities failed}
+	}
+	
+\end{algorithm}
+
+
+
+\begin{algorithm}[h]
+	\caption{Function \texttt{get\_possible\_values} that builds the set of possible values for the next slot of $\vec{d}$ given the slots already filled in.}
+	\label{alg:get_possible_values}
+	
+	\KwIn{
+		$\left\{
+		\begin{aligned}
+		    &\vec{d}:= (d_i)_{\{1 \le i \le j\}}  \text{ :the set of values for the inputs already computed}\\
+		    &\mat{C}_{j + 1}   \text{ :The matrix of constraints of this step, pre-computed}\\
+			&p \in \N^* \text{: the modulus of input encoding}
+		\end{aligned}
+		\right.$
+	}
+	
+	\KwResult{
+		$S$ : contains only values suitable for the $j+1$-th slot of $\vec{d}$.
+	}
+	
+	
+	% Add vertical space and horizontal line
+	\vspace{0.5em} % adjust the space as needed
+	\hrule
+	\vspace{0.5em} % adjust the space as needed
+	
+	$\bar S \gets \{\}$ \Comment*[r]{$\bar S$ is the set of forbidden values for $d_{j+1}$}
+	
+	\For {$c \in C_{j+1}$}{
+	  	$\bar c \gets (- c[-1] \cdot c[0], -c[-1] \cdot c[1], \dots)$ \Comment*[r]{}
+		$\bar C \gets \bar C \cup \{\bar c\}$ \;
+	    $\bar c \gets c[j+1]$ \Comment*[r]{We retrieve the $(j+1)$th coefficient of the inequation $c$}
+	    $\bar S \gets \bar S \cup \left \{\modulo{- \bar c \cdot \sum_{k=1}^{j} c_k \cdot d_k}{p} \right \}$ \Comment*[r]{We compute the value forbidden by $c$}	
+	
+	}
+	$S \gets \Z_p \setminus \bar S$\\
+	\Return{$S$}
+\end{algorithm}
+
+\TODO{Problème d'alignement ci-dessus}
+
+
+

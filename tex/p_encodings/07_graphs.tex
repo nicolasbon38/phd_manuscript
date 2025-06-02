@@ -1,5 +1,5 @@
 \section{Scaling our Approach to any Boolean Circuit}
-\label{sec:graphs}
+\label{sec:p_encodings_graphs}
 
 Our framework optimizes the homomorphic evaluation of single Boolean functions but suffers the following limitations:
 
@@ -15,7 +15,7 @@ As a consequence, we need a solution to extend our framework to these cases. In 
 \subsection{Graph of Subcircuits}
 \label{sec:graph_definition}
 
-Let $f: \B^\ell \longrightarrow \B$ be a Boolean function, and let $\mathcal{F}$ be a Boolean circuit representing $f$ (some preliminaries about Boolean circuits can be found in Section \ref{sec:preliminaries_boolean}). Let us describe the layout of the circuit $\mathcal{F}$. It has $\ell$ input wires, denoted by $\{y_j\}_{1 \le j \le \ell}$, and the output wire is denoted by $z$. The intermediary wires are denoted by $\{t_j\}_{1 \le j \le \theta}$. The Boolean operation gates are of fan-out 1. 
+Let $f: \B^\ell \longrightarrow \B$ be a Boolean function, and let $\mathcal{F}$ be a Boolean circuit representing $f$ (some preliminaries about Boolean circuits can be found in Section \ref{sec:p_encodings_preliminaries_boolean}). Let us describe the layout of the circuit $\mathcal{F}$. It has $\ell$ input wires, denoted by $\{y_j\}_{1 \le j \le \ell}$, and the output wire is denoted by $z$. The intermediary wires are denoted by $\{t_j\}_{1 \le j \le \theta}$. The Boolean operation gates are of fan-out 1. 
 
 
 Our goal is to split the circuit into a directed acyclic graph $\mathcal{G}$, whose vertexes are subcircuits $\{\mathcal{F}_1, \dots, \mathcal{F}_k\}$ and whose edges connect the outputs of a subcircuit with the input of another. Each subcircuit $\mathcal{F}_i$ represents a subfunction $f_i: \B^{l_i} \mapsto \B$ that is evaluable with a gadget with our framework. 
@@ -37,7 +37,7 @@ The graph is valid for $f$ with respect to modulus $p$ if the following properti
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.75\textwidth]{images/graphs.png}
+    \includegraphics[width=0.75\textwidth]{img/to_harmonize/graphs.png}
     \caption{Example of graph of subcircuits (on left) and of a valid subcircuit (on right). Each subcircuit $\mathcal{F}_i$ is evaluated homomorphically with a gadget $\Gamma_i$.}
     \label{fig:enter-label}
 \end{figure}
@@ -73,7 +73,7 @@ Our heuristic works as follows:
     \item Now we want to construct the smallest valid graph evaluating $\mathcal{F}$ using subcircuits from the $\widehat{\mathcal{F}_{z_{i}}}$'s. While finding the smallest graph is hard, constructing any valid graph is easy. As a consequence, our strategy to find a small graph is to randomly create a lot of valid graphs and to take the smallest one. The procedure to create a valid graph is the following: we start from the output $z$ and we randomly draw a subcircuit $\mathcal{F}_z$ from $\widehat{\mathcal{F}_z}$. The inputs of $\mathcal{F}_z$ can be sorted into two categories: the ones belonging to $\mathcal{Y}$ and the ones belonging to $\mathcal{Z}$. For each one of these latter wires $w \in \mathcal{Z}$, we repeat the procedure, i.e. we draw a subcircuit $\mathcal{F}_w$ from $\widehat{\mathcal{F}_w}$, and so on. When we have reached all the input wires of $\mathcal{F}$, we get a valid graph $\mathcal{G}$ . This second step is run a large amount of times (the number of trials is a parameter of the method), and the smallest graph, i.e. the one with the fewest subcircuits, is returned.
 \end{enumerate}
 
-We carried on this method on the s-box of AES in Section \ref{sec:aes}.
+We carried on this method on the s-box of AES in Section \ref{sec:p_encodings_aes}.
 
 \subsection{Parallelization of the Execution of the Graph}
 \label{sec:parallelization}

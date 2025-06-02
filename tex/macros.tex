@@ -14,6 +14,7 @@
 \newcommand{\Z}{\mathbb{Z}}
 \newcommand{\T}{\mathbb{T}}
 \newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
 
 % Distributions
 \newcommand{\unif}[1]{\mathcal U \left ( #1 \right )}
@@ -33,7 +34,7 @@
 \newcommand{\drawfrom}{\overset{\$}{\leftarrow}}
 \newcommand{\innerProduct}[2]{\left \langle #1, #2 \right \rangle}
 \newcommand{\abs}[1]{\left \lvert #1 \right \rvert}
-
+\newcommand{\norm}[1]{\lVert #1 \rVert}
 
 % TFHE-specific notations
 \newcommand{\lweSigma}{\sigma_{\LWE}}
@@ -99,3 +100,33 @@
 \newcommand{\EncDef}[2]{\begin{cases} 0 \mapsto #1 \\ 1 \mapsto #2 \end{cases}}
 \newcommand{\EncDefZero}[1]{\begin{cases} 0 \mapsto #1 \\ 1 \mapsto \{0\} \end{cases}}
 \newcommand{\EncDefOne}[1]{\begin{cases} 0 \mapsto \{0\} \\ 1 \mapsto \{#1\} \end{cases}}
+
+
+% Macros for the Hippogryph section
+\newcommand{\hippo}{Hippogryph}
+\newcommand{\ie}{\textit{i.e.,}}
+
+\newcommand{\EncDefCanonicalBinary}[3]{
+	\begin{cases}
+		\Z_2 \mapsto \Z_{#1} \\
+		0 \mapsto \{#2\} \\ 
+		1 \mapsto \{#3\}
+	\end{cases}
+}
+
+\newcommand{\EncDefCanonical}[2]{
+	\begin{cases}
+		\Z_{#1} \mapsto \Z_{#2} \\
+		0 \mapsto \{0\} \\
+		\vdots \\
+		#1 - 1 \mapsto \{#1 - 1\}
+	\end{cases}
+}
+
+
+% AES Cipher Step Macros
+\newcommand{\SubBytes}{\texttt{SubBytes}~}
+\newcommand{\ShiftRows}{\texttt{ShiftRows}~}
+\newcommand{\MixColumns}{\texttt{MixColumns}~}
+\newcommand{\AddRoundKey}{\texttt{AddRoundKey}~}
+\newcommand{\KeyExpansion}{\texttt{KeyExpansion}~}
