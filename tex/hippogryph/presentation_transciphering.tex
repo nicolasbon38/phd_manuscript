@@ -5,10 +5,26 @@
 One common challenge with all FHE schemes is that the ciphertexts are much larger than the corresponding plaintexts. 
 For example, a plaintext message of a few kilobytes can require tens or even hundreds of megabytes of data, making the processing of large data sets impractical. While compression techniques can help reduce the expansion factor in TFHE ciphertexts, the encrypted data still remains an order or two of magnitude larger than the original plaintext. 
 
-It is possible to mitigate this issue using \emph{transciphering}~\cite{transciphering}. The idea is to off-load the task of actually encrypting the data to a symmetric cipher, and to simply encrypt homomorphically the key that is used. The user then sends both the homomorphically encrypted key and the ciphertext to the server, which can then homomorphically decrypt the received ciphertexts. This is done by running a fully homomorphic evaluation of the decryption function of the symmetric cipher, producing valid homomorphic ciphertexts representing the data. The server can then proceed to the homomorphic operations, like in the traditional FHE setting.
+It is possible to mitigate this issue using \emph{transciphering}~\cite{transciphering}. The idea is to off-load the task of actually encrypting the data to a symmetric cipher, and to simply encrypt homomorphically the key that is used. The user then sends both the homomorphically encrypted key and the ciphertext to the server, which can then homomorphically decrypt the received ciphertexts. This is done by running a fully homomorphic evaluation of the decryption function of the symmetric cipher, producing valid homomorphic ciphertexts representing the data. The server can then proceed to the homomorphic operations, like in the traditional FHE setting. This principle is illustrated on Figure \ref{fig:transciphering}
+
+\begin{figure}
+	\centering
+	\input{img/blocks_from_slides/transciphering.tex}
+	\captionsetup{singlelinecheck=off}
+	\caption[]{An illustration of the transciphering process: \\
+		\begin{enumerate}
+			\item Data is encrypted with the symmetric cipher.
+			\item The symmetric key is homomorphically encrypted.
+			\item The client uploads both the encrypted data, as well as the encrypted key.
+			\item The server homomorphically evaluates the decryption algorithm of the symmetric cipher, using the symmetric key homomorphically encrypted. It retrieves the data, as valid homomorphic ciphertexts.
+			\item The server can then evaluate the homomorphic application!
+		\end{enumerate}
+		The red color is for symmetric algorithms, green for FHE, and hatched algorithms means that they are evaluated homoomorphically.
+	}
+	\label{fig:transciphering}
+\end{figure}
 
 
-\TODO{Refaire une figure comme celle de Transistor ?}
 
 Implementing FHE encryption through transciphering solves the bandwidth issue: the data sent by the client to the server is encrypted using a symmetric cipher, thus avoiding the significant ciphertext 
 expansion implied by direct FHE encryption. The only exception is the symmetric key, which does experience expansion, but this overhead is amortized across the entire data set.

@@ -235,7 +235,7 @@
 		align=center,
 		anchor=west
 		] at (0.5*\boxwidth, 0)
-		{$\dots + f(0) \cdot X^{\endval}$};
+		{$f(0)$};
 		
 		
 		
@@ -246,9 +246,11 @@
 			\pgfmathsetmacro{\endval}{int(\N * (\i + 0.5) / \p - 1)}
 			
 			\ifthenelse{\isodd{\i}}{ %then
-				\pgfmathsetmacro{\colorIndex}{(\p + 1) / 2 + (\i - 1) / 2}
+				\pgfmathsetmacro{\colorIndex}{int((\p + 1) / 2 + (\i - 1) / 2)}
+				\def\labelWindow{$-f(\colorIndex)$}
 			}{ %else
-				\pgfmathsetmacro{\colorIndex}{\i / 2}
+				\pgfmathsetmacro{\colorIndex}{int(\i / 2)}
+				\def\labelWindow{$f(\colorIndex)$}
 			}
 		
 			% Convert to hue [0,1]
@@ -260,12 +262,32 @@
 			\node[
 			draw,
 			fill=mycolor!50,
-%			inner xsep=2pt, inner ysep=2pt,
+			inner xsep=2pt, inner ysep=2pt,
 			text width=\boxwidth,
 			align=center,
 			anchor=west
 			] at ({\i*\boxwidth}, 0)
-			{\small $f(\i)$};
+			{\small \labelWindow};
+			
+				\node[
+			draw,
+			fill=mycolor!50,
+			inner xsep=2pt, inner ysep=2pt,
+			text width=\boxwidth,
+			align=center,
+			anchor=west
+			] at ({\i*\boxwidth}, 0)
+			{\small \labelWindow};
+			
+		\ifthenelse{\isodd{\i}}{%
+			\path[
+			pattern={Lines[angle=45, distance=4pt, line width=0.7pt]},
+			pattern color=black,
+			opacity=0.5
+			]
+			({\i*\boxwidth}, 0.25) rectangle ++(\boxwidth, -0.5); % Adjust vertical size as needed
+		}{}
+		
 		}
 		
 		% Last half sector
@@ -288,7 +310,102 @@
 		align=center,
 		anchor=west
 		] at ({\p*\boxwidth}, 0)
-		{\footnotesize $-f(0) X^{\start} + \dots$};
+		{\small $-f(0)$};
+		
+		\path[
+		pattern={Lines[angle=45, distance=4pt, line width=0.7pt]},
+		pattern color=black,
+		opacity=0.5
+		]
+		({\p*\boxwidth}, 0.25) rectangle ++(\slightlylarger, -0.5); % Adjust vertical size as needed
+	\end{tikzpicture}
+}
+
+
+
+
+\newcommand{\oddAccumulatorInverted}[2]{% (p, N)
+	\pgfmathsetmacro{\p}{#1}
+	\pgfmathsetmacro{\N}{#2}
+	\begin{tikzpicture}[x=1cm]
+		
+		\def\boxwidth{3cm}
+		
+		% first half sector
+		\pgfmathsetmacro{\start}{0}
+		\pgfmathsetmacro{\endval}{int(ceil(\N * 0.5 / \p - 1))}
+		
+		% Compute centered color index
+		\pgfmathsetmacro{\colorIndex}{0}
+		
+		% Convert to hue [0,1]
+		\pgfmathsetmacro{\hue}{\colorIndex / \p}
+		% Set HSB color
+		\definecolor{mycolor}{hsb}{\hue,1,1}
+		
+		\pgfmathsetlengthmacro{\halfbox}{\boxwidth / 2}
+		\pgfmathsetlengthmacro{\slightlylarger}{1.1 * \boxwidth / 2}
+		\node[
+		draw,
+		fill=mycolor!50,
+		inner xsep=2pt, inner ysep=2pt,
+		text width=\halfbox,
+		align=center,
+		anchor=west
+		] at (0.5*\boxwidth, 0)
+		{$-f(0)$};
+		
+		% Intermediate sectors
+		\foreach \i in {1,...,\numexpr\p-1} {
+			\pgfmathsetmacro{\start}{int(\N * (\i - 0.5) / \p)}
+			\pgfmathsetmacro{\endval}{int(\N * (\i + 0.5) / \p - 1)}
+			
+			\ifthenelse{\isodd{\i}}{ %then
+				\pgfmathsetmacro{\colorIndex}{int((\p + 1) / 2 + (\i - 1) / 2)}
+				\def\labelWindow{$f(\colorIndex)$}
+			}{ %else
+				\pgfmathsetmacro{\colorIndex}{int(\i / 2)}
+				\def\labelWindow{$-f(\colorIndex)$}
+			}
+			
+			% Convert to hue [0,1]
+			\pgfmathsetmacro{\hue}{\colorIndex / \p}
+			% Set HSB color
+			\definecolor{mycolor}{hsb}{\hue,1,1}
+			
+			
+			\node[
+			draw,
+			fill=mycolor!50,
+			inner xsep=2pt, inner ysep=2pt,
+			text width=\boxwidth,
+			align=center,
+			anchor=west
+			] at ({\i*\boxwidth}, 0)
+			{\small \labelWindow};
+		}
+		
+		% Last half sector
+		\pgfmathsetmacro{\start}{int(\N * (\p - 0.25) / \p)}
+		\pgfmathsetmacro{\endval}{\N - 1}
+		
+		% Compute centered color index
+		\pgfmathsetmacro{\colorIndex}{0}
+		
+		% Convert to hue [0,1]
+		\pgfmathsetmacro{\hue}{\colorIndex / \p}
+		% Set HSB color
+		\definecolor{mycolor}{hsb}{\hue,1,1}
+		
+		\node[
+		draw,
+		fill=mycolor!50,
+		inner xsep=2pt, inner ysep=2pt,
+		text width=\slightlylarger,
+		align=center,
+		anchor=west
+		] at ({\p*\boxwidth}, 0)
+		{\small $f(0)$};
 		
 	\end{tikzpicture}
 }

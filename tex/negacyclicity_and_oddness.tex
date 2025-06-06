@@ -215,15 +215,7 @@ We present in Definition \ref{def:odd_accumulator} the formula for the accumulat
 
 Let us explain the structure of this accumulator. The polynomial has degree $N$ and is made of $p$ distinct windows of width $\frac{N}{p}$. Each of these windows has constant coefficient value $f(k)$, for $k \in \{0, \dots, p-1\}$.
 For $0 \le \alpha \le \frac{p-1}{2}$, the range of degrees whose coefficients are $f(\alpha)$ is $\left [ \alpha \frac{2N}{p} - \frac{N}{2p}~;~ \alpha \frac{2N}{p} + \frac{N}{2p} \right ]$. Now, for $\frac{p+1}{2} \le \beta \le p-1$, we can write $\beta = \alpha + \frac{p+1}{2}$, with $0 \le \alpha < \frac{p-1}{2}$. This time, the range of spanned degrees is $\left [ \alpha \frac{2N}{p} + \frac{N}{2p} ~;~ (\alpha + 1) \frac{2N}{p} - \frac{N}{2p} \right ]$. Thus, the values $k \in \{0, \dots, p-1\}$ spans the entire space $[0; N)$ without overlap. The values over $\frac{p+1}{2}$ gets negated by the negacyclicity, so the underlying coefficient is also negated to compensate this effect. We illustrate this construction on Figure \ref{fig:accumulator_odd}.
-\TODO{Est-ce que ke paragraphe ci-dessus n'est pas trop lourd ?}
-
-\begin{figure}
-	\centering
-	\includegraphics[width=\textwidth]{img/to_harmonize/accumulator_odd.png}
-	\caption{Illustration of the construction of the accumulator. On top is the ring $\Z_{2N}$ splitted in windows. Below is a representation of the polynomial $v$, with its version once rotated by a multiplication by $X^N$. On the figure, $p$ = 5.}
-	\label{fig:accumulator_odd}
-	\TODO{Harmoniser avec le tikz}
-\end{figure}
+\TODO{Est-ce que le paragraphe ci-dessus n'est pas trop lourd ?}
 
 
 
@@ -232,6 +224,7 @@ For $0 \le \alpha \le \frac{p-1}{2}$, the range of degrees whose coefficients ar
 	\begin{tikzpicture}
 		\drawSingleRing{5}{5}{small}{true}{true}{true}
 		\drawRingOddEncoding{64}{5}{big}{true}{false}
+		\draw[red, loosely dashed, line width=1mm] (-6,0) -- (6,0);
 	\end{tikzpicture}
 	
 	\vspace{1.5em}
@@ -239,8 +232,10 @@ For $0 \le \alpha \le \frac{p-1}{2}$, the range of degrees whose coefficients ar
 	\textbf{Odd-Modulus Accumulator:}\\[0.5em]
 	\oddAccumulator{5}{32}
 %	
-	\caption{Illustration of the construction of the accumulator. On top is the ring $\Z_{2N}$ splitted in windows. Below is a representation of the polynomial $v$, with its version once rotated by a multiplication by $X^N$. On the figure, $p$ = 5.}
-\TODO{Finir cette vigure et retirer l'autre}
+%	\vspace{1.5em}
+%	\textbf{Rotated by $N$:}\\
+%	\oddAccumulatorInverted{5}{32}
+	\caption{Illustration of the construction of the Odd-Modulus accumulator. On top is the ring $\Z_{2N}$ splitted in windows. Below is a representation of the polynomial $v$, with its version once rotated by a multiplication by $X^N$. On the figure, $p = 5$ and $N = 32$. Hatching shows the parts which have an additional minus signs}
 	\label{fig:accumulator_odd}
 \end{figure}
 

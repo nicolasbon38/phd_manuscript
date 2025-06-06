@@ -260,6 +260,14 @@
 		(\angleA:\radiusInner) arc[start angle=\angleA, end angle=\angleB, radius=\radiusInner] --
 		(\angleB:\radiusOuter) arc[start angle=\angleB, end angle=\angleA, radius=\radiusOuter] -- cycle;
 		%
+		\ifthenelse{\isodd{\y}}{ %then
+			% 2. Hatching pattern on top (with transparency)
+			\path[pattern=north east lines, pattern color=black, opacity=0.5]
+			(\angleA:\radiusInner) arc[start angle=\angleA, end angle=\angleB, radius=\radiusInner] --
+			(\angleB:\radiusOuter) arc[start angle=\angleB, end angle=\angleA, radius=\radiusOuter] -- cycle;
+		}{}
+		
+		
 		\ifthenelse{\equal{#4}{true}}{%
 			\node[rotate=\angleMid - 90] at (\angleMid:\radiusMid) {\small \i};
 		}{}

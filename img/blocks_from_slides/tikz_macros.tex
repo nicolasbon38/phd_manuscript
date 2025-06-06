@@ -1,5 +1,12 @@
-\newcommand{\symcolor}{MediumRed}
-\newcommand{\fhecolor}{MediumGreen}
+%!TEX root = ../../thesis.tex
+
+\definecolor{symcolorinner}{HTML}{ed5858}
+\newcommand{\symcolor}{symcolorinner}
+
+\definecolor{fhecolorinner}{HTML}{5eaaa9}
+\newcommand{\fhecolor}{fhecolorinner}
+
+
 
 \pgfmathsetmacro{\sizenode}{1}
 \pgfmathsetmacro{\sizeindice}{0.5 * \sizenode}  % Compute value dynamically
@@ -9,13 +16,13 @@
 \newcommand{\imageinbox}[5]{
 	% Draw the colored box
 	\node[draw=#3, very thick, inner sep=4pt] (#5) at (#4) {
-		\includegraphics[width=\sizenode cm]{assets/#1} % Main image
+		\includegraphics[width=\sizenode cm]{img/blocks_from_slides/assets/#1} % Main image
 	};
 	
 	
 	% Overlay the smaller image in the lower right corner
 	\node[anchor=south west, inner sep=0pt] at ($(#5.south east) + (-0.3, -0.2)$) {
-		\includegraphics[width=\sizeindice cm]{assets/#2} % Smaller image
+		\includegraphics[width=\sizeindice cm]{img/blocks_from_slides/assets/#2} % Smaller image
 	};
 }
 
@@ -29,7 +36,7 @@
 	\node [draw=#1, very thick, rectangle, minimum width=\sizenode cm, minimum height=\sizenode cm] (#2) at (#3) {
 		\begin{tabular}{c}
 			#4 \\
-			\includegraphics[width=\sizeindice cm]{assets/#5}
+			\includegraphics[width=\sizeindice cm]{img/blocks_from_slides/assets/#5}
 		\end{tabular}
 	};
 }
@@ -37,17 +44,23 @@
 
 \newcommand{\homomorphicoperator}[4]{
 	\node [draw=#1, rectangle, very thick, pattern={Lines[angle=45, line width=1mm, distance=3mm]}, pattern color=\fhecolor!50, minimum width=\sizenode cm, minimum height=\sizenode cm] (#2) at (#3) {#4};
+	
+	% Overlay the smaller image in the lower right corner
+	\node[anchor=south west, inner sep=0pt] at ($(#2.north east) + (-0.3, -0.2)$) {
+		\includegraphics[width=\sizeindice cm]{img/blocks_from_slides/assets/evaluation_key.png} % Smaller image
+	};
 }
 
 
 % define the nodes
+\newcommand{\keygenfhe}[1]{\node[draw=\fhecolor, rectangle, very thick, minimum size = \sizenode cm] at (#1)(keygen) {$\textsf{KeyGen}_{\textsf{FHE}}$};}
 
 \newcommand{\encsym}[1]{\operatorwithimage{\symcolor}{enc_sym}{#1}{$\textsf{Enc}_{\textsf{Sym}}$}{red_key.png}}
 \newcommand{\encfhe}[1]{\operatorwithimage{\fhecolor}{enc_fhe}{#1}{$\textsf{Enc}_{\textsf{FHE}}$}{green_key.png}}
 \newcommand{\decfhe}[1]{\operatorwithimage{\fhecolor}{dec_fhe}{#1}{$\textsf{Dec}_{\textsf{FHE}}$}{green_key.png}}
 
 \newcommand{\fheneuralnetwork}[1]{\homomorphicoperator{\fhecolor}{fhe_neural_network}{#1}{
-	\includegraphics[width=\sizenode cm]{assets/neural_network.png}
+	\includegraphics[width=\sizenode cm]{img/blocks_from_slides/assets/neural_network.png}
 }}
 \newcommand{\transciphering}[1]{\homomorphicoperator{\fhecolor}{transciphering}{#1}{$\textsf{Dec}_{\textsf{Sym}}^{(\textsf{FHE})}$}}
 
@@ -56,5 +69,5 @@
 \newcommand{\encrypteddata}[1]{\encryptedvalue{data.png}{\symcolor}{#1}{data_sym}}
 \newcommand{\fhedata}[1]{\encryptedvalue{data.png}{\fhecolor}{#1}{data_fhe}}
 \newcommand{\encryptedkey}[1]{\encryptedvalue{red_key.png}{\fhecolor}{#1}{encrypted_key}}
-
+\newcommand{\fheresult}[1]{\encryptedvalue{results.png}{\fhecolor}{#1}{result_fhe}}
 

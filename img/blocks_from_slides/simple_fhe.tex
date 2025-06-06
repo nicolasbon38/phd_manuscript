@@ -1,0 +1,114 @@
+%!TEX root = ../../thesis.tex
+\begin{tikzpicture}
+	
+	%%%% Client Side (with its keys)%%%%%%%%%
+	
+	%%%Header%%%%%%%%%%%%%
+	\node (client) at (0,0) {
+		\includegraphics[width=\sizenode cm]{img/blocks_from_slides/assets/laptop.png} % Replace with your image file
+	};
+	\node at ($(client) + (0, 1)$) {Client};
+	
+	%%%%%%%%%%%%%%%%%%%%%%%
+	
+	%%%%%%%%% KeyGen%%%%%%%%%%%%
+	
+	\keygenfhe{$(client) + (1, -2)$}
+	
+	\node (encryption_key) at ($(keygen.west) + (-2, 0.5)$) {
+		\includegraphics[width=\sizenode cm]{img/blocks_from_slides/assets/green_key.png}
+	};
+	
+	\node[below=0.05 of encryption_key] (evaluation_key) {
+		\includegraphics[width=\sizenode cm]{img/blocks_from_slides/assets/evaluation_key.png}
+	};
+	
+	\draw[-latex] (keygen) -- (encryption_key);
+	\draw[-latex] (keygen) -- (evaluation_key);
+	
+	\node (one) at ($(keygen) - (4, 0)$) {1.};
+	%%%%%%%%% Chiffrement homomorphe%%%%%%%%%%%%
+	
+	\encfhe{$(keygen) + (-1, -3)$}
+	\node (plain_data) at ($(enc_fhe.west) + (-1, 0)$) { 
+		\includegraphics[width=\sizenode cm]{img/blocks_from_slides/assets/data.png} % Replace with your image file
+	};
+	
+	\fhedata{$(enc_fhe.east) + (1, 0)$}
+	
+	\draw[-latex] (plain_data) -- (enc_fhe); 
+	\draw[-latex] (enc_fhe) -- (data_fhe);
+	
+	\node (two) at ($(plain_data) - (1, 0)$) {2.};
+	
+	
+	%%%%%Server Side %%%%%%%
+	
+	\node (server) at (8,0) {
+		\includegraphics[width=\sizenode cm]{img/blocks_from_slides/assets/server.png} % 
+	};
+	
+	\node at ($(server) + (0, 1)$) {Server};
+	
+	
+%	%%%%%%%%%%Transfert de la donnée chiffrée et de la clé
+%	
+%	
+	\fhedata{$ (4, -8) - (1, 0)$}
+	\node (evaluation_key) at ($(data_fhe.east) +(1, 0)$) {
+		\includegraphics[width=\sizenode cm]{img/blocks_from_slides/assets/evaluation_key.png}
+	};
+
+	
+	\draw[color=gray, thick, opacity=0.6, dash pattern=on 6pt off 3pt] ($(data_fhe) - (1, - 1)$) rectangle ++(3.5,-2);
+	
+	\draw[->, gray, >=stealth, line width=1mm, opacity=0.6] ($(data_fhe) - (1.5, 1.5)$) -- ++(5,0);
+	
+	\node (three) at ($(data_fhe) - (1.5, 0)$) {3.};
+%	
+      
+%	%%%%%%%%%% evaluation du réseau de neurone homomorphe
+%	
+	\fheneuralnetwork{$(server) + (0, -11)$}
+	
+	\fhedata{$(fhe_neural_network.west) - (1, 0)$}
+	
+	\fheresult{$(fhe_neural_network.east) + (1, 0)$}
+	% 
+	\draw[-latex] (data_fhe) -- (fhe_neural_network); 
+	\draw[-latex] (fhe_neural_network) -- (result_fhe);
+	%        
+	\node (three) at ($(data_fhe) - (1, 0)$) {3.};
+	
+	%	%%%%%%%%%%Transfert reotur%	
+	%	
+	\fheresult{$(4, -13)$}
+	
+	\draw[color=gray, thick, opacity=0.6, dash pattern=on 6pt off 3pt] ($(result_fhe) - (1, - 1)$) rectangle ++(2,-2);
+%	
+	\draw[<-, gray, >=stealth, line width=1mm, opacity=0.6] ($(result_fhe) - (1.5, 1.5)$) -- ++(3,0);
+	
+	\node (four) at ($(result_fhe) - (1.5, 0)$) {4.};
+	%
+
+	%%%%%%%%% Déchiffrement homomorphe%%%%%%%%%%%%
+	
+	
+	\decfhe{$(enc_fhe) + (0, -12)$}
+	\node (plain_result) at ($(dec_fhe.east) + (1, 0)$) { 
+		\includegraphics[width=\sizenode cm]{img/blocks_from_slides/assets/results.png} % Replace with your image file
+	};
+%	
+	\fheresult{$(dec_fhe.west) - (1, 0)$}
+%	
+	\draw[-latex] (result_fhe) -- (dec_fhe); 
+	\draw[-latex] (dec_fhe) -- (plain_result);
+%	
+	\node (five) at ($(result_fhe) - (1, 0)$) {5.};
+	
+
+	%%%%%%%%%Sep%%%%%%%
+	\draw (4, 0) -- (4, -17);
+	
+\end{tikzpicture}
+
