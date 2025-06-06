@@ -1,0 +1,208 @@
+% !TeX root = ./main.tex
+%% \section{Statistical independance of secret key and output key stream}
+%% \ac{Je pense qu'il faut enlever cette section}
+%% The independence between the key and the output key stream can be expressed by the following theorem.
+
+%% \begin{lemma}
+%% Let $n \in \mathbb{N}$ and let $F^{(n)}$ be the augmented function as defined in Section~\ref{sec:security-linear}. Let $X$ be the uniform random variable in $\mathbb{F}_p^{16}$ and let $S$ be the random variable in $\mathbb{F}_p^{4n}$ corresponding to the output of $F^{(n)}$ and let $K$ be the random variable corresponding to the secret key. If $F^{(n)}$ is balanced for all key, then
+%% $$H(\keyvar |\outvar) = H(\keyvar )\,,$$
+%% where $H$ is the entropy.
+%% \end{lemma}
+
+%% \begin{proof}
+%% First, it is known that if the events $\keyvar = \keyevent$ and $\outvar = \outevent$ for all $\keyevent \in \mathbb{F}_p^{16(n-1)}$ and for all $\outevent \in \mathbb{F}_p^{4n}$ are independent then the result holds. 
+
+%% Let $K^0 \in \mathbb{F}_p^{n-1}$ and $S^0 \in \mathbb{F}_p^{4n}$. We have 
+%% $$\mathrm{Pr}[S= S^0 | K = K^0] = \mathrm{Pr}[S^0 = F^{(n)}(X,K_0^0,\ldots,K_{n-1}^0)] = \frac{1}{p^{4n}}\,.$$
+%% The last equality comes from the hypothesis that $F^{(n)}$ is balanced for all possible keys. We eventually obtain independence between the output and the key.
+%% \end{proof}
+
+%%%
+\section{Complexity of Correlation Attacks over \(\F_p\)}
+\label{sec:complexity-correlation}
+
+%\ac{Ce qui suit est encore en vrac}
+
+\subsection{Proof of Proposition~\ref{prop: approx}}
+\begin{figure}[b!]
+\newcommand{\blue}[1]{\color{blue}#1}
+\newcommand{\red}[1]{\color{red}#1}
+    \centering
+    \begin{tikzpicture}[xscale=.9]
+      \footnotesize
+      % variables
+      %\draw ( 2, 0) node(Xt){$X_{t}$} ;
+      \draw (-1.7, 0) node(U){$U$} ;
+      \draw (11.5, 0) node(Xtplus){$X$} ;
+      \draw (8, 1.5) node(Kt){$K$} ;
+      % \draw (4.5, 1.5) node(St){$S_t$};
+      % operations
+    \draw (-1, 1) rectangle +(1, 1) node[pos=0.5]{$G_{1}$} ;
+  \draw ( 0, -0.5) rectangle +(1, 1) node[pos=0.5]{$G_{2}$};
+      \draw (3.5, 1) rectangle +(1, 1) node[pos=0.5]{$\filter$} ;
+      \draw ( 6, -0.5) rectangle (7, 0.5) node[pos=0.5]{$L$} ;
+      \draw (8, 0) node(add)[inner sep=0pt]{$\boxplus$} ;
+      \draw (9, -0.5) rectangle (10, 0.5) node[pos=0.5]{$\subW$} ;
+      % arrows
+      \draw[->] (-.5, 0) -- (-.5, 1) ;
+      \draw[->] (-1.5, 0) --  node[below,pos=.3] { $\blue{a}$} (0, 0) ;
+      \draw[->] (1, 0) --  node[below, pos=.31] { $\red{L^{\top}(\alpha) + \filter^{*}(\beta')}$} node[below, pos=.85] { $\red{L^{\top}(\alpha)}$} (6, 0) ;
+      \draw[->] (4, 0) -- node[left,pos=.7] {$\red{\filter^{*}(\beta')}$} (4, 1) ;
+      \draw[->] (7, 0) --  node[below] {$\red{\alpha}$} (add) ;
+      \draw[->] (Kt) -- node[left,pos=.2] {$\blue{\alpha}$}(add) ;
+      \draw[->] (add) -- node[below] {$\red{\alpha}$} (9, 0) ;
+      \draw[->] (10, 0) --  node[below] {$\blue{b}$} (Xtplus) ;
+      \draw[->] (4, 2) -- node[left,pos=.5] {\blue{$\beta'$}} (4, 2.5) node[above] {};
+    \draw[->] (-.5, 2) -- node[left,pos=.5] {\blue{$\beta$}} (-.5, 2.5) node[above] {};
+    \draw[dashed] (1.2,-.5) -- +(0, 3);
+    % masks
+    \end{tikzpicture}
+
+  \caption{Masks propagation through a composition with \coolName{}'s round function. Input and output masks are written in blue while inner masks whose value are deduced are written in red.\label{fig:masks}}
+\end{figure}
+\begin{proof}
+  For \(n\)~rounds, the Fourier coefficient $\widehat{F_{\alpha, \beta}}(0,\lambda)$ corresponds to a Fourier coefficient of the following function
+    \[\begin{array}{rccl}
+H^{(n)}: & \F_p^{16} \times \F_{p}^{16(n-1)} & \rightarrow & \F_{p}^{4(n-1)} \times \F_p^{16}\\
+& (X_{0}, K_{1}, \ldots, K_{n-1}) & \mapsto & (S_0, \ldots, S_{n-2},X_{n-1})\;.
+     \end{array}\]
+ In other words, the output of \(H^{(n)}\) corresponds (up to a reordering of the 16 last digits) to the concatenation of the output of the augmented function \(F^{(n)}\) and of the remaining 12~internal digits that are not output by~$\filter$. % the last state of the FSM which are not outputted by~\(\filter\).
+ Then, \(H^{(n+1)}\) can be seen as the composition of \(H^{(n)}\) with the round function
+ \[\begin{array}{rcl}
+ \F_p^{16} \times \F_p^{16} & \rightarrow & \F_p^4 \times \F_p^{16}\\
+ (X_{n-1},K_n) & \mapsto & \left(\filter(X_{n-1}), \subW(L(X_{n-1})+K_n)\right)\end{array}\]
+ Let \(G\) be any function of the form
+ \[\begin{array}{rcl}
+ G:\F_p^{\ell} & \rightarrow & \F_p^k \times \F_p^{16}\\
+ U & \mapsto & (G_1(U),G_2(U))\end{array}\;.\]
+ Then, the Fourier transform of the composition
+ \[F:(U,K) \mapsto (G_1(U), \filter(G_2(U)), \subW(L(G_2(U))+K))\]
+ can be easily derived from the Fourier transform of~\(G\), as shown on Figure~\ref{fig:masks}.
+ Indeed, the detailed computation of the Fourier coefficient
+ \[\mathcal{I} := {\widehat F}(a, \alpha;\beta, \beta', b)\]
+ for the input mask \((a, \alpha)\) and output mask \((\beta, \beta', b)\) is as follows.
+ \begin{eqnarray*}
+   \mathcal{I} & = & \sum_{U \in \F_p^\ell,K \in \F_p^{16}} \omega^{\beta \cdot G_1(U) + \beta' \cdot \filter(G_2(U)) + b \cdot \subW(L(G_2(U))+K) - \alpha \cdot K - a \cdot U} \\
+   & = & \sum_{U \in \F_p^\ell} \omega^{\beta \cdot G_1(U) + \beta' \cdot \filter(G_2(U))- a \cdot U} \left(\sum_{Z \in \F_p^{16}} \omega^{b \cdot \subW(Z) -\alpha \cdot Z+ \alpha \cdot L(G_2(U))}\right)
+ \end{eqnarray*}
+ where we set \(Z = L(G_2(U))+K\).
+ We then deduce
+ \begin{eqnarray*}
+   \mathcal{I} & = & \sum_{U \in \F_p^\ell} \omega^{\beta \cdot G_1(U) + \beta' \cdot \filter(G_2(U))- a \cdot U + \alpha \cdot L(G_2(U))} {\widehat \subW}(\alpha, b)\\
+   & = & {\widehat \subW}(\alpha, b)\sum_{U \in \F_p^\ell} \omega^{\beta \cdot G_1(U) + \filter^*(\beta') \cdot G_2(U)- a \cdot U + L^T(\alpha) \cdot G_2(U)} \\
+   & = & {\widehat \subW}(\alpha, b) {\widehat G}(a ; \beta, L^T(\alpha) + \filter^*(\beta'))
+   \end{eqnarray*}
+ where \(\filter^*: \F_p^4 \rightarrow \F_p^{16}\) is the function outputting an internal state whose digits are all zero, expect the digits affected by \(\filter\), which are equal to the inputs.
+       Finally, we observe that \(H^{(1)}\) is the identity function implying that \({\widehat H^{(1)}}(a,b) = p^{16}\) if \(a=b\) and \(0\) otherwise.
+       It follows that the Fourier coefficients of \(H^{(n)}\) are either zero, or given by % \jb{Il manque pas un $\ind{a}(b'_{0})$ du coup comme premier terme ?}
+       \[{\widehat H^{(n)}}(a, \alpha_1, \ldots \alpha_{n-1}; \beta_0, \ldots, \beta_{n-2}, b) = p^{16} \prod_{i=1}^{n-1} {\widehat \subW}(\alpha_{i}, b'_i) \;,\]
+       for some \(b'_1, \ldots, b'_{n-1}\).
+       Therefore,
+       \[p^{-16n} {\widehat H^{(n)}}(a, \alpha_1, \ldots, \alpha_{n-1}; \beta_0, \ldots, \beta_{n-2}, b) = \prod_{i=1}^{n-1} \frac{{\widehat \subW}(\alpha_{i}, b'_i)}{p^{16}} \;.\]
+ %Note that $\widehat{F_{\alpha, \beta}}(0,\lambda)$ corresponds to a particular case of $\widehat H^{(n)}$.
+   The result then directly follows by observing that \({\widehat \subW}(\alpha_{i}, b'_i)\) is the product of the Fourier coefficients of the 16~S-boxes composing \(\subW\).
+\hfil\qed
+  \end{proof}
+
+%% Let $(a, \alpha_1, ..., \alpha_{n}; \beta_0, ..., \beta_{n-1})$ be a vector of masks where the semi-colon separates input ones from output ones. Let us begin by proving that there exists \(b' \in \F_p^{16}\) such that
+%%      % \noindent
+%%      % \scalebox{0.86}{
+%%      {\footnotesize
+%%      \begin{equation*}
+%%          {\widehat H^{(n+1)}}(a, \alpha_1, ..., \alpha_{n}; \beta_0, ..., \beta_{n-1}, b) ~=~
+%%          {\widehat H^{(n)}}(a, \alpha_1, ..., \alpha_{n-1}; \beta_0, ..., \beta_{n-2}, b') \times {\widehat \subW}(\alpha_{n}, b) .
+%%        \end{equation*}
+%%      }
+
+   
+%%      Let \(\omega\) be a \(p\)-th root of unity in~\(\mathbb{C}\) and \(\chi(x) = \omega^x\) for \(x \in \F_p\). Then,
+     
+%%        \begin{eqnarray*}
+%%          \mathcal{I} & = &   {\widehat H^{(n)}}(a,\alpha_1, \ldots, \alpha_{n-1}; \beta_0, \ldots, \beta_{n-2},b') \times {\widehat \subW}(\alpha_{n}, b) \\
+%%                      & = & \sum_{X_0, K_1, \ldots, K_{n-1}} \chi\left(\sum_{i=0}^{n-2}\beta_i \cdot S_i + b'\cdot X_{n-1}- \sum_{i=1}^{n-1} \alpha_i \cdot K_i- a \cdot X_0\right) \sum_{Z} \chi\left(b \cdot \subW(Z) - \alpha_n \cdot Z\right) \\
+%%                      & = & \sum_{X_0 ,K_1, \ldots, K_{n-1},K_n }   \chi\left(\sum_{i=0}^{n-2}\beta_i \cdot S_i + b' \cdot X_{n-1} - \sum_{i=1}^{n-1} \alpha_i \cdot K_i - a \cdot X_0\right)\\
+%%        & & \hspace*{2cm} \times \chi\left(b \cdot \subW(K_n+L(X_{n-1})) - \alpha_n \cdot K_n - \alpha_n \cdot L(X_{n-1})\right)\;,
+%%        \end{eqnarray*}
+%%        where the variables summed over go through $\F_p^{16}$, and the last equality is obtained by setting \(Z = K_n + L(X_{n-1})\). Let \(\filter^*: \F_p^4 \rightarrow \F_p^{16}\) be the function outputting an internal state whose digits are all zero, expect the digits affected by \(\filter\), which are equal to the inputs. By exchanging the positions of $ b' \cdot X_{n-1}$ and $b \cdot X_{n} = b \cdot \subW(K_n+L(X_{n-1}))$, adding $\alpha_n \cdot K_n$ to the sum of $ \alpha_i \cdot K_i$, and adding $\beta_{n-1}\cdot S_{n-1} = \filter^*(\beta_{n-1}) \cdot X_{n-1}$ to the sum of $\beta_{i}\cdot S_{i}$, we deduce that \ac{Je trouve ca mega complique. Pourquoi pas simplement: We can rewrite \(\mathcal{I}\) as follows.}
+%%       \begin{eqnarray*}
+%%        \mathcal{I} 
+%%        & = & \sum_{X_0, K_1, \ldots, K_{n} \in \F_p^{16}}  \chi\left(\sum_{i=0}^{n-1}\beta_i \cdot S_i + b \cdot X_n - \sum_{i=1}^{n} \alpha_i \cdot K_i - a \cdot X_0\right) \\
+%%             & & \quad \times \chi\left(b' \cdot X_{n-1} -\filter^*(\beta_{n-1})\cdot X_{n-1}  - \alpha_n \cdot L(X_{n-1})\right).
+%%            \end{eqnarray*}
+%%            \begin{eqnarray*}
+%%          & = & \sum_{X_0, K_1, \ldots, K_{n} \in \F_p^{16}}  \chi\left(\sum_{i=0}^{n-1}\beta_i \cdot S_i  + b \cdot X_n - \sum_{i=1}^{n} \alpha_i \cdot K_i - a \cdot X_0\right)\\
+%%        & & \quad\times \chi\left((b'-\filter^*(\beta_{n-1}) - L^T(\alpha_n)) \cdot X_{n-1}\right) \\
+%%      & = &    {\widehat H^{(n+1)}}(a,\alpha_1, \ldots, \alpha_n; \beta_0, \ldots, \beta_{n-1},b) \;,
+%%          \end{eqnarray*}
+%%        when \(b'=\filter^*(\beta_{n-1}) + L^T(\alpha_n)\) and \(L^T\) is the transpose of~\(L\). 
+
+
+   
+
+
+\subsection{Data Complexity of Fast Correlation Attacks}
+\label{sec:fast-correlation-data}
+
+It is well-known that the capacity of a linear approximation determines the minimal length of the sequence obtained by a given linear combination of the digits of \((S_t)_{t \in \mathbb{N}}\) that is required for recovering the initial state of the key-LFSR from the linear approximation
+\[\sum_{i=1}^{n-1} \alpha_i \cdot K_{t+i} + \sum_{i=0}^{n-1} \beta_i \cdot S_{t+i}, \forall t \geq 0\;.\]
+
+However, the same result holds even when the approximation is not linear as stated in the following theorem.
+\begin{theorem}\label{th:Nmin}
+  Let  \(F\) be a function from \(\F_p^\kappa \times \F_p^m\) to \(\F_p^n\). Let \(g:\F_p^\kappa \rightarrow \F_p\) and \(h: \F_p^n \rightarrow \F_p\) such that the probability distribution of
+  \[(U,V) \mapsto h(F(U,V)) - g(U)\]
+  is close to the uniform distribution, \ie, for all \(z \in \F_p\),
+  \[\pr_{(U,V) \drawfrom \F_p^\kappa \times \F_p^m}[h(F(U,V)) - g(U)=z] = \frac{1}{p} + \varepsilon_z \mbox{ with } \varepsilon_z\ll 1\;.\]
+  Let \((U_t)_{t \in \mathbb{N}}\) be a sequence of elements in~\(\F_p^\kappa\) defined by \(U_{t+1} = \Phi(U_t)\), where  $\Phi$ is a function from $\F_p^\kappa$ to itself. Let \((V_t)_{t \in \mathbb{N}}\) be a sequence of elements in~\(\F_p^m\).
+  Then, the minimal length \(N\) of the sequence \( (B_{t})_{t \in \mathbb{N}} \vcentcolon= \left( h(F(U_t,V_t) \right)_{t \in \mathbb{N}}\) 
+    required for recovering \(U_0\) is
+  \[N = \frac{\kappa \ln p}{\Delta}\]
+  with \[\Delta = p \sum_{y \in \F_p} \varepsilon_y^2 = \sum_{a \in \F_p^*} \left|p^{-\kappa} \sum_{U \in \F_p^\kappa,V\in \F_p^m}\omega^{a(h(F(U,V)) - g(U))}\right|^2\;.\]
+\end{theorem}
+\begin{proof}
+  Let
+  \[\mathcal{C} = \{(g(\Phi^t(U_0)))_{0 \leq t < N}, U_0 \in \F_p^\kappa\}\;.\]
+  This set is a (non-linear) code over \(\F_p\) of length~\(N\) and size \(p^\kappa\).
+  As originally observed by Meier and Staffelbach~\cite{EC:MeiSta88}, recovering \(U_0\) from \((B_0, \ldots, B_{N-1})\) boils down to decoding this code. Indeed, \((B_0, \ldots, B_{N-1})\) can be seen as the result of the transmission of the \(N\)-digit word \((g(U_0), \ldots, g(\Phi^{N-1}(U_0)))\)  through a noisy transmission channel. This transmission channel is memoryless, since each digit is affected in the same way:
+  \[B_t = g(\Phi^{t}(X_0)) + \eta_t\]
+  where the probability distribution of all \(\eta_t\) is given by
+  \[\pi_z := \pr[\eta_t = z] = \pr_{(U,V) \drawfrom \F_p^\kappa \times \F_p^m}[h(F(U,V)) - g(U)=z]= \frac{1}{p} + \varepsilon_z\;.\]
+  This transmission channel is called symmetric in the sense that its transition matrix, formed by the probabilities that an input value~\(i\) is transformed to~\(j\), is a circulant matrix whose rows correspond to the probability distribution \((\pi_0, \ldots, \pi_{p-1})\).
+  Therefore, Shannon's channel-coding theorem~\cite[Section~7.7]{add:CovTho06} implies that this code can be decoded with a non-negligeable success probability if and only if its rate, \ie, the ratio between the logarithm of its size and its length, is smaller than the channel capacity:
+  \[\frac{\kappa}{N} \leq C_{\mathrm{channel}}\;.\]
+  The capacity of any \(p\)-ary symmetric channel is given by~\cite[Th.~7.2.1]{add:CovTho06}
+  \[C_{\mathrm{channel}} = 1 - H_p(\pi_0, \pi_1, \ldots, \pi_{p-1})\]
+  where \(H_p\) denotes the \(p\)-ary entropy, i.e.,
+  \[H_p(\pi_0, \pi_1, \ldots, \pi_{p-1}) := - \sum_{z \in \F_p} \pi_z \log_p(\pi_z)\;.\]
+  We use that, for \(\varepsilon \ll 1\),
+  \[\ln\left(\varepsilon + \frac{1}{p}\right) = \ln(1 + p \varepsilon) - \ln p = p \varepsilon - \ln p + o(\varepsilon)\;.\]
+  It follows that
+  \begin{eqnarray*}
+    \sum_{z \in \F_p} \left(\varepsilon_z + \frac{1}{p}\right) \ln\left(\varepsilon_z + \frac{1}{p}\right) & \simeq & p \sum_{z \in \F_p} \varepsilon_z^2 - \ln p \sum_{z \in \F_p} \left(\varepsilon_z + \frac{1}{p}\right)\;.
+  \end{eqnarray*}
+  We then deduce that
+  \[C_{\mathrm{channel}} = 1 + \frac{1}{\ln p} \left(p \sum_{z \in \F_p} \varepsilon_z^2  -\ln p\right) = \frac{1}{\ln p} \left(p \sum_{z \in \F_p} \varepsilon_z^2\right)\;.\]
+  It is well-known (see Prop.~\ref{prop:capa}) that the same quantity can also be derived from the Fourier transform of the function
+  \[f: (U,V) \mapsto h(F(U,V)) - g(U)\;.\]
+  Indeed, if \(\pi'\) denotes the function from \(\F_p\) to \(\mathbb{R}\) defined by \(\pi'(x) = \pi_x - \frac{1}{p} = \varepsilon_x\), we have
+    \[\Delta = p \sum_{y \in \F_p} \left|\pi'(y)\right|^2 = \sum_{a \in \F_p} \left|{\widehat \pi'}(a)\right|^2\]
+    where the last equality corresponds to Plancherel's formula.
+    Moreover, the Fourier transform of~\(\pi'\) an be computed as follows: if \(a \neq 0\),
+    \begin{eqnarray*}
+      {\widehat \pi'}(a) & = & \sum_{x \in \F_p} \pi'(x) \omega^{-ax} = \sum_{x \in \F_p} \pi_x \omega^{-ax} - p^{-1} \sum_{x \in \F_p} \omega^{-ax}\\
+      & = & p^{-(\kappa+m)} \sum_{x \in \F_p} \#f^{-1}(x) \omega^{-ax} = p^{-(\kappa+m)} \sum_{U,V \in \F_p^\kappa \times \F_p^m}  \omega^{-a f(U,V)}
+      \\ & = & p^{-(\kappa+m)} {\widehat f}(0, -a)\;,
+      \end{eqnarray*}
+    and \({\widehat \pi'}(0) = 0\).
+        It follows that
+        \[\Delta = \sum_{a \in \F_p^*} \left|p^{-(\kappa+m)} {\widehat f}(0, a)\right|^2\;.\]
+        \hfil\qed
+\end{proof}
+
+
+
+% Leo: ce qui suit est pour qu'emacs compile bien l'article, pas touche !
+%%% Local Variables:
+%%% mode: latex
+%%% ispell-local-dictionary: "english"
+%%% TeX-master: "main"
+%%% End:

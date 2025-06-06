@@ -1,15 +1,9 @@
 \section{Boolean Encoding over $\Z_p$ and Homomorphic Evaluation Strategy Between $\B$ and $\Z_p$}
 \label{sec:p_encodings_homorphic_layer}
 
-To evaluate Boolean functions in TFHE, one could use the vanilla TFHE with $p=2$. The problem is that the only evaluable function would be the \texttt{XOR} operation. To evaluate the other operators, the solution of \cite{JC:CGGI20} which is also implemented in \texttt{tfhe-rs} library \cite{tfhe-rs} \footnote{more precisely, in the \texttt{boolean} crate} is to take a larger $p$, specifically $p=8$. This allows all the operations of the Boolean algebra to be carried out using the \textit{bit-of-padding} method, that we presented in Chapter \ref{chap:negacyclicity}. This has a heavy impact on performances, because it requires a bootstrapping after each Boolean gate to make sure no data ever overflows into the MSB.
-
-By using \emph{odd} values for $p$, we remove this constraint of padding and can perform more operations without bootstrapping.
 
 
-Moreover, the classical construction of the PBS of TFHE (introduced in Section \ref{sec:pbs_algorithm}) takes only one input and so can only evaluate univariate functions. The common solution to evaluate multivariate functions is to concatenate several input ciphertexts into one by shifting the bits of each input and to sum them all. The problem is that the number of message bits cannot grow too much because the other parameters of the underlying $\LWE$ and $\GLWE$ instance must grow accordingly, degrading the performances. As a consequence, the performances quickly degrades as the arity of the function increases. Our approach consists in removing the padding bit and using a combination of homomorphic additions before a PBS to evaluate a function for \emph{any} number of inputs with the cost of a single PBS.
-
-
-To this purpose, we propose a construction in which we embed Boolean values in $\Z_p$ for well-chosen values of $p$, forming an ``intermediate homomorphic layer'' between $\B$ and $\Z_q$. In the following, we explain how we define such a layer, and we describe our new strategy to evaluate Boolean functions in a more efficient way without considering the circuit representation of the function. Note that we generalize this construction to arithmetic spaces in Chapter \ref{chap:hyppogriph}.
+We propose a construction in which we embed Boolean values in $\Z_p$ for well-chosen values of $p$, forming an ``intermediate homomorphic layer'' between $\B$ (the plaintext space of bits) and $\Z_q$ (the ciphertext space). In the following, we explain how we define such a layer, and we describe our new strategy to evaluate Boolean functions in a more efficient way without considering the circuit representation of the function. Note that we generalize this construction to arithmetic spaces in Chapter \ref{chap:hyppogriph}.
 
 
 \subsection{Encoding of $\B$ over $\Z_p$}
@@ -30,15 +24,30 @@ To represent Boolean values over $\Z_p$, we use a mapping function that we call 
 \end{definition}
 
 
-\begin{figure}
-  \centering
-    \includegraphics[scale=0.2]{img/to_harmonize/encoding_example_double.png}
-  \caption{Representation of two valid $p$-encodings. The green part represents $\Encoding(1)$,  and the red part $\Encoding(0)$. Note that the relaxed negacyclity is respected by the $p$-encoding on the right-hand figure as $p$ is even.}
-  \label{fig:encodings}
+
+\begin{figure}[ht]
+	\centering
+	\begin{minipage}{0.45\textwidth}
+		\centering
+		\begin{tikzpicture}[scale=0.8]
+			\drawSingleRingGreenRed{15}{small}{true}{true}{9, 10}{0, 8, 11, 12, 14}
+		\end{tikzpicture}
+		\caption*{Example with $p=15$}
+	\end{minipage}
+	\hfill
+	\begin{minipage}{0.45\textwidth}
+		\centering
+		\begin{tikzpicture}[scale=0.8]
+			\drawSingleRingGreenRed{16}{small}{true}{true}{8, 12, 13}{0, 4, 9, 11}
+		\end{tikzpicture}
+		\caption*{Example with $p=16$}
+	\end{minipage}
+	
+	\caption{Representation of two valid $p$-encodings. The green part represents $\Encoding(1)$,  and the red part $\Encoding(0)$. Note that even if $p$ is even on the right-hand figure, the relaxed negacyclity is still respected.}
 \end{figure}
 
 
-In our approach when we need to encrypt a bit, we apply a $p$-encoding to embed it on $\Z_p$, then we encrypt the result using the classical setup of TFHE.  When new values are freshly encrypted or produced by a PBS, only one element of $ \Z_p$ is chosen for each bit. We call such an encoding a canonical $p$-encoding:
+In our approach when we need to encrypt a bit, we apply a $p$-encoding to embed it in $\Z_p$, then we encrypt the result using the classical setup of TFHE.  When new values are freshly encrypted or produced by a PBS, only one element of $ \Z_p$ is chosen for each bit. We call such an encoding a canonical $p$-encoding:
 
 \begin{definition}[Canonical Encoding]
     A $p$-encoding $\Encoding$ is said \emph{canonical} if and only if it is valid and $\left| \Encoding(0) \right| = \left| \Encoding(1) \right| = 1$
@@ -67,7 +76,7 @@ Let $c$ be a ciphertext encoding a bit $b$ under a $p$-encoding $\Encoding$, whe
 
 
 
-Our goal is to represent the Boolean function we want to evaluate with a sum of $p$-encodings (we define what we mean by ``sum of $p$-encoding'' in Section \ref{sec:p_encodings_new_strategy}).  When sums are carried out on ciphertexts (and so homomorphically on the underlying $p$-encodings), the sets $\Encoding(0)$ and $\Encoding(1)$ of the $p$-encodings may move, grow, shrink, but they should never overlap as it would result in a loss of information. As we removed the need of a bit of padding, we do not need to track a potential overflow of data (informally we say that ciphertexts are free to ``loop around the torus''). After the sum, the encoding of the result can be reset to a canonical one with a PBS to allow further computation. Or, if the homomorphic computation is over, the result can be recovered by decrypting the ciphertext and checking in which partition the decrypted value lies.
+Our goal is to represent the Boolean function we want to evaluate with a sum of $p$-encodings (we define what we mean by ``sum of $p$-encoding'' in Section \ref{sec:p_encodings_new_strategy}).  When sums are carried out on ciphertexts (and so homomorphically on the underlying $p$-encodings), the sets $\Encoding(0)$ and $\Encoding(1)$ of the $p$-encodings may move, grow, shrink, but they should never overlap as it would result in a loss of information. As we removed the need for a bit of padding, we do not need to track a potential overflow of data (informally we say that ciphertexts are free to ``loop around the torus''). After the sum, the encoding of the result can be reset to a canonical one with a PBS to allow further computation. Or, if the homomorphic computation is over, the result can be recovered by decrypting the ciphertext and checking in which partition the decrypted value lies.
 
 
 The next subsection explains in further details the process of evaluating Boolean functions on with $p$-encodings.
@@ -95,16 +104,16 @@ Let $f$ be a bivariate Boolean function and let us construct two sets $\mathcal{
 
 We say that the sum of $p$-encodings $\Encoding_x + \Encoding_y$ is \emph{suitable for the evaluation of $f$} if and only if $\mathcal{P}_0 \cap \mathcal{P}_1 = \emptyset$. The definition can be generalized to any number of arguments $\ell$ for $f$. For a given $f$, finding such correct encodings is not trivial. We elaborate further on this point in Section \ref{sec:search}. 
 
-If $\Encoding_x$ and $\Encoding_y$ are suitable for $f$, then one can use the computed sets $\mathcal{P}_b$ to construct a new $p$-encoding \[\Encoding_z = \EncDef{\mathcal{P}_0}{\mathcal{P}_1}\] that encodes the bit $f(x, y)$. As $\Encoding_z$ is valid, then the clear value of the bit can be recovered by decryption, or further computations can be performed without the need of a bootstrapping. 
+If $\Encoding_x$ and $\Encoding_y$ are suitable for $f$, then one can use the computed sets $\mathcal{P}_0$ and $\mathcal{P}_1$ to construct a new $p$-encoding \[\Encoding_z = \EncDef{\mathcal{P}_0}{\mathcal{P}_1}\] that encodes the bit $f(x, y)$. As $\Encoding_z$ is valid, then the clear value of the bit can be recovered by decryption, or further computations can be performed without the need of a bootstrapping. 
 
 
 \begin{definition}[Application of a function to a vector of encodings]
-    Let $f:\B^\ell \mapsto \B$ be a Boolean function and let $\Encoding = (\Encoding_1, \dots, \Encoding_l)$ be a vector of $p$-encodings. We define $f(\Encoding)$ by:
-    \[f(\Encoding) = \EncDef{\mathcal{P}_0}{\mathcal{P}_1}\]
+    Let $f:\B^\ell \mapsto \B$ be a Boolean function and let $\vec \Encoding = (\Encoding_1, \dots, \Encoding_l)$ be a vector of $p$-encodings. We define $f(\vec \Encoding)$ by:
+    \[f(\vec \Encoding) = \EncDef{\mathcal{P}_0}{\mathcal{P}_1}\]
     with: 
     \[\mathcal{P}_b = \left \{ \left [ \sum_{i=1}^{l} \gamma_i \right ]_p \mid (\gamma_1, \dots, \gamma_l) \in \prod_{i=1}^\ell \Encoding_i(b_i) \text{ and } f(b_1, \dots, b_l) = b \right \} \forall b \in \B\]
 
-We stress that $f(\Encoding)$ is a valid $p$-encoding if and only of $\mathcal{P}_0 \cap \mathcal{P}_1 = \emptyset$.
+$f(\vec \Encoding)$ always exists, but is valid only if it respects the constraints of Definition \ref{def:validity}.
 \end{definition}
 
 
@@ -130,10 +139,22 @@ and the $p$-encoding resulting of the operation $f: (x, y) \mapsto x \oplus y$ i
 Figure \ref{fig:operations} further illustrates this construction for these two operations.
 
 \begin{figure}
-    \centering
-    \includegraphics[width=\textwidth]{img/to_harmonize/operators.png}
-    \caption{Starting from two canonical encodings, we produce two new $p$-encodings corresponding to the results of the $\&$ and the $\oplus$ operations.}
-    \label{fig:operations}
+	\centering
+	\begin{tikzpicture}
+		\drawSingleRingGreenRedBox{15}{small}{true}{6}{9}{0}{0}{0.5}{}
+		\node at (2.5, 0) {\Huge $\&$};
+		\drawSingleRingGreenRedBox{15}{small}{true}{4}{5}{10}{0}{0.5}{}
+		\node at (7.5, 0) {\Huge $=$};
+		\drawSingleRingGreenRedBox{15}{small}{true}{10}{11, 13, 14}{20}{0}{0.5}{}
+		
+		\drawSingleRingGreenRedBox{15}{small}{true}{6}{9}{0}{-10}{0.5}{}
+		\node at (2.5, -5) {\Huge $\oplus$};
+		\drawSingleRingGreenRedBox{15}{small}{true}{4}{5}{10}{-10}{0.5}{}
+		\node at (7.5, -5) {\Huge $=$};
+		\drawSingleRingGreenRedBox{15}{small}{true}{10}{11, 13, 14}{20}{-10}{0.5}{}
+	\end{tikzpicture}
+	\caption{Starting from two canonical encodings, we produce two new $p$-encodings corresponding to the results of the $\&$ and the $\oplus$ operations.}
+	\label{fig:operations}
 \end{figure}
 
 
@@ -141,7 +162,7 @@ To wrap up, here is our proposed framework to evaluate a Boolean function $f: \B
 
 \begin{enumerate}
 \item Encrypt each input $b_i$ with some canonical $p$-encoding $\Encoding_i$ into a ciphertext $c_i$ such that $\Encoding_{sum} = f(\Encoding_1, \dots, \Encoding_\ell)$ is a valid encoding.
-\item For a Boolean function $f$ to be evaluated on $b_1, \dots, b_l$, compute homomorphically the sum of the ciphertexts $c = c_1 + \dots + c_l$. This yields an encryption of $b = f(b_1, \dots, b_l)$, encoded with a valid $p$-encoding $\Encoding_{sum} = f(\Encoding_1, \dots, \Encoding_l)$.
+\item For a Boolean function $f$ to be evaluated on $b_1, \dots, b_\ell$, compute homomorphically the sum of the ciphertexts $c = c_1 + \dots + c_\ell$. This yields an encryption of $b = f(b_1, \dots, b_\ell)$, encoded with a valid $p$-encoding $\Encoding_{sum} = f(\Encoding_1, \dots, \Encoding_\ell)$.
 \item \begin{enumerate}
     \item If the result is directly required by the client, $c$ is returned as ciphertext which can be decrypted to get the result in $\Z_p$ and associated to the right Boolean value.
     \item If the result is reused in further homomorphic computations, a PBS calculating $\texttt{Cast}_{\Encoding_{sum} \mapsto \Encoding_{new}}$ on the result is computed (like introduced in Property \ref{prop:cast_valid_to_canonical}), with $\Encoding_{new}$ a new canonical $p$-encoding. The resulting value can then be used as an input for a next Boolean function.
@@ -185,20 +206,47 @@ Instead of leveraging its Boolean representation $f(a, b, c) = a \& c \oplus b \
 
 \begin{enumerate}
     \item Encrypting the bits with the $7$-encodings:\[\Encoding_a = \Encoding_b = \EncDefOne{1} \text{ and } \Encoding_c = \EncDefOne{2}\].
-    \item Applying the function $f$ on the $7$-encodings by summing the ciphertexts, producing a valid $7$-encoding:\[\Encoding_{sum} = \EncDef{\{0, 1, 2, 5\}}{\{3, 4, 6\}}\] At this point, only sums have been performed on the ciphertexts.
+    \item Applying the function $f$ on the $7$-encodings by summing the ciphertexts, producing a valid $7$-encoding:\[\Encoding_{sum} = \EncDef{\{0, 1, 2, 5\}}{\{3, 4, 6\}}\]
     \smallskip
     \item With one PBS, resetting the result to a target canonical $p$-encoding (with any $p$), for example \[\Encoding_{new} = \EncDefOne{1} \text{ with } p=7\]
 \end{enumerate}
 
 A visualization of this procedure can be found in Figure \ref{fig:illustration}. We just defined the gadget $\Gamma = \left ( (\Encoding_a, \Encoding_b, \Encoding_c), \Encoding_{new}, 7, 7\right )$.
 
-\begin{figure}
-    \centering
-    \includegraphics[width=\linewidth]{img/to_harmonize/illustration_framework.png}
-    \caption{Illustration of an execution of the framework for the multiplexing function.}
-    \label{fig:illustration}
-\end{figure}
 
+\begin{figure}
+	\centering
+	\begin{tikzpicture}
+		\def\scaleTorus{0.4}
+		\def\vertspace{3}
+		\def\horizspace{3}
+		
+		\drawSingleRingGreenRedBox{7}{small}{true}{1}{0}{0}{0}{\scaleTorus}{tore1}
+		\drawSingleRingGreenRedBox{7}{small}{true}{1}{0}{0}{-\vertspace / \scaleTorus}{\scaleTorus}{tore2}
+		\drawSingleRingGreenRedBox{7}{small}{true}{2}{0}{0}{-2 * \vertspace / \scaleTorus}{\scaleTorus}{tore3}
+		
+		\node[draw, align=center, thick] (plusnode) at (\horizspace, -\vertspace) {\Huge$+$};
+		
+		\draw[->, thick] (\scaleTorus * 3.5, 0) -- (plusnode.north west);
+		\draw[->, thick] (\scaleTorus * 3.5, -\vertspace) -- (plusnode.west);
+		\draw[->, thick] (\scaleTorus * 3.5, -2 * \vertspace) -- (plusnode.south west);
+		
+		\drawSingleRingGreenRedBox{7}{small}{true}{3, 4, 6}{0, 1, 2, 5}{2 * \horizspace / \scaleTorus}{-\vertspace / \scaleTorus}{\scaleTorus}{tore4}
+		
+		\draw[->, thick] (plusnode.east) -- (2 * \horizspace - \scaleTorus * 3.5, -\vertspace);
+		
+		\node[draw, align=center, thick] (pbsnode) at (3 * \horizspace, -\vertspace) {\Huge PBS};
+		
+		\draw[->, thick] (2 * \horizspace + \scaleTorus * 3.5, -\vertspace) -- (pbsnode.west);
+		
+		\drawSingleRingGreenRedBox{7}{small}{true}{1}{0}{4 * \horizspace / \scaleTorus}{-\vertspace / \scaleTorus}{\scaleTorus}{tore4}
+		
+		\draw[->, thick] (pbsnode.east) -- (4 * \horizspace - \scaleTorus * 3.5, -\vertspace);
+		
+	\end{tikzpicture}
+	\caption{Illustration of an execution of the framework for the multiplexing function.}
+	\label{fig:illustration}
+\end{figure}
 
 \subsection{Encoding Switching}
 
@@ -218,15 +266,15 @@ To apply a gadget to a given ciphertext, it has to be encrypted under the right 
 
 \begin{property}[Encoding switching with multiplication by a constant]
     \label{prop:mult_constant}
-    Let $x$ be a ciphertext encoded under $\Encoding_x = \EncDef{\{\alpha_i\}_{0 \le i \le l_0}}{\{\beta_i\}_{0 \le i \le l_1}} $ and $a \in \Z_p$ a constant value prime with $p$. The encoding of $x$ can be switched to:
+    Let $x$ be a ciphertext encoded under $\Encoding_x = \EncDef{\{\alpha_i\}_{0 \le i \le l_0}}{\{\beta_i\}_{0 \le i \le l_1}} $ and $a \in \Z_p$ a constant value coprime with $p$. The encoding of $x$ can be switched to:
     \[\Encoding'_x = \EncDef{\{[a \cdot \alpha_i]_p\}_{0 \le i \le l_0}}{\{[a \cdot \beta_i]_p\}_{0 \le i \le l_1}}\]
     by an homomorphic multiplication of the ciphertext $x$ by the clear value $a$.
 \end{property}
 \begin{proof}
-As $a$ is prime with $p$, the multiplication by $a$ is a bijection from $\Z_p$ to $\Z_p$. By definition, all the $\alpha_i$'s are different of the $\beta_i$'s. If we apply a bijection on them, the inequalities are conserved.
+As $a$ is coprime with $p$, the multiplication by $a$ is a bijection from $\Z_p$ to $\Z_p$. By definition, all the $\alpha_i$'s are different of the $\beta_i$'s. If we apply a bijection on them, the inequalities are conserved.
 \end{proof}
 
-Note that the condition of primality between $a$ and $p$ is a sufficient condition for the multiplication to be a valid encoding switching, but is not necessary. In particular, one other case is particularly useful in practice:
+Note that the condition of coprimality between $a$ and $p$ is a sufficient condition for the multiplication to be a valid encoding switching, but is not necessary. In particular, one other case is particularly useful in practice:
 
 \begin{property}[Encoding switching for a canonical encoding containing a zero]
 \label{prop:mult_from_1}
@@ -249,7 +297,7 @@ These techniques are powerful because they do not require any bootstrapping, so 
                         \bot & \text{ otherwise.}
                     \end{cases}
     \end{align}
-    Here, $\bot$ simply denotes an arbitrary placeholder value, as it will never be reached.
+    $\bot$ simply denotes an arbitrary placeholder value, as it will never be reached.
     \label{prop:enc_switch_pbs}
 \end{property} 
 

@@ -50,7 +50,7 @@ To homomorphically evaluate the function $f$, we evaluate each subcircuits with 
 \subsection{Heuristics to Find a Small Graph}
 \label{sec:heuristics_graph}
 
-Finding such a graph can be done by exhaustively evaluating all the possible subcircuits with our method introduced in Section \ref{sec:search}, and then find the more efficient one. However it is not really practical to evaluate \emph{all} the possible subcircuits, so we develop some heuristics to reduce the search space. Let us start by defining a few bounds on the considered subcircuits, we will leave the other ones apart in our algorithm:
+Finding such a graph can be done by exhaustively evaluating all the possible subcircuits with our method introduced in Section \ref{sec:p_encodings_search}, and then find the more efficient one. However it is not really practical to evaluate \emph{all} the possible subcircuits, so we develop some heuristics to reduce the search space. Let us start by defining a few bounds on the considered subcircuits, we will leave the other ones apart in our algorithm:
 
 \begin{itemize}
     \item The subcircuits have at most $B$ inputs ($\forall i, l^{(i)} < B$). The purpose of this bound is to limit the running time of Algorithm \ref{alg:add_element}. In practice, for our experiments, we took $B = 10$.

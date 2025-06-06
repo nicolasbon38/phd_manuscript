@@ -1,0 +1,76 @@
+
+%\input{macros}
+
+
+% components
+\newcommand\plaintextSpace{\mathcal{P}}
+\newcommand\mainField{\F_{p}}
+\newcommand\evenRing{\mathbb{Z}_t}
+\newcommand\LFSRlen{\text{\textsf{len}}}
+\newcommand\pseudoKS{\mathcal{K}}
+\newcommand\whitening{\mathcal{W}}
+\newcommand\thesbox{\pi}
+\newcommand\mixmat{M}
+\newcommand\filter{\phi}
+\newcommand\fsmState[1]{X_{#1}}
+
+% noises
+\newcommand\noiseFresh{\sigma_\text{\textsf{fresh}}}
+\newcommand\noisePBS{\sigma_\text{\textsf{PBS}}}
+\newcommand\noiseLFSR{\sigma_\text{\textsf{LFSR}}}
+\newcommand\noiseBeforeSN{\sigma_\text{\textsf{SN}}}
+\newcommand\noiseOutput{\sigma_\text{\textsf{output}}}
+
+% operations
+\newcommand\subWords{\text{\textsf{SubDigits}}}
+\newcommand\mixColumns{\text{\textsf{MixColumns}}}
+\newcommand\shiftRows{\text{\textsf{ShiftRows}}}
+\newcommand\filterName{\text{\textsf{Filter}}}
+\newcommand\subW{\text{\textsf{SD}}}
+\newcommand\mixC{\text{\textsf{MC}}}
+\newcommand\shiftR{\text{\textsf{SR}}}
+\newcommand\clock[1]{\mathsf{clock}_{#1}}
+
+
+% macros for proof
+\newcommand\keyspace{\mathcal{K}}
+\newcommand\outspace{\mathcal{S}}
+\newcommand\keyevent{k}
+\newcommand\outevent{s}
+\newcommand\keyvar{K}
+\newcommand\outvar{S}
+\newcommand\fsmspace{\mathcal{X}}
+\newcommand\fsmvar{X}
+\newcommand{\set}[1]{\left\{#1\right\}}
+\newcommand{\card}[1]{\left|#1\right|}
+\newcommand{\hamming}{\mathrm{wt}}
+\newcommand{\im}{\mathrm{Im}}
+
+
+% Cool names
+\newcommand\coolName{\texttt{Transistor}\xspace}
+\newcommand\minimalLength{correlation-immune length\xspace}
+
+% latex magic for eprint version
+\newif\ifeprint
+\eprinttrue
+%\eprintfalse
+
+
+
+
+
+\input{tex/transistor/intro}
+\input{tex/transistor/constraints}
+\input{tex/transistor/spec}
+\input{tex/transistor/rationale}
+\input{tex/transistor/security}
+\input{tex/transistor/bench}
+\input{tex/transistor/conclusion}
+
+
+%\appendix
+%\input{algorithms/full_spec}
+%\input{appendix}
+%\input{fhe_appendix.tex}
+%\input{cryptanalysis-appendix}

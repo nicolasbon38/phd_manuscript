@@ -71,7 +71,7 @@ The idea is to ensure that the message stays in the first half of the torus all 
 
 The advantage of this method is that it relaxes the negacyclicity constraint and makes the bootstrapping able to evaluate any function (not only the negacyclic one). However, this construction is rather fragile: any linear function can break it by propagating a carry into the MSB. 
 
-To avoid this, when evaluating an homomorphic circuit, the program needs to keep track of the maximal value that each homomorphic operation can yield and make sure that it will never propagate a carry into the MSB. This often leads to extra bootstrapping to contril the growth of the message and eliminate the overflows. 
+To avoid this, when evaluating an homomorphic circuit, the program needs to keep track of the maximal value that each homomorphic operation can yield and make sure that it will never propagate a carry into the MSB. This often leads to extra bootstrapping to control the growth of the message and eliminate the overflows. 
 
 In Chapter \ref{chap:p_encodings}, we will demonstrate how this method makes the evaluation of Boolean circuit very inefficient, and what we can do to improve that.
 
@@ -88,9 +88,25 @@ In the following, we give the definition of the accumulator $\acc$ in those case
 	\TODO{Dire quelque chose surl'encodage dans les MSB, (que veut dire f(i) en fait)}
 \end{definition}
 
+An example of such an accumulator is shown on Figure \ref{fig:negacyclic_accumulator}.
 
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}
+		\drawHalfRing{4}{small}{true}{true}{true}
+		\drawSingleRingHalfColor{64}{4}{big}{true}{false}{true}
+	\end{tikzpicture}
+				
+	\vspace{1.5em}
+	
+	\textbf{Negacyclic Accumulator:}\\[0.5em]
+	\negacyclicAccumulator{4}{32}
+	
+	\caption{An example of negacyclic accumulator on the first half of the torus, with $p=4$ and $N = 32$}
+	\label{fig:negacyclic_accumulator}
+\end{figure}
 
-\TODO{FAIRE UNE JIOLIE FIGURE}
+\TODO{Peaufiner la figure}
 
 
 
@@ -206,7 +222,31 @@ For $0 \le \alpha \le \frac{p-1}{2}$, the range of degrees whose coefficients ar
 	\includegraphics[width=\textwidth]{img/to_harmonize/accumulator_odd.png}
 	\caption{Illustration of the construction of the accumulator. On top is the ring $\Z_{2N}$ splitted in windows. Below is a representation of the polynomial $v$, with its version once rotated by a multiplication by $X^N$. On the figure, $p$ = 5.}
 	\label{fig:accumulator_odd}
+	\TODO{Harmoniser avec le tikz}
 \end{figure}
+
+
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}
+		\drawSingleRing{5}{5}{small}{true}{true}{true}
+		\drawRingOddEncoding{64}{5}{big}{true}{false}
+	\end{tikzpicture}
+	
+	\vspace{1.5em}
+%	
+	\textbf{Odd-Modulus Accumulator:}\\[0.5em]
+	\oddAccumulator{5}{32}
+%	
+	\caption{Illustration of the construction of the accumulator. On top is the ring $\Z_{2N}$ splitted in windows. Below is a representation of the polynomial $v$, with its version once rotated by a multiplication by $X^N$. On the figure, $p$ = 5.}
+\TODO{Finir cette vigure et retirer l'autre}
+	\label{fig:accumulator_odd}
+\end{figure}
+
+
+
+
 
 \TODO{Aussi rapatrier le reste de la section sur l'implem ?}
 

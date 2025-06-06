@@ -1,3 +1,9 @@
+%%%own papers%%%
+
+
+
+
+
 @misc{lattice-estimator,
 	author = {Martin R.  Albrecht and Rachel Player and Sam Scott},
 	title = {On the concrete hardness of Learning with Errors},
@@ -88,6 +94,30 @@
 	note = "Thèse de doctorat dirigée par Furon, Teddy Informatique Université de Rennes (2023-....) 2023",
 	note = "2023URENS103",
 	url = "http://www.theses.fr/2023URENS103/document",
+}
+
+
+
+
+@inproceedings{DBLP:conf/ccs/CurtisP19,
+	author       = {Benjamin R. Curtis and
+	Rachel Player},
+	editor       = {Michael Brenner and
+	Tancr{\`{e}}de Lepoint and
+	Kurt Rohloff},
+	title        = {On the Feasibility and Impact of Standardising Sparse-secret {LWE}
+	Parameter Sets for Homomorphic Encryption},
+	booktitle    = {Proceedings of the 7th {ACM} Workshop on Encrypted Computing {\&}
+	Applied Homomorphic Cryptography, WAHC@CCS 2019, London, UK, November
+	11-15, 2019},
+	pages        = {1--10},
+	publisher    = {{ACM}},
+	year         = {2019},
+	url          = {https://doi.org/10.1145/3338469.3358940},
+	doi          = {10.1145/3338469.3358940},
+	timestamp    = {Sun, 19 Jan 2025 13:26:43 +0100},
+	biburl       = {https://dblp.org/rec/conf/ccs/CurtisP19.bib},
+	bibsource    = {dblp computer science bibliography, https://dblp.org}
 }
 
 
@@ -340,12 +370,62 @@
 	bibsource    = {dblp computer science bibliography, https://dblp.org}
 }
 
+
+
+
+@inproceedings{transciphering,
+	author       = {Michael Naehrig and
+	Kristin E. Lauter and
+	Vinod Vaikuntanathan},
+	editor       = {Christian Cachin and
+	Thomas Ristenpart},
+	title        = {Can homomorphic encryption be practical?},
+	booktitle    = {Proceedings of the 3rd {ACM} Cloud Computing Security Workshop, {CCSW}
+	2011, Chicago, IL, USA, October 21, 2011},
+	pages        = {113--124},
+	publisher    = {{ACM}},
+	year         = {2011},
+	url          = {https://dl.acm.org/citation.cfm?id=2046682},
+	timestamp    = {Tue, 10 Nov 2020 16:06:16 +0100},
+	biburl       = {https://dblp.org/rec/conf/ccs/NaehrigLV11.bib},
+	bibsource    = {dblp computer science bibliography, https://dblp.org}
+}
+
+
+
+@misc{call_nist,
+	author = {National Institute of Standards and Technology},
+	title = {The NIST Threshold Call},
+	url = {https://csrc.nist.gov/Projects/threshold-cryptography},
+	year = {2025}
+}
+
+@techreport{HomomorphicEncryptionSecurityStandard,
+	author = {Martin Albrecht and Melissa Chase and Hao Chen and Jintai Ding and Shafi Goldwasser and Sergey Gorbunov and Shai Halevi and Jeffrey Hoffstein and Kim Laine and Kristin Lauter and Satya Lokam and Daniele Micciancio and Dustin Moody and Travis Morrison and Amit Sahai and Vinod Vaikuntanathan},
+	title = {Homomorphic Encryption Security Standard},
+	institution= {HomomorphicEncryption.org},
+	publisher = {HomomorphicEncryption.org},
+	address = {Toronto, Canada},
+	year = {2018},
+	month = {November}
+}
+
+
+
 %%%%%%%%Libraries%%%%%%%%%%%%%
 @Misc{tfhe-rs,
 	title={{TFHE-rs: A Pure Rust Implementation of the TFHE Scheme for Boolean and Integer Arithmetics Over Encrypted Data}},
 	author={Zama},
 	year={2022},
 	note={\url{https://github.com/zama-ai/tfhe-rs}},
+}
+
+
+@Misc{Concrete,
+	title={{Concrete: TFHE Compiler that converts python programs into FHE equivalent}},
+	author={Zama},
+	year={2022},
+	note={\url{https://github.com/zama-ai/concrete}},
 }
 
 
@@ -361,4 +441,39 @@
 	title = {{TFHEpp: pure C++ implementation of TFHE cryptosystem}},
 	year = {2020},
 	howpublished = {\url{https://github.com/virtualsecureplatform/TFHEpp}}
+}
+
+@misc{heaan,
+	author = {Cryptolab Inc.},
+	title = {{HEaaN : Fully homomorphic encryption with CKKS scheme}},
+	year = {2020},
+	howpublished = {\url{https://github.com/virtualsecureplatform/TFHEpp}}
+}
+
+@misc{lattigo,
+	title = {Lattigo v6},
+	howpublished = {Online: \url{https://github.com/tuneinsight/lattigo}},
+	month = Aug,
+	year = 2024,
+	note = {EPFL-LDS, Tune Insight SA}
+}
+
+
+
+
+@misc{OpenFHE,
+	author = {Ahmad Al Badawi and Andreea Alexandru and Jack Bates and Flavio Bergamaschi and David Bruce Cousins and Saroja Erabelli and Nicholas Genise and Shai Halevi and Hamish Hunt and Andrey Kim and Yongwoo Lee and Zeyu Liu and Daniele Micciancio and Carlo Pascoe and Yuriy Polyakov and Ian Quah and Saraswathy R.V. and Kurt Rohloff and Jonathan Saylor and Dmitriy Suponitsky and Matthew Triplett and Vinod Vaikuntanathan and Vincent Zucca},
+	title = {{OpenFHE}: Open-Source Fully Homomorphic Encryption Library},
+	howpublished = {Cryptology ePrint Archive, Paper 2022/915},
+	year = {2022},
+	note = {\url{https://eprint.iacr.org/2022/915}},
+	url = {https://eprint.iacr.org/2022/915}
+}
+
+
+@Misc{HEIR,
+	title={{HEIR: Homomorphic Encryption Intermediate Representation}},
+	author={HEIR Contributors},
+	year={2023},
+	note={\url{https://github.com/google/heir}},
 }

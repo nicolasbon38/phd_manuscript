@@ -2,7 +2,13 @@
 
 \chapter{Presentation of the TFHE Scheme}
 
-\TODO{Ecrire une petite page qui présente TFHE rapidement, et notamment explique le "plan" ed la section et les features du bootstrapping}
+The previous chapter presented insights on Fully Homomorphic Encryption in general, but this thesis will exclusively cover the TFHE scheme.
+
+Presented in \cite{JC:CGGI20, these_chillotti} as an evolution of the FHEW scheme \cite{EC:DucMic15}, TFHE quickly gained traction to become one of the most promising scheme to attain performances good enough to be  used in real-world scenarios. 
+
+At the core of TFHE lies a powerful \textit{Programmable Bootstrapping} operation (PBS). As we presented in Section \ref{sec:gentry_bootstrapping}, it allows to manage the noise in the ciphertexts during the computation, allowing to achieve Fully Homomorphic Encryption. In TFHE, this bootstrapping operation goes a step further: it enables the evaluation of arbitrary functions directly on the refreshed ciphertexts, with negligible computational or noise overhead.
+
+In this chapter we provide an in-depth presentation of the TFHE scheme. We introduce the hardness assumptions it relies on, its encryption procedure as well as its homomorphic capabilities. We conclude with insights into its practical performance.
 
 \section{Hardness Assumptions: $\LWE$ and $\GLWE$ problems}
 \label{sec:hardness_assumptions}
@@ -35,10 +41,10 @@ Regev proved that the search and decisional problems are reducible to each other
 
 The hardness of this problem depends on the parameters $q$, $n$, $\chi_s$ and $\chi_e$, and so does the security of the schemes built upon it. There is not yet in the literature simple guidelines to construct secure instances of the problem. Common practice in the field is to derive an approximate concrete security level $\lambda$ for a given parameter set with a tool named \texttt{lattice-estimator} \cite{lattice-estimator}. Users can input concrete values and distributions for the parameters, and the tool evaluates the security of the underlying $\LWE$ instance by running simulations of attacks of the literature.
 
-In Definition \ref{def:LWE}, we did not precise the shapes of the distributions $\chi_s$ and $\chi_e$ (beyond the fact they yields small values). Several distributions are possible: a discrete Gaussian with a small variance, a uniform distribution restricted on a small interval, or a binomial. The choice of the right distribution depends of the considered use-case, each possibilities offering different trade-offs in matter of security and efficiency.
-\TODO{Trouver des référenes, par ex : eprint/2024/1979 ou eprint/21/1358 or eprint 2019/389, liste de travaux de Rachel Player}
+In Definition \ref{def:LWE}, we did not precise the shapes of the distributions $\chi_s$ and $\chi_e$ (beyond the fact they yields small values). Several distributions are possible: a discrete Gaussian with a small variance, a uniform distribution restricted on a small interval, or a binomial. Some versions with sparse secrets also exist. The choice of the right distribution depends of the considered use-case, each possibilities offering different trade-offs in matter of security and efficiency \cite{AFRICACRYPT:BGPW16, DBLP:conf/ccs/CurtisP19, EPRINT:BGPT19, EPRINT:SLZS24}.
 
-Most implementations of TFHE select a uniform distribution on $\{0, 1\}$ for the secret, and a Gaussian with a small variance $\lweSigma$ for the noise. We will use those distributions in this thesis, and will use the notation $\LWE_{(q, n, \sigma)}$ for these instances.
+
+Most implementations of TFHE select a uniform distribution on $\{0, 1\}$ for the secret, and a Gaussian with a small variance $\lweSigma$ for the noise. We will use these distributions in this thesis, and will use the notation $\LWE_{(q, n, \sigma)}$ for these instances.
 
 
 
@@ -70,9 +76,6 @@ Note that if we fix $k = 1$, we fall back on the classical $\RLWE$ problem, nota
 Concretely, using polynomial rings allows to encode more information in a single sample, yielding more compact ciphertexts and public keys. The schemes can also benefit from high-speed polynomial arithmetic techniques such as Fast Fourier Transforms (FFT). 
 
 General consensus is that hardness of an instance $\GLWE_{(q, k, N, \sigma)}$ is similar to the hardness of $\LWE_{(q, k \cdot N, \sigma)}$, which makes possible to use the \texttt{lattice-estimator} as well.
-
-
-\TODO{Je ne trouve pas de reference pour ce claim, mais c'est ce que tout le monde fait}
 
 
 \section{Torus Equivalence and Discretization}
@@ -155,7 +158,7 @@ $\chi_{\lweSigma}$, a centered Gaussian distribution of standard deviation $\lwe
 	where:
 	\begin{itemize}
 		\item the elements $\vec a = (a_0, \dots, a_{n-1})$ are sampled uniformely at random in $\lweRing$.
-		\TODO{Confusion de notation avec le modsiwtch ?}
+
 		\item $\tilde m$ is the message encoded in the ciphertext space: $\tilde m = \rho(m) \in \lweRing$.
 		\item $e$ is a small random Gaussian noise sampled from $\chi_{\lweSigma}$.
 	\end{itemize}
@@ -402,12 +405,15 @@ Algorithm \ref{alg:external_product} details this procedure:
 \input{tex/algorithms/alg_external_product.tex}
 
 
+As for Keyswitch, External Product increase the noise in the ciphertexts. 
+
+\Question{Formule de bruit ?}
+
+
 The line of work of \cite{chimera, AC:BCGGJ24} gives a nice mathematical overview of how these decompositions techniques can be interpreted as lifts from the $\Z$-module structure to the underlying ring. 
 
-\TODO{Le key switching est un cas particulier d'un external product.}
 
-\TODO{Parler du bruit}
-\TODO{Vérifier que toutes les décompositions et leurs définitions sont cohérentes entre ellesx}
+\TODO{Vérifier que toutes les décompositions et leurs définitions sont cohérentes entre elles}
 
 
 \paragraph{CMUX}
@@ -431,10 +437,12 @@ Beyond adding a new homomorphic capabilities in TFHE's arsenal, external product
 \end{figure}
 
 
-We can now move to the most important feature of TFHE: the \textit{programmable bootstraapping}.
+We can now move to the most important feature of TFHE: the \textit{programmable bootstrapping}.
 
 \section{Programmable Bootstrapping}
 \label{sec:pbs}
+
+Programmable Bootstrapping is a quite complex construction. To present it, we start by an informal presentation (Section \ref{sec:overview_blind_rotation}) and then move to the actual algorithm (Section \ref{sec:pbs_algorithm}). In the first informal part, we make some oversimplifications to make the process easier to understand. For a rigorous presentation of the algorithm, one shall refer to the second section.
 
 \subsection{An informal overview of the blind rotation}
 \label{sec:overview_blind_rotation}
@@ -443,8 +451,8 @@ Recall Gentry's blueprint introduced in Section \ref{sec:gentry_bootstrapping}. 
 
 In TFHE, for a $\LWE$ ciphertext $\vec c$ of form $(a_0, \dots, a_{n-1}, b)$, encrypted under a key $\lweSecretKey$, the decryption algorithm has two steps:
 \begin{itemize}
-	\item Computing the phase $\phi(\vec c) = b - \innerProduct{\vec a}{\lweSecretKey}$ (``the linear step'')
-	\item Rounding the phase to the closest plaintext value. (``the rounding step'')
+	\item[-] Computing the phase $\phi(\vec c) = b - \innerProduct{\vec a}{\lweSecretKey}$ (``the linear step'')
+	\item[-] Rounding the phase to the closest plaintext value. (``the rounding step'')
 \end{itemize}
 
 Performing the first step homomorphically is quite simple to do (in fact, this is exactly what we do in the key-switching algorithm). But performing the rounding is trickier. Actually, TFHE do both operations at once using an operation called \textit{blind rotation}, which is the core of the bootstrapping algorithm. 
@@ -452,7 +460,6 @@ Performing the first step homomorphically is quite simple to do (in fact, this i
 Introduced in \cite{EC:DucMic15}, the blind rotation takes advantage of the particular structure of the ring $\glweRing$. To explain this algorithm, we start by have a closer look to this ring.
 
 
-\TODO{	DISCLAIMER: in the following, we make some oversimplifications to introduce more easily and naturally the blind rotation operation. In Section \ref{sec:pbs_algorithm}, we detail the actual full algorithm. 	}
 
 
 \paragraph{Fun with Rings}
@@ -472,27 +479,27 @@ The goal here is to introduce blind rotation without the complexity induced by t
 \paragraph{Constructing a rounding function}
 How can we use this property to construct a rounding function ? Suppose we have a plaintext space $\plaintextRing$ and a ciphertext space $\lweRing$. Let $\vec c$ be  a $\LWE$ ciphertext, and $\mu = \phi(\vec c) = m + e$ its noisy phase produced by the linear step of the decryption algorithm. We want to round $\mu$ to the closest plaintext in $\plaintextRing$ to retrieve the message $m$.
 
-To do so, we are going to use a specifically tailored polynomial, called the \textit{accumulator polynomial} $\acc$. This polynomial is made of contiguous ``windows'' of size $\frac N p$ in which every coefficients are equal to each others. Coefficients of the window of index 0 have value 0, and so on. These windows are centered on the $p$ coefficients corresponding to the noiseless encodings of the plaintexts values in $\Z_N$. We illustrate such an accumulator on Figure \ref{fig:illustration_accumulator}.
+To do so, we are going to use a specifically tailored polynomial, called the \textit{accumulator polynomial} $\acc$. This polynomial is made of contiguous ``windows'' of size $\frac N p$ in which every coefficients are equal to each others. Coefficients of the window of index 0 have value 0, and so on. These windows are centered on the $p$ coefficients corresponding to the noiseless encodings of the plaintexts values in $\Z_N$. We illustrate such an accumulator on Figure \ref{fig:illustration_accumulator} (in the ``Rounding version'').
 
 
 
 Our rounding procedure takes three steps:
 
-\begin{itemize}
+\begin{enumerate}%[noitemsep, topsep=0pt]
 	\item Switching the modulus of $\mu$ to send it into $\Z_N$ to produce $\tilde \mu = \rounding{\frac{\mu \cdot N}{q}}$.
 	\item Computing the product $X^{- \tilde \mu} \cdot acc(X)$.
 	\item Extracting the degree-zero coefficient to retrieve $v_{\tilde \mu}$.
-\end{itemize}
+\end{enumerate}
 
 If the noise $\abs{\tilde e}$ in $\tilde \mu$ is smaller than half the width of a window (here $\frac{N}{2p}$), we properly get $v_{\tilde \mu} = m$. 
 
 \paragraph{Making it programmable:}
 This rounding using polynomials is the core idea of the bootstrapping algorithm. But actually, the killer feature of TFHE is that you can transform this rounding operation into a look-up table evaluation ! This is why TFHE's bootstrapping is called \textit{programmable}.
 
-It is simply done by replacing the coefficients of the accumulator by the evaluations of a function $f:\plaintextRing \mapsto \plaintextRing$. So, the algorithm outputs $f(i)$ instead of $i$ ! This is illustrated on Figure \ref{fig:illustration_accumulator}.
+It is simply done by replacing the coefficients of the accumulator by the evaluations of a function $f:\plaintextRing \mapsto \plaintextRing$. So, the algorithm outputs $f(i)$ instead of $i$ ! This is illustrated on Figure \ref{fig:illustration_accumulator} (in the ``Programmable version'').
 
 
-\begin{figure}[H]
+\begin{figure}
 	\centering
 	
 	% Wrapped torus visual
@@ -609,20 +616,16 @@ In the PBS, $\SampleExtract$ is run with $\alpha = 0$. After that, we now have a
 
 
 \paragraph{Putting it all together:}
-Figure \ref{fig:PBS_layout} sums up the ciphertexts type, their shape and the noise behaviour during the PBS algorithm. It is presented as a loop, to show that it is possible to chain several PBS. Linear operations can be interleaved in the graph to evaluate any computational circuit, on the figure they are before the $\KeySwitch$ but they can also be placed after it.
-\TODO{Ce paragraphe est mal écrit}
+This serie of operations allows to evaluate a bootstrapping. The final keyswitching produces a ciphertext of same morphology and same secret key than the input one, so it is possible to loop and evaluate successively several functions. Linear operations can be interleaved in this loop, at any stage. On Figure \ref{fig:PBS_layout}, we show such a loop, where linear operations take place before the final keyswitching.
+
 
 
 \begin{figure}
-	\label{fig:PBS_layout}
 	\centering
 	\input{img/tikz/tikz_PBS_internals_circuit.tex}
 	\caption{The PBS circuit, with the inner operations and the shapes of the ciphertexts at every step. Some arbitrary linear operations are interleaved in the middle. We also illustrate indicative noise levels in the gauges under the wires.}
+	\label{fig:PBS_layout}
 \end{figure}
-
-
-
-
 
 
 \section{Performances of the PBS}
@@ -637,22 +640,15 @@ One key aspect of TFHE is \textit{the degradation of the speed of the bootstrapp
 \begin{figure}
 	\centering
 	\includegraphics[width=0.8\linewidth]{img/to_harmonize/timings_pbs_precisions.png}
-	\label{fig:PBS_perfs}
 	\caption{TODO: remove the legend "CJP21". Maybe redraw it to have a taller figure}
+	\label{fig:PBS_perfs}
 \end{figure}
-
-
 
 
 
 Intuitively, the reason is simple. When one wants to use a greater $p$, the torus must be sliced into more parts, that are thus smaller. When we switch the modulus to $2N$ in the bootstrapping, the ``windows'' of the accumulator polynomial gets smaller, so the bound on the noise to ensure correct bootstrapping must be smaller. To keep some room to enable the homomorphic capabilities of TFHE, one has to pick a greater value for the degree $N$. As this must be a power of two, it quickly reach values where the polynomial operations gets very slow.
 
-Usually, PBS is not used for plaintext modulus greater than 8 bits. Some constructions exist in the literature to extend the capabilities of this algorithm to larger plaintext spaces, notably \cite{bibid}. In this thesis, we propose our own in Chapter \ref{chap:larger_lut}.
-
-\TODO{Ici faire un petit survey, mais ne pas se répéter avec la section suivante}
-
-
-
+Usually, PBS is not used for plaintext modulus greater than 8 bits. Some constructions exist in the literature to extend the capabilities of this algorithm to larger plaintext spaces, notably the WoP-PBS of \cite{AC:CLOT21}. In this thesis, we propose our own in Chapter \ref{chap:larger_lut}.
 
 
 

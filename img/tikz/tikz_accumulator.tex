@@ -1,6 +1,3 @@
-
-
-
 \newcommand{\accumulator}[3]{% (p, N, with_f)
 	\pgfmathsetmacro{\p}{#1}
 	\pgfmathsetmacro{\N}{#2}
@@ -121,3 +118,177 @@
 	\end{tikzpicture}
 }
 
+
+
+
+\newcommand{\negacyclicAccumulator}[2]{% (p, N)
+	\pgfmathsetmacro{\p}{#1}
+	\pgfmathsetmacro{\N}{#2}
+	\begin{tikzpicture}[x=1cm]
+		
+		\def\boxwidth{4.2cm}
+		
+		% first half sector
+		\pgfmathsetmacro{\start}{0}
+		\pgfmathsetmacro{\endval}{int(\N * 0.5 / \p - 1)}
+		
+		% Compute centered color index
+		\pgfmathsetmacro{\colorIndex}{0}
+		
+		% Convert to hue [0,1]
+		\pgfmathsetmacro{\hue}{\colorIndex / \p}
+		% Set HSB color
+		\definecolor{mycolor}{hsb}{\hue,1,1}
+		
+		\node[
+		draw,
+		fill=mycolor!50,
+		inner xsep=2pt, inner ysep=2pt,
+		text width=\boxwidth / 2,
+		align=center,
+		anchor=west
+		] at (0.5*\boxwidth, 0)
+		{$\dots + f(0) \cdot X^{\endval}$};
+		
+		
+		
+		
+		% Intermediate sectors
+		\foreach \i in {1,...,\numexpr\p-1} {
+			\pgfmathsetmacro{\start}{int(\N * (\i - 0.5) / \p)}
+			\pgfmathsetmacro{\endval}{int(\N * (\i + 0.5) / \p - 1)}
+			
+			% Compute centered color index
+			\pgfmathsetmacro{\colorIndex}{\i}
+			
+			% Convert to hue [0,1]
+			\pgfmathsetmacro{\hue}{\colorIndex / \p}
+			% Set HSB color
+			\definecolor{mycolor}{hsb}{\hue,1,1}
+			
+		
+			\node[
+			draw,
+			fill=mycolor!50,
+			inner xsep=2pt, inner ysep=2pt,
+			text width=\boxwidth,
+			align=center,
+			anchor=west
+			] at ({\i*\boxwidth}, 0)
+			{\small $ f(\i) X^{\start} + \dots + f(\i) X^{\endval}$};
+		}
+		
+		% Last half sector
+		\pgfmathsetmacro{\start}{int(\N * (\p - 0.5) / \p)}
+		\pgfmathsetmacro{\endval}{\N - 1}
+		
+		% Compute centered color index
+		\pgfmathsetmacro{\colorIndex}{0}
+		
+		% Convert to hue [0,1]
+		\pgfmathsetmacro{\hue}{\colorIndex / \p}
+		% Set HSB color
+		\definecolor{mycolor}{hsb}{\hue,1,1}
+		
+		\node[
+		draw,
+		fill=mycolor!50,
+		inner xsep=2pt, inner ysep=2pt,
+		text width=1.1 * \boxwidth / 2,
+		align=center,
+		anchor=west
+		] at ({\p*\boxwidth}, 0)
+		{\footnotesize $-f(0) X^{\start} + \dots$};
+			
+	\end{tikzpicture}
+}
+
+
+
+
+\newcommand{\oddAccumulator}[2]{% (p, N)
+	\pgfmathsetmacro{\p}{#1}
+	\pgfmathsetmacro{\N}{#2}
+	\begin{tikzpicture}[x=1cm]
+		
+		\def\boxwidth{3cm}
+		
+		% first half sector
+		\pgfmathsetmacro{\start}{0}
+		\pgfmathsetmacro{\endval}{int(ceil(\N * 0.5 / \p - 1))}
+		
+		% Compute centered color index
+		\pgfmathsetmacro{\colorIndex}{0}
+		
+		% Convert to hue [0,1]
+		\pgfmathsetmacro{\hue}{\colorIndex / \p}
+		% Set HSB color
+		\definecolor{mycolor}{hsb}{\hue,1,1}
+		
+		\pgfmathsetlengthmacro{\halfbox}{\boxwidth / 2}
+		\pgfmathsetlengthmacro{\slightlylarger}{1.1 * \boxwidth / 2}
+		\node[
+		draw,
+		fill=mycolor!50,
+		inner xsep=2pt, inner ysep=2pt,
+		text width=\halfbox,
+		align=center,
+		anchor=west
+		] at (0.5*\boxwidth, 0)
+		{$\dots + f(0) \cdot X^{\endval}$};
+		
+		
+		
+		
+		% Intermediate sectors
+		\foreach \i in {1,...,\numexpr\p-1} {
+			\pgfmathsetmacro{\start}{int(\N * (\i - 0.5) / \p)}
+			\pgfmathsetmacro{\endval}{int(\N * (\i + 0.5) / \p - 1)}
+			
+			\ifthenelse{\isodd{\i}}{ %then
+				\pgfmathsetmacro{\colorIndex}{(\p + 1) / 2 + (\i - 1) / 2}
+			}{ %else
+				\pgfmathsetmacro{\colorIndex}{\i / 2}
+			}
+		
+			% Convert to hue [0,1]
+			\pgfmathsetmacro{\hue}{\colorIndex / \p}
+			% Set HSB color
+			\definecolor{mycolor}{hsb}{\hue,1,1}
+			
+			
+			\node[
+			draw,
+			fill=mycolor!50,
+%			inner xsep=2pt, inner ysep=2pt,
+			text width=\boxwidth,
+			align=center,
+			anchor=west
+			] at ({\i*\boxwidth}, 0)
+			{\small $f(\i)$};
+		}
+		
+		% Last half sector
+		\pgfmathsetmacro{\start}{int(\N * (\p - 0.25) / \p)}
+		\pgfmathsetmacro{\endval}{\N - 1}
+		
+		% Compute centered color index
+		\pgfmathsetmacro{\colorIndex}{0}
+		
+		% Convert to hue [0,1]
+		\pgfmathsetmacro{\hue}{\colorIndex / \p}
+		% Set HSB color
+		\definecolor{mycolor}{hsb}{\hue,1,1}
+		
+		\node[
+		draw,
+		fill=mycolor!50,
+		inner xsep=2pt, inner ysep=2pt,
+		text width=\slightlylarger,
+		align=center,
+		anchor=west
+		] at ({\p*\boxwidth}, 0)
+		{\footnotesize $-f(0) X^{\start} + \dots$};
+		
+	\end{tikzpicture}
+}

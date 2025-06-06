@@ -1,0 +1,81 @@
+\section{Full Specification of \coolName{}}
+\label{app:spec}
+
+%\newcommand\clock[1]{\mathsf{clock}_{#1}}
+
+A reference implementation in {\tt Sage} is available online at
+\begin{quote}
+  \url{https://github.com/CryptoExperts/Transistor/}
+\end{quote}
+
+
+\subsection{LFSRs}
+\label{app:spec-lfsrs}
+
+An LFSRs of length $\ell$ at time $t$ is a list of digits ${x^t_0, ..., x^t_{\ell-1}}$
+that is clocked as follows:
+\begin{enumerate}
+\item $x_0^{t+1} \gets - \sum_{i=0}^{\ell-1} x_i^t c_i$,
+\item $x_{i}^{t+1} \gets x_{i-1}^t$ for $0 < i < \ell$,
+\item the output is $x_{\ell-1}^t$,
+\end{enumerate}
+where $C=(c_i)_{0 \leq i < \ell}$ is the list of its taps, each being
+a digit of $\mathbb{F}_{17}$. We define $\clock{C}$ to be the function
+applying the operations above to a list ${x^t_0, ..., x^t_{\ell-1}}$
+to update it, and returning $x_{\ell-1}^t$.
+
+For the key schedule $\pseudoKS$, we use the following taps:
+\begin{equation*}
+  \footnotesize
+  \begin{split}
+    C(\pseudoKS) ~=~& \{9, 4, 6, 4, 8, 6, 6, 16, 3,
+                      9, 15, 12, 8, 12, 11, 4, 4, 8, 1,
+                      8, 8, 9, 4, 6, 6, 7, 6, 3, \\
+                    & 16, 14, 14, 6, 10, 15, 14, 13, 10, 1, 1,
+                      10, 13, 11, 14, 10, 7, 4, 15, 8, 16,
+                      3, 13, \\
+                    & 14, 15, 16, 3, 16, 9, 3, 6,
+                      12, 15, 9, 12, 3\}~,
+  \end{split}
+\end{equation*}
+and for the whitening LFSR $\whitening$ we use
+\begin{equation*}
+  \footnotesize
+  \begin{split}
+    C(\whitening) ~=~& \{8, 14, 14, 14, 1, 6, 12, 10, 14, 14,
+                       14, 5, 2, 5, 6, 13, 6, 15, 14, 3, \\
+                     & 13, 16, 1, 13, 9, 1, 7, 15, 13, 6,
+                       14, 3\}
+  \end{split}
+\end{equation*}
+
+
+\subsection{Master Key Processing}
+\label{app:spec-masterkey}
+
+We generate the digits in $\pseudoKS$ first, and then those in $\whitening$. To generate them, we concatenate the 128-bit long master key with an IV and then a byte set to 1. The result is fed into \textsf{SHAKE128}, and the output byte stream of this primitive is used to generate digits of $\mathbb{F}_{17}$ using rejection sampling: if a byte $x$ is equal to 255, we discard it; otherwise, we generate the digit $\lfloor x / 15 \rfloor$. Since $15 \times 17 = 255$, this results in an unbiased transformation.
+
+
+\subsection{Running \coolName{}}
+\label{app:spec-transistor}
+
+Using \coolName{} to generate a keystream is done as follows.
+\begin{enumerate}
+\item Use the procedure described in Section~\ref{app:spec-masterkey} to fill the key schedule and whitening LFSRs.
+\item Set the FSM state to be all zero.
+\item Then, while keystream blocks are needed, we repeat the following:
+  \begin{enumerate}
+  \item Clock the key schedule 16 times and add its content (modulo 17) into the FSM in the order specified in Figure~\ref{fig:numbering}.
+  \item ($\subWords$) Apply the S-box $\thesbox$ (see Equation~(\ref{eq:thesbox})) to each element of the FSM.
+  \item ($\phi$) Take the elements with indices in $\{ 4, 6, 12, 14\}$, clock the whitening LFSR four times, and add its successive outputs to these elements. The result forms a keystream tuple of four digits.
+  \item ($\shiftRows$) Shift the elements of the $i$-th row of the FSM by $i$ positions to the left.
+  \item ($\mixColumns$) Apply the matrix $\mixmat$ (see Equation~(\ref{eq:mixmat})) to each column of the FSM.
+  \end{enumerate}
+\end{enumerate}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% ispell-local-dictionary: "english"
+%%% TeX-master: "../main"
+%%% End:

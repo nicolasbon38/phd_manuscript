@@ -1,5 +1,5 @@
 \subsection{AES}
-\label{sec:aes}
+\label{sec:p_encodings_aes}
 
 %\subsubsection{Reminders on AES and Choice of an Alternative Representation}
 
@@ -14,7 +14,7 @@ A round of AES can be decomposed into 4 steps:
 \end{enumerate}
 
 
- The s-box of \texttt{SubBytes} takes 8 bits in input and yields 8 bits of output. It is defined by two substeps: an inversion in $GF(2^8)$ followed by an affine transformation. While the latter is trivial to compute with TFHE, the former is much trickier and thus we did not take advantage of this representation. Using our framework, the obvious-looking solution is to split the full s-box $\B^8 \mapsto \B^8$ into 8 subfunctions $f_0, \dots, f_7: \B^8 \mapsto \B$. We could then give them to the search algorithm of Section \ref{sec:search}. If this would work, we could evaluate the Rjindael s-box in 8 PBS. Unfortunately, the algorithm does not converge for values of $p$ ``reasonable'', that is to say less than 7 bits. 
+ The s-box of \texttt{SubBytes} takes 8 bits in input and yields 8 bits of output. It is defined by two substeps: an inversion in $GF(2^8)$ followed by an affine transformation. While the latter is trivial to compute with TFHE, the former is much trickier and thus we did not take advantage of this representation. Using our framework, the obvious-looking solution is to split the full s-box $\B^8 \mapsto \B^8$ into 8 subfunctions $f_0, \dots, f_7: \B^8 \mapsto \B$. We could then give them to the search algorithm of Section \ref{sec:p_encodings_search}. If this would work, we could evaluate the Rjindael s-box in 8 PBS. Unfortunately, the algorithm does not converge for values of $p$ ``reasonable'', that is to say less than 7 bits. 
 
 
 We thus need to leverage an alternative representation of the s-box. A well known efficient Boolean representation of the AES s-box is given in \cite{boyar}. In this work, authors applied logic minimization techniques to produce an optimized Boolean circuit (in terms of number of gates) of the s-box splitted in 3 phases:
@@ -88,7 +88,7 @@ We summarize hereafter the parameters and performances of our implementations of
         \texttt{$\PBS_{(17, 5)}$} & \ref{sec:ascon} & 740 & 2 & 1024 & $2^{13}$ & $2^{2}$& $2^7$ & 3 & $2^5$ & 3 & 18 ms\\
          \hline
         
-        \texttt{$\PBS_{(11, 4)}$} & \ref{sec:aes} & 708 & 3 & 512 & $2^{15}$ & $2^{2}$& $2^6$ & 4 & $2^2$ & 7 & 17 ms  \\
+        \texttt{$\PBS_{(11, 4)}$} & \ref{sec:p_encodings_aes} & 708 & 3 & 512 & $2^{15}$ & $2^{2}$& $2^6$ & 4 & $2^2$ & 7 & 17 ms  \\
             \hline
        \end{tabular}
 
@@ -122,7 +122,7 @@ We summarize hereafter the parameters and performances of our implementations of
       \cline{2-3}
       & One full Ascon hashing run $(*)$ & 3840 \texttt{$\PBS_{(17, 5)} + 3840 \PBS_{(2, 1)}$}\\
         \hline
-        \multirow{2}{*}{\ref{sec:aes}} & One evaluation of the AES s-box & 36 \texttt{$\PBS_{(11, 4)}$}\\
+        \multirow{2}{*}{\ref{sec:p_encodings_aes}} & One evaluation of the AES s-box & 36 \texttt{$\PBS_{(11, 4)}$}\\
         \cline{2-3}
         & A full run of \texttt{AES-128}  & 5760 \texttt{$\PBS_{(11, 4)}$} + 1280 \texttt{$\PBS_{(2, 1)}$}\\
         \hline
@@ -156,7 +156,7 @@ We summarize hereafter the parameters and performances of our implementations of
       \cline{2-3}
       & One full Ascon hashing run $(*)$ & 19968\\
         \hline
-        \multirow{2}{*}{\ref{sec:aes}} & One evaluation of the AES s-box & 115 (\cite{boyar})\\
+        \multirow{2}{*}{\ref{sec:p_encodings_aes}} & One evaluation of the AES s-box & 115 (\cite{boyar})\\
         \cline{2-3}
         & A full run of \texttt{AES-128}  & 23360 (\cite{boyar}, \cite{EPRINT:Maximov19})\\
         \hline
@@ -208,7 +208,7 @@ We summarize hereafter the parameters and performances of our implementations of
         \cline{2-3}
         & \cite{DBLP:conf/wahc/TramaCBS23} & 270 s\\
         \cline{2-3}
-        & Our work (Section \ref{sec:aes}) & 103 s\\
+        & Our work (Section \ref{sec:p_encodings_aes}) & 103 s\\
     \hline
         \multirow{3}{*}{\begin{tabular}{c}
             One full evaluation of AES-128   \\

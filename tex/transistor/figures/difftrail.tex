@@ -1,0 +1,62 @@
+\begin{figure}
+\centering
+\begin{tikzpicture}[scale=.5]
+\foreach \i in {0,...,2}{
+	\foreach \j in {0,...,3}{
+		\foreach \k in {0,...,3}{
+			\draw (0 + \k + 6*\i,0 + \j) rectangle (1 + \k + 6*\i,1 + \j);
+			\draw (0 + \k + 6*\i,0 + \j - 8) rectangle (1 + \k + 6*\i,1 + \j - 8);
+		}
+	}
+}
+\draw[->,>=latex,thick] (4,2) -- (6,2) node[above,midway] {$\shiftR$};
+\draw[->,>=latex,thick] (10,2) -- (12,2) node[above,midway] {$\mixC$};
+
+\draw[thick] (14,0) -- (14, -2);
+\draw[thick] (14,-2) -- (-2,-2) node[above,midway] {$\subW$};
+\draw[->,>=latex,thick] (-2,-2) -- (-2,-6) -- (0,-6);
+
+\draw[->,>=latex,thick] (4,-6) -- (6,-6) node[above,midway] {$\shiftR$};
+\draw[->,>=latex,thick] (10,-6) -- (12,-6) node[above,midway] {$\mixC$};
+
+\draw (2,4) node[above] {$\delta^0$};
+\draw (8,4) node[above] {$\delta^1$};
+\draw (14,4) node[above] {$\delta^2$};
+\draw (2,-4) node[above] {$\delta^3$};
+\draw (8,-4) node[above] {$\delta^4$};
+\draw (14,-4) node[above] {$\delta^5$};
+
+%zero conditions
+\foreach \j in {0,7,12}{
+\foreach \i in {0,8}{
+\draw (.5 + \j,.5 - \i) node {$\color{red}{\mathbf{0}}$};
+\draw (2.5 + \j,.5 - \i) node {$\color{red}{\mathbf{0}}$};
+\draw (.5 + \j,2.5 - \i) node {$\color{red}{\mathbf{0}}$};
+\draw (2.5 + \j,2.5 - \i) node {$\color{red}{\mathbf{0}}$};
+}
+
+}
+%green and blue conditions
+\foreach \i in {0,1,2,3}{
+\fill[blue] (13,\i) rectangle (14,\i + 1);
+\fill[green] (15,\i) rectangle (16,\i + 1);
+\draw (1.5,-7.5+\i) node {$\color{blue}{\mathbf{\triangle}}$};
+\draw (3.5,-7.5+\i) node {$\color{green}{\mathbf{\square}}$};
+}
+\draw (7.5,-4.5) node {$\color{blue}{\mathbf{\triangle}}$};
+\draw (8.5,-5.5) node {$\color{blue}{\mathbf{\triangle}}$};
+\draw (9.5,-6.5) node {$\color{blue}{\mathbf{\triangle}}$};
+\draw (6.5,-7.5) node {$\color{blue}{\mathbf{\triangle}}$};
+
+\draw (9.5,-4.5) node {$\color{green}{\mathbf{\square}}$};
+\draw (6.5,-5.5) node {$\color{green}{\mathbf{\square}}$};
+\draw (7.5,-6.5) node {$\color{green}{\mathbf{\square}}$};
+\draw (8.5,-7.5) node {$\color{green}{\mathbf{\square}}$};
+
+
+
+\end{tikzpicture}
+\caption{Diferential path \yr{name figure}}
+\label{fig:difftrail}
+\end{figure}
+

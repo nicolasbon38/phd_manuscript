@@ -1,0 +1,52 @@
+\begin{algorithm}[t!]
+    \caption{\texttt{LFSR.clock} - Produce a pseudo random element of the state. \label{alg:lsfr}}
+    
+    % \KwContext{
+    %     $\left\{
+    %     \begin{array}{l}
+    %         \F_p: \text{ The field of embedding.}
+    %     \end{array}
+    %     \right.$
+    % }
+
+    \State{
+        $\left\{
+        \begin{array}{l}
+            \ell: \text{ Size of the state of the LFSR.} \\
+            (u_1, \dots, u_\ell): \text{ Encrypted initial state of the LFSR.} \\
+            (\lambda_1^{(0)}, \dots, \lambda_\ell^{(0)}): \text{ Coefficients of retroaction in the definition of the LFSR.} \\
+            (\lambda_1^{(i)}, \dots, \lambda_\ell^{(i)}): \text{ Previous coefficients used in the linear combination.}
+        \end{array}
+        \right.$
+    }
+
+    \KwResult{
+        $\left\{
+        \begin{array}{l}
+            o^{(i)}: \text{ Encryption of the $i$-th pseudorandom element of $\field{17}$.} \\
+            (\lambda_1^{(i+1)}, \dots, \lambda_\ell^{(i+1)}): \text{ Updated coefficients of the linear combination.}
+        \end{array}
+        \right.$
+    }
+
+    % Add vertical space and horizontal line
+    \vspace{0.5em} % adjust the space as needed
+    \hrule
+    \vspace{0.5em} % adjust the space as needed
+
+    $o^{(i)} \gets 0$
+
+    \Comment{Evaluation of the linear combination}
+    \For{$k \in \{1, \dots, \ell\}$}{
+        $o^{(i)} \gets \texttt{SumTFHE}(o^{(i)}, \texttt{ClearMultTFHE}(u_k, \lambda_k^{(i)}))$
+    }
+    \Comment{Update of the next coefficients}
+    \For{$k \in \{2, \dots, \ell\}$}{
+        $\lambda_k^{(i+1)} \gets \lambda_{k-1}^{(i)} + \lambda_\ell^{(i)} \cdot \lambda_k^{(0)}$
+    }
+    $\lambda_1^{(i+1)} \gets \lambda_\ell^{(i)} \cdot \lambda_1^{(0)}$
+    
+    \Return{$o^{(i)}$}
+    
+\end{algorithm}
+

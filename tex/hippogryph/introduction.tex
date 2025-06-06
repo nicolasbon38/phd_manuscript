@@ -1,52 +1,26 @@
-\section{Introduction}
-\label{sec:introduction}
-Fully Homomorphic Encryption (FHE) is a corpus cryptographic techniques that allows data to be processed while remaining encrypted, without any need for decryption. Various FHE schemes, such as BGV~\cite{ITCS:BraGenVai12}, designed for general computation, CKKS~\cite{AC:CKKS17}, optimized for approximate arithmetic, and TFHE~\cite{AC:CGGI16,JC:CGGI20}, specialized for binary operations and low-latency bootstrapping, offer different trade-offs in terms of functionality and performance. Although FHE provides strong end-to-end encryption, it still faces significant efficiency challenges. One of the main limitations is the substantial ciphertext expansion, which hampers fast data transmission to the server.
+The last example of application of the previous chapter was to evaluate homomorphically the AES cipher. But why would someone need to do such a thing ?
 
-To mitigate this issue of large uplink data transmission with FHE, it is now standard to rely on a method called \emph{transciphering}. In this approach, the client first encrypts its data using a symmetric encryption scheme and sends both the encrypted data and (once and for all) the FHE-encrypted symmetric key to the server. Leveraging its encrypted-domain computing capabilities, the server can then decrypt the encrypted data \emph{within the homomorphic domain}, ultimately producing homomorphic ciphertexts on which it can perform the requested calculations.
-
-The first attempt to transcipher AES ciphertexts into FHE data was made in 2012 by Gentry, Halevi, and Smart \cite{gentry_BGV}. They used the BGV scheme~\cite{ITCS:BraGenVai12}, a fully homomorphic encryption method based on the Ring-LWE problem, as implemented in HElib~\cite{EPRINT:HalSho20}, an open-source library for FHE. However, their implementation resulted in an execution latency of 17.5 minutes, with now obsolete parameters (despite an amortized cost of 5.8 seconds per block), highlighting the impracticality of this approach for fast data transmission with AES. That is why many researchers have since developed new ``FHE-friendly'' symmetric cryptosystems to improve efficiency.
-%
-Today, several proposals exist, including block ciphers such as LowMC \cite{lowMC}, PRINCE \cite{PRINCE}, and CHAGHRI \cite{Chaghri}, as well as stream ciphers like Elisabeth \cite{Elisabeth}, PASTA \cite{pasta}, Kreyvium \cite{kreyvium} and Transistor \cite{transistor}. These new schemes, referred to as hybrid encryption schemes, offer faster and more efficient homomorphic execution compared to the work of Gentry et al. \cite{gentry_BGV}, though none have yet been standardized.
-
-In 2022, the National Institute of Standards and Technology (NIST) announced a future call for threshold encryption with a specific focus on FHE, indicating that AES would serve as the benchmark for evaluating proposals \cite{call_nist}. Since then, numerous teams have revisited AES transciphering to improve efficiency. In 2023, the work of Trama et al. \cite{DBLP:conf/wahc/TramaCBS23} brought AES execution times to under 5 minutes in sequential mode and 30 seconds in parallel mode, leveraging TFHE programmable bootstrapping (PBS) in integer mode and using the Tree-Based Method (TBM) \cite{Guimaraes_Borin_Aranha_2021} to perform bootstrapping on multiple encrypted inputs. Later in 2023, Bon et al. \cite{DBLP:journals/tches/BonPR24} proposed the \textit{p-encoding} method for binary ciphertexts in TFHE, achieving an AES evaluation in 211 seconds. Other teams then achieved further optimizations using TFHE in leveled homomorphic encryption (LHE) mode and circuit bootstrapping, such as Fregata \cite{fregata} and Thunderbird \cite{thunderbird}, which reduced sequential execution times to 86 seconds and 46 seconds, respectively, on a single core. 
-The timing results in the above works are summarized in Table~\ref{tab:soa} where we provide both the original timings given in the papers and the timings obtained on our single machine test bench.
-
-Still, even if AES is often considered a reference benchmark, it is unlikely to be used for transciphering in practical FHE deployments, as the {``FHE-friendly''} stream-cipher based approach {is known to lead} much better performances. Examples of stream ciphers specifically designed for FHE transciphering purposes are notably provided in \cite{kreyvium,kreyvium-2, transistor}. Nevertheless, AES remains an interesting case study as a nontrivial algorithm that has eluded ``practical'' FHE execution for years. It also exemplifies the challenge of switching between boolean- and byte-oriented operations, a recurrent issue in TFHE-based implementations.
+There are two answers to this question. First,  AES is a particularly interesting benchmark, as an example of a nontrivial algorithm which has eluded ``practical'' FHE execution performances for years. This is part of the reason why it will most likely be selected by NIST as a flagship reference in its upcoming call on threshold (homomorphic) cryptography \cite{call_nist}. Since 2023, the algorithm has thus been the subject of a renewed attention from the FHE community and has served as a playground to test advanced operators\cite{DBLP:conf/wahc/TramaCBS23, ISC:WWLLL23, TCHES:BonPoiRiv24, TCHES:WLWLLW24}. AES is particularly interesting as a benchmark notably because of the tension between boolean- and byte-oriented operations within the algorithm.
 
 
-\paragraph{Our Contributions.}
-This paper provides a first set of tools to resolve this kind of tension by consistently combining the (byte-oriented) LUT-based approach with a generalization of the (boolean-oriented) $p$-encodings one to get the best of both worlds. We then show that this strategy pays off, at least for AES, as we improve the state of the art for a TFHE execution of the algorithm between 30 and 45\% and almost break the 1 second latency barrier with a mild amount of parallelism.
+There is also a more down-to-earth reason: evaluating symmetric ciphers using FHE is the core of a cryptographic technique called \textit{transciphering}, which is a promising solution for solving the \textit{ciphertext expansion} problem of FHE. In this protocol, the client first encrypts its data using a symmetric encryption scheme and sends both the encrypted data and (once and for all) the FHE-encrypted symmetric key to the server. Leveraging its encrypted-domain computing capabilities, the server can then decrypt the encrypted data \emph{within the homomorphic domain}, ultimately producing homomorphic ciphertexts on which it can perform the requested calculations. With this trick, the amount of data uploaded by the client is drastically reduces, as symmetric ciphertexts are much lighter than homomorphic ones.
 
-Specifically, all the aforementioned approaches rely on TFHE but offer different trade-offs. Binary ciphertext-based techniques, such as those in \cite{DBLP:journals/tches/BonPR24}, are faster in sequential mode but require costly evaluations of the 8-bit Sbox. In contrast, the programmable bootstrapping-based approach of \cite{DBLP:conf/wahc/TramaCBS23} simplifies Sbox evaluation but is less efficient for the remainder of the AES circuit.
-%
-Building on these works, we propose a hybrid framework, which we refer to as \emph{\hippo}\footnote{Following the seemingly emerging tradition of using (possibly mythical) bird names, like Fregata or Thunderbird, for frameworks running AES over TFHE.}, combining the strengths of these two approaches. The Sbox is evaluated using PBS in integer mode as in \cite{DBLP:conf/wahc/TramaCBS23}, while the rest of the AES circuit leverages the $p$-encoding method from \cite{DBLP:journals/tches/BonPR24}. The integration of these two techniques requires non-trivial transitions between the methods, which constitute a key contribution of our work.
-This seamless combination sets a new record for AES homomorphic evaluation, achieving execution in approximately 30 seconds on a standard laptop using a single core.
 
-We emphasize that all timings reported in this paper were obtained consistently on the same machine, which is generally \emph{not} the case in previous studies. Achieving this required gathering and running the original code from prior works or, when the code was unavailable or incomplete, reimplementing the corresponding algorithms.
-To support further research on AES execution over TFHE, we have created two Git repositories\footnote{\url{https://github.com/CryptoExperts/Hippogryph} and \url{https://github.com/daphnetrm/Benchmark-of-AES-Evaluation-with-TFHE}.} containing all source code and necessary resources to reproduce our benchmark.
+In this chapter, we introduce \hippo, the fastest homomorphic implementation of AES using TFHE at the time of writing. To construct it, we leveraged three main ideas:
 
-\begin{table}[ht]
-\centering
-\caption{State-of-the-art \emph{single-core} homomorphic evaluation of AES. The table indicates both the original timings, in seconds, provided in the papers and, in brackets, the timings obtained on our single machine test bench (a 12th Gen Intel(R) Core(TM) i7-12700H CPU laptop).}
-%\SB{attention: uniformiser les timings avec ceux de la dernière section}
-% \RS{Supprimier la colonne // dans cette table. Et oui soit mettre les timings des papiers, et le dire, soit mettre les timings tels que nous les avons mesurés (et le dire aussi :-))}
-% \SB{je serais tentée de mettre les 2 : timings mesurés et timings orignaux (avec les timings originaux entre paranthèses ou dans une colonne supplémentaire, qu'en pensez-vous ?}}
-\label{tab:soa}
-\begin{tabular}{|>{\centering\arraybackslash}p{0.8cm}|>{\centering\arraybackslash}p{1.8cm}|>{\centering\arraybackslash}p{4.5cm}|>{\centering\arraybackslash}p{2cm}|}
-\hline
-\textbf{Year} & \textbf{Reference} & \textbf{Method} & \textbf{Timings} \\
-\hline
-\multirow{3}{*}{2023} & \cite{DBLP:conf/wahc/TramaCBS23} & Tree-Based Method (TBM) & 270 (270) s\\
-\cline{2-4}
-& \cite{DBLP:journals/tches/BonPR24} & $p$-encoding method &  135 (90) s\\
-\cline{2-4}
-& \cite{fregata} & TFHE in ``LHE'' mode  & 86 (87) s\\
-\hline
-2024 & \cite{thunderbird} & TFHE in ``LHE'' mode & 46 (60) s\\
-\hline \hline
-2025 & This work & Combined TBM/$p$-encodings & 32 s\\
-\hline
-\end{tabular}
-\end{table}
+\begin{itemize}
+	\item[-] We generalized the $p$-encoding construction introduced in Chapter \ref{chap:p_encodings} to the arithmetic case.
+	\item[-] The LUT-oriented implementation of \cite{DBLP:conf/wahc/TramaCBS23} is extremely efficient to evaluate the large Sbox of AES, so we borrowed this idea as it was.
+	\item[-] We associated both previous techniques by developing a framework of conversion between Boolean and arithmetic representations.
+\end{itemize}
 
-\paragraph{Organisation.} In the following, Section~\ref{sec:preliminaries} provides the necessary background on TFHE and a concise overview of the AES scheme and its subroutines. Section~\ref{sec:previous-blocks} focuses on the two building blocks of \hippo, as introduced in \cite{DBLP:conf/wahc/TramaCBS23} and \cite{DBLP:journals/tches/BonPR24}. Section~\ref{sec:our_work} introduces our new design. Finally, Section~\ref{sec:comparison} presents a detailed comparison with existing approaches, supported by relevant benchmarks.
+
+The result of this work is doubly interesting: first, we manage tu outperform the rest of the literature on homomorphic AES evaluation. Second, we develop a generic framework useful to resolve the recurring tension between Boolean and arithmetic representations within homomorphic circuits, which we believe is of independent interest.
+
+
+We start this chapter by introducing the notion of transciphering in Section \ref{sec:transciphering}, which will be a recurring theme in the rest of this manuscript. Then, after some preliminaries on the AES cipher (Section \ref{sec:preliminaries_aes}), we introduce in Section \ref{sec:previous-blocks} some advanced homomorphic operators from \cite{DBLP:conf/wahc/TramaCBS23} that will be useful in this work. We then generalize the $p$-encoding construction of Chapter \ref{chap:p_encodings} to the arithmetic case (Section \ref{sec:generalization_p_encodings}). Finally, Section~\ref{sec:hippogryph_our_work} introduces our new design and Section~\ref{sec:comparison} presents a detailed comparison with existing approaches, supported by relevant benchmarks.
+
+
+\TODO{Mettre la table récapitulative du papier ici ?}
+
+

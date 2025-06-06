@@ -1,0 +1,201 @@
+\section{Description of \coolName}
+\label{sec:description}
+
+\TODO{Ici, je ne sais pas si onn peut beaucoup compresser, mais relire quand même}
+
+
+Bringing everything together, we designed the stream cipher \coolName{}.
+Its overall structure is presented in Section~\ref{sec:description-structure}, its details are explained in Section~\ref{sec:sepc-details}, and the influence of noise is discussed in Section~\ref{sec:rationale-controllin-noise}. A reference implementation can be found at
+  \url{https://github.com/CryptoExperts/Transistor/}.
+
+\subsection{Overall Structure}
+\label{sec:description-structure}
+
+
+\paragraph{Usage.}
+\label{sec:usage}
+%\lp{j'ai encore bidouillé cette partie, qu'en pensez-vous?}
+\coolName{} is a stream cipher that generates a keystream consisting of elements from \( \mainField = \mathbb{F}_{17} \), referred to as {\em digits}.  It is intended for transciphering, i.e., for the type of protocol we summarized in the introduction\ifeprint (see Figure~\ref{fig:transciphering-principle})\fi.
+More precisely, a 128-bit master key and an IV are used to initialize the internal state of \coolName{} using  a PRF (namely, {\tt SHAKE}~\cite{add:SHA3}), as suggested in~\cite{FSE:BerGil07}. This initialization  is only performed on the client side, and in particular is not evaluated homomorphically, meaning that its cost is negligible. On the other hand, it ensures for example that related IVs cannot be exploited. The entire resulting internal state is then encrypted using TFHE and sent alongside the ciphertext. This ciphertext is obtained by casting the plaintext message to a string of digits of $\mainField$, which is added digit by digit to the keystream produced by \coolName{} using the group law of $\mainField$.
+
+
+
+% \ac{My two cents: Il faut qu'on dise clairement s'il y a une IV ou non. Plus je réfléchis, moins je trouve convaincant de dire qu'il n'y a pas d´IV, car cela veut dire qu'on tire une nouvelle clef au hasard à chaque msg. Ca n'est pas top, non ? Par contre, on peut dire que son coût n'est pas important, et donc qu'on peut choisir une initiation coûteuse, car elle n'est jamais faite côté serveur.}
+
+  
+
+%\lp{j'ai pensé parler ici de l'overhead impliqué par l'envoi de la clef maître mais en fait on en parle déjà et dans l'intro et dans les benchmarks...}
+
+% \lp{@cryptoExperts: ça serait cool de remettre une couche ici sur le fait qu'on puisse choisir $p$ comme ça nous arrange, histoire qu'on ne se reprenne pas un reviewer chafouin persuadé que notre choix de $p$ nous condamne à l'inutilité}
+% \nicolas{ajouté ci-dessous}
+% \ac{Je pense que cette argumentation doit aller ailleurs, peut-etre ds la section précédente sur le choix de \(p\) mais pas ici.}
+%\lp{j'ai gardé la toute première phrase de la discussion sur $p$ ici et j'ai bougé le reste de cette discussion plus haut, dans le paragraphe ``The parity of the plaintext space''}\yr{Modifié des trucs mineurs ici dans le paragraphe ci-dessus}
+
+
+\paragraph{Internal State.}
+The overall structure of \coolName{} is outlined in Figure~\ref{fig:structure}.
+
+The idea is to generate two pseudo-random sequences with a very long
+period using two distinct LFSRs. One of them generates whitening
+subkeys, while the other acts as a sort of key schedule. The output of
+the latter is fed into a Finite State Machine (FSM) with its own
+state, and which operates on it using non-linear operations. We thus
+have the following components:
+\begin{itemize}
+\item a register of 16 elements of $\mainField$ (the \emph{FSM state}),
+\item an LFSR over $\mainField$ (the \emph{key schedule} or \emph{key-LFSR} $\pseudoKS$) of length $|\pseudoKS| = 64$, 
+\item an LFSR over $\mainField$ (the \emph{whitening LFSR} $\whitening$), of length $|\whitening| = 32$,
+\item a non-linear round function from $\mainField^{16}$ to itself (the \emph{round function}), and
+\item a filter $\filter : \mainField^{16} \to \mainField^4$ that extracts $4$ digits from the FSM.
+\end{itemize}
+
+%\lp{j'ai rajouté le texte ci-dessous pour spécifier l'initialisation et le claim de sécurité.}
+
+The FSM state is initialized to all zeros, and each LFSR is initialized using digits derived from the 128-bit master key and IV using SHAKE~\cite{add:SHA3}. 
+\ifeprint
+  We provide a detailed algorithm in Appendix~\ref{app:spec} which specifies, among other things, the processing of the master key and the LFSR taps. 
+\fi
+
+
+\paragraph{Security Claim.} \coolName{} is a stream cipher providing 128
+bits of security, meaning any attack should require at least $2^{128}$
+elementary operations, assuming no more than $2^{31}$ digits (about
+1~GB) are generated with each IV.  We allow up to $2^{128}$ digits in
+total per key, corresponding to the multi-initial-state setting.
+
+
+% \MR{J'ai ajouté les longueurs des LFSR. A valider.}
+% \leo{normalement ce qui est écrit maintenant est correct (j'ai changé la longueur du masquage en $w=32$, et non $w=16$ puisque nos mots font 4 bits et non 8... Désolé)}
+
+\TODO{ICI, décommenter la structure}
+%\input{figures/structure}
+
+
+\subsection{Detailed Description}
+\label{sec:sepc-details}
+
+Obviously taking inspiration from the AES, the state of the FSM is organized into a two-dimensional array of size $4\times 4$, where each entry corresponds to a digit in $\F_p$. With this representation, the successive operations applied to the state can be defined as follows.
+% \jb{il y a un truc qui cloche avec cette phrase/cette liste ?}\lp{pas sûr de ce que tu veux dire, j'ai fait quelques modifs ceci dit}\yr{modifié matrix -> array pour pas confondre avec une matrice qui est une application}\jb{Ca me semble mieux ! (Le commentaire datait de la soumission EC)}
+\begin{description}
+\item[$\subWords~(\subW)$] is an S-box layer: the permutation $\thesbox$ is applied on each digit.
+\item[$\mixColumns~(\mixC)$] applies to each column an MDS matrix $\mixmat$ over \(\F_p\).
+\item[$\shiftRows~(\shiftR)$] rotates the $i$-th row by $i$ positions to the left.
+\item[$\filterName~(\mathbf{\filter})$] takes $4$ digits from the state and returns them. 
+\end{description}
+
+In what follows, we provide a more detailed description of each step, using the notation summarized in~Figure~\ref{fig:notations}. The keystream output at clock $t \geq 0$ consists of a tuple $Z_t \in \mainField^4$, called a block. The internal state of the FSM, just before the filter is applied, is denoted by $\fsmState{t}$ (so that $S_t = \filter(\fsmState{t})$). As a consequence, $\fsmState{t+1} = \subW\left(K_{t+1} + \left(\mixC \circ \shiftR (\fsmState{t})\right)\right)$, where $K_t$ is obtained by concatenating 16 successive digits generated by the key-schedule LFSR $\pseudoKS$. The FSM is initialized with the all-zero value and its initial state is denoted by $X_{-1} \vcentcolon= 0$.
+
+
+\TODO{Ici figure sur les notations à décommenter}
+%\input{./figures/notations}
+
+
+
+\paragraph{S-box Layer ($\subW$).}
+We let $\thesbox$ be defined by its lookup table:
+\begin{equation}
+  \label{eq:thesbox}
+  \thesbox = {\tt [1, 12, 6, 11, 14, 3, 15, 5, 10, 9, 13, 16, 7, 8, 0, 2, 4]}
+\end{equation}
+so that $\thesbox(0) = 1$, $\thesbox(1) = 12$, and so on. It has the following polynomial representation, and is thus of maximum degree: %\jb{il y a un $13x^{10}$  dans le polynome. C'est un $13x^{10}$ ?}\lp{oui}
+\begin{equation*}
+  \begin{split}
+    \thesbox(x) ~=~& 1 + 4 x^{1} + 13 x^{2} + 7 x^{3} + 16 x^{4} + 15 x^{5} + 5 x^{7} + 5 x^{8} \\
+    & + 11 x^{9} + 13 x^{10} + 12 x^{11} + 13 x^{12} + 15 x^{14} + x^{15}~.
+  \end{split}
+\end{equation*}
+It was chosen by enumerating all APN permutations of $\mathbb{F}_{17}$, i.e., all permutations $A$ such that the equation $A(x+a)=A(x)+b$ has at most 2 solutions $x$ for all $a \neq 0$ and all $b$. Then, we selected $\thesbox$ among those that offer a good balance between minimizing the number of pairs $(a,b)$ for which the previous equation has exactly two solutions, and minimizing the maximum modulus of the Walsh spectrum (see Definition~\ref{def:fourier}).
+
+
+\paragraph{Linear Layer ($\mixC$).} We opted for a $4 \times 4$ Maximum Distance Separable (MDS) matrix to ensure optimal diffusion. The matrix we chose is 
+\begin{equation}
+  \label{eq:mixmat}
+  \mixmat = \left[ { \tiny
+      \begin{array}{rrrr}
+        2 & 1 & 1 & 1 \\
+        1 & -1 &1 & -2 \\
+        1 & 1 & -2 &-1 \\
+        1 & -2 &-1 &1 \\
+      \end{array}
+    }\right]~.
+   % \begin{array}{cccc}
+    %  -1 & -1 & -1 & 2 \\
+     % -1 & 1 & 2 & -1 \\
+     % -1 & 2 & 1 & 1 \\
+     % 2 & 1 & -1 & 1 \\
+   % \end{array} \right]~.
+\end{equation}
+%We obtained it by performing an exhaustive search of all $4 \times 4$ matrices with coefficients in ${-2,-1,1,2}$ with at most one coefficient 2 or -2 in each row, and then picking one with the smallest $\ell_2$-norm for a matrix with coefficients in $\mathbb{F}_{17}$. The idea with our initial restrictions to ensure that the $\ell_2$ norm will be low as it depends on the absolute value of the coefficients.
+
+We verified that there is no MDS matrix in  $\mathbb{F}_{17}$ with coefficients in $\{-1,1\}$ by exhaustively  testing all such matrices. As we were interested in MDS matrices with minimal $\ell_2$-norm and we were able to find during the initial experiments  matrices with a squared $\ell_2$-norm of 7, it was evident from the definition of the $\ell_2$-norm that matrices with minimal $\ell_2$-norm could not have coefficients $x$ with $|x| > 2$.  Thus, by testing all matrices with coefficients in $\{-2,-1,1,2\}$, we found a total of $30\>720$ MDS matrices with an $\ell_2$-norm of 7. We selected $\mixmat$ for its symmetries, particularly because it is its own transpose. % Among them, some matrices had a more structured form, as they could be written as 
+
+% \begin{equation*}
+%   \mixmat = \left[
+%   \begin{array}{rr}
+%     A & B  \\
+%     B & -A 
+%   \end{array} \right]~.
+% \end{equation*}
+% where both $A$ and $B$ are $2\times 2$ matrices. There were in total 256 matrices of this particular form and we chose $M$ randomly among them, taking into account also that $\mixmat = \mixmat^{T}$.
+% (which means its linear behaviour is close to its differential behaviour). \leo{À vérifier}\ac{Cette phrase est bizarre : les branch nb et la distribution des poids sont les memes pour les deux codes si le code est MDS. Donc je ne vois pas ce que cela apporte qu'ils soient identiques.} \leo{ok, j'ai viré}
+
+
+\paragraph{Filter.} The filter function $\filter$ maps $\mainField^{16}$ (i.e., the full FSM state) to a tuple $(a,b,c,d)$ in $\mainField^{4}$. As summarized in Figure~\ref{fig:filter}, we have that $a,b,c$ and $d$ correspond to the digits of the FSM state with indices 4, 6, 12, and 14 respectively (using the numbering from Figure~\ref{fig:numbering}).
+
+
+\paragraph{LFSRs.} The whitening LFSR $\whitening$ and the key schedule LFSR $\pseudoKS$ are simply LFSRs over \(\F_p\) of maximum period, and have length 32 and 64 respectively. We obtain a
+  maximum-period LFSR over $\mainField^w$ using the coefficients of a
+  primitive polynomial as the taps.  More precisely, we used the {\tt SageMath}
+  implementation of the finite field $\F_{p^w}$, which resulted in a pseudo-Conway polynomial. The output of the LFSR is taken from its last cell.
+
+  More precisely, an LFSRs of length $\ell$ at time $t$ is a list of digits ${x^t_0, ..., x^t_{\ell-1}}$
+  that is clocked as follows:
+  \begin{enumerate}
+  \item $x_0^{t+1} \gets - \sum_{i=0}^{\ell-1} x_i^t c_i$,
+  \item $x_{i}^{t+1} \gets x_{i-1}^t$ for $0 < i < \ell$,
+  \item the output is $x_{\ell-1}^t$,
+  \end{enumerate}
+  where $C=(c_i)_{0 \leq i < \ell}$ is the list of its taps, each being
+  a digit of $\mathbb{F}_{17}$. We define $\clock{C}$ to be the function
+  applying the operations above to a list ${x^t_0, ..., x^t_{\ell-1}}$
+  to update it, and returning $x_{\ell-1}^t$.
+
+  For the key schedule $\pseudoKS$, we use the following taps:
+  \begin{equation*}
+    \footnotesize
+    \begin{split}
+      C(\pseudoKS) ~=~& \{9, 4, 6, 4, 8, 6, 6, 16, 3,
+                        9, 15, 12, 8, 12, 11, 4, 4, 8, 1,
+                        8, 8, 9, 4, 6, 6, 7, 6, 3, \\
+                      & 16, 14, 14, 6, 10, 15, 14, 13, 10, 1, 1,
+                        10, 13, 11, 14, 10, 7, 4, 15, 8, 16,
+                        3, 13, \\
+                      & 14, 15, 16, 3, 16, 9, 3, 6,
+                        12, 15, 9, 12, 3\}~,
+    \end{split}
+  \end{equation*}
+  and for the whitening LFSR $\whitening$ we use
+  \begin{equation*}
+    \footnotesize
+    \begin{split}
+      C(\whitening) ~=~& \{8, 14, 14, 14, 1, 6, 12, 10, 14, 14,
+                         14, 5, 2, 5, 6, 13, 6, 15, 14, 3, \\
+                       & 13, 16, 1, 13, 9, 1, 7, 15, 13, 6,
+                         14, 3\}~.
+    \end{split}
+  \end{equation*}
+
+
+\paragraph{Master Key Processing.}
+We generate the digits in $\pseudoKS$ first, and then those in $\whitening$. To generate them, we concatenate the 128-bit long master key with an IV and then a byte set to 1. The result is fed into \textsf{SHAKE128}, and the output byte stream of this primitive is used to generate digits of $\mathbb{F}_{17}$ using rejection sampling: if a byte $x$ is equal to 255, we discard it; otherwise, we generate the digit $\lfloor x / 15 \rfloor$. Since $15 \times 17 = 255$, this results in an unbiased transformation.
+
+
+% Leo: ce qui suit est pour qu'emacs compile bien l'article, pas touche !
+%%% Local Variables:
+%%% mode: latex
+%%% ispell-local-dictionary: "english"
+%%% TeX-master: "main"
+%%% End:
+
+
+

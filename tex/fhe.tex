@@ -2,12 +2,12 @@
 
 \chapter{Introduction to Fully Homomorphic Encryption}
 
+\TODO{En tête de chapitre, une introduction générale à la cryptographie ?}
+
+\section{Motivation and Use-Cases}
 
 
-\section{Why ?}
-
-
-
+\TODO{}
 
 
 \section{Historical Background}
@@ -17,31 +17,30 @@
 \TODO{Citer l'historique des schémas partiellements homomorphes, et des trucs "à niveaux" comme DHGV}
 
 
+
+
 \section{The bootstrapping : breakthrough construction}
 \label{sec:gentry_bootstrapping}
 
 
 In 2009, Craig Gentry publishes the breakthrough paper \textit{Fully Homomorphic Encryption using Ideal Lattices} \cite{STOC:Gentry09}. In this work, he introduces the first ever fully homomorphic encryption scheme. Its main idea is the \textit{bootstrappability} of a scheme.
 
-Bootstrappability is the ability of a scheme to evaluate homomorphically its own decryption circuit. Gentry shows that if a scheme achieves bootstrappability, then it achieves fully homomorphic encryption. Building on this theoretical result, he constructs a lattice-based bootstrappable scheme and demonstrates the first ever example of fully homomorphic scheme.
-
-Since this foundational work, lattice-based constructions have remained the only serious candidate for fully homomorphic encryption. 
+Bootstrappability is the ability of a scheme to evaluate homomorphically its own decryption circuit. Gentry shows that if a scheme achieves bootstrappability, then it achieves fully homomorphic encryption. Building on this theoretical result, he constructs a lattice-based bootstrappable scheme and demonstrates the first ever example of fully homomorphic scheme. Since this foundational work, lattice-based constructions have remained the only serious candidate for fully homomorphic encryption. 
 
 Such homomorphic schemes work by injecting some small random noise in the plaintext data before encryption. Its role is to ensure security, relying on computational hardness assumptions such as Learning With Errors (LWE) (we explain it further in Section \ref{sec:hardness_assumptions}). Because the noise is small, it can be easily removed during decryption by a simple rounding operation. 
-
+result
 Gentry's original scheme offered homomorphic additions and multiplications. However, because the plaintext messages are noisy, these operations increase the noise in the ciphertexts. So, if too much operations are performed, the noise gets so large that it becomes preponderant and blows the meaningful information contained in the ciphertexts.
 
 This is where bootstrappability comes in. It gives access to an operation (the \textit{bootstrapping}) that decrypts homomorphically the noisy ciphertexts. But how can this help to achieve FHE ?
 
-Imagine the server has a ciphertext $\vec c_1$ encrypting the (noisy) message $m +e_1$ under the secret key $\vec s_1$, where $m$ is the plain message and $e_1$ denotes the noise. Let us say that $\vec c_1$ is the result of a large number of homomorphic operations, so the noise $e_1$ is rather large. If we want to keep computing without losing information, we need to reduce the noise by a bootstrapping. 
+Imagine the server has a ciphertext $\vec c_1$ encrypting the (noisy) message $m +e_1$ under the secret key $\vec s_1$, where $m$ is the plain messaresultge and $e_1$ denotes the noise. Let us say that $\vec c_1$ is the output of a circuit of homomorphic operations, so the noise $e_1$ is rather large. If we want to keep computing without losing information, we need to reduce the noise by a bootstrapping. 
 
-To do so, the client needs to give to the server a \textit{bootstrapping key} $\BSK$. In order to create it, the client can treat the secret key $s_1$ as a message and encrypt it under another secret key $s_2$ to produce $\BSK = \texttt{Enc}_{s_2}(s_1)$. Now, if the server computes \textit{homomorphically} the decryption of $c_1$ using $\BSK$, it retrieves an encryption $c_2$ of the same message under the secret key $s_2$. But because, decryption removes noise, $e_1$ disappears and the ciphertext is fresh again !
+To do so, the client needs to give to the server a \textit{bootstrapping key} $\BSK$. In order to create it, the client can treat the secret key $\vec s_1$ as a message and encrypt it under another secret key $s_2$ to produce $\BSK = \texttt{Enc}_{s_2}(s_1)$. Now, if the server computes \textit{homomorphically} the decryption of $c_1$ using $\BSK$, it retrieves an encryption $\vec c_2$ of the same message under the secret key $\vec s_2$. But because, decryption removes noise, $e_1$ disappears and the ciphertext is fresh again !
 
-Actually, \textit{all} the noise does not get removed (this would be a shame, because the security of the encryption relies on the presence of noise in the ciphertexts). As there is some noise in the encryption in $\BSK$, the result $c_2$ carries some noise $e_2$. But if things are well dimensioned, it is possible to get $e_2 \ll e_1$ and so gain some room for further computations.
+Actually, \textit{all} the noise does not get removed (this would not be desirable, because all the security of the encryption relies on the presence of noise in the ciphertexts). As there is some noise in $\BSK$, the result $\vec c_2$ carries some noise $e_2$. But if things are well dimensioned, it is possible to get $e_2 \ll e_1$ and so retrieve some room for further computations.
 
 
-Gentry's original scheme was merely theoretical, because the homomorphic operations and in particular the bootstrapping were extremely slow (and the size of the objects were extremely large). But since then, significant improvements have been achieved in FHE efficiency. Modern schemes are on the verge of being usable in practice for some use-cases. In the next section, we give a tour of the modern schemes and libraries that makes the FHE landcape as of today.
-
+Gentry's original scheme was merely theoretical, because the homomorphic operations and in particular the bootstrapping was extremely slow. But since then, significant improvements have been achieved in FHE efficiency. Modern schemes are on the verge of being usable in practice for some use-cases. In the next section, we give a tour of the modern schemes and libraries that makes the FHE landcape as of today.
 
 \TODO{Faire une figure}
 
@@ -49,13 +48,37 @@ Gentry's original scheme was merely theoretical, because the homomorphic operati
 \section{Current landscape of the FHE schemes and libraries}
 \label{sec:landscape}
 
-\TODO{Ecrire ça. Reprendre l'outline de la présentation de Gentry à FHE.org}
+After a decade of research, homomorphic schemes have evolved to stabilize around two main paradigms. We present both by their main representatives: TFHE \cite{JC:CGGI20} and CKKS \cite{AC:CKKS17}. They have quite different (and complimentary) philosophies of computing, and lead to radically different design choices when used:
+
+
+\paragraph{TFHE:} This scheme relies on a very low-latency\footnote{by FHE standards} bootstrapping operation. It manipulates small limbs of data of a few bits, and operates \textit{exact} computations on them in a quite reactive manner.
+
+
+\paragraph{CKKS:} CKKS has quite opposite features than TFHE. It relies on a \textit{approximate} paradigm fo the computations, so is quite appropriate for floating-point computations. Moreover, it supports SIMD (Same Instruction Multiple Data) within its ciphertexts, so it allows for heavy parallelization. While its bootstrapping is quite heavy and appeared later in the literature \cite{EC:CHKKS18}, a lot of advancements happened in the last few years making it closer to practical \cite{EC:CheChiSon19, RSA:HanKi20, AC:KPKKM22}.
+
+
+\TODO{Mention BGV/FV (ou alors plutôt dans la partie précédente)}
+
+
+Several libraries implement these schemes, facilitating their adoption. For TFHE, we can mention tfhe-rs \cite{tfhe-rs}  and TFHEpp \cite{TFHEpp}. For CKKS, we can mention HEAAN \cite{heean} and Lattigo \cite{lattigo}. Finally, OpenFHE \cite{openfhe} is an attempt at constructing an universal library that supports all the schemes and allows conversions.
+
+
+These libraries target users familiar with FHE, and offer quite low-level API. One of the issue slowing down the massive adoption of FHE is the difficulty of developing concrete applications from the cryptographic primitives. A layer of compilation is thus required from ``plaintext'' programming to homomorphic code. Such projects of homomorphic compiler include Concrete \cite{Concrete} and heir \cite{HEIR}.
+
+
+Another active line of research is hardware acceleration. Quite promising theoretical results have been achieved \cite{TCHES:GVPHMS23, EPRINT:BBTV23a, EPRINT:CPBFSJ23, EPRINT:KHMR24} and the first ``FHE-tailored'' chips have started to be produced. Such hardware include NTT/FFT-dedicated accelerators, as there operations accounts for the largest part of the computations. 
+
+
+Some standardization projects are arising \cite{HomomorphicEncryptionSecurityStandard, call_nist}, which would be an important step for the adoption of FHE in practice.
+ 	
 
 
 \section{Security Properties}
 
+\TODO{Voir dernier papier de Gentry au JC, et éventuellement intégrer l'idée principale}
 
-It is common in cryptography to modelize the security of a scheme by a \textit{security game}. In an idealized world, a challenger running the scheme is opposed to a polynomial-time attacker. This attacker has access to \textit{oracles} that they can query. For encryption scheme, one of these game is the \textit{indisguishability game}: the attacker pick two messages and send them to the challenger. The challenger flips a coin and encrypts one of the messages at random. They send this ciphertext (named the \textit{challenge ciphertext}) to the attacker, who have to guess which message has been encrypted. If the attacker can do better that random guessing (so guess right with probability larger than 0.5), we say that they have a \textit{non-negligible advantage}, indicating a vulnerability against the type of attack.
+
+In cryptography, the security of a scheme is modelized by a \textit{security game}. In an idealized world, a challenger running the scheme is opposed to a polynomial-time attacker. This attacker has access to \textit{oracles} that they can query. For encryption scheme, one of these game is the \textit{indisguishability game}: the attacker pick two messages and send them to the challenger. The challenger flips a coin and encrypts one of the messages at random. They send this ciphertext (named the \textit{challenge ciphertext}) to the attacker, who have to guess which message has been encrypted. If the attacker can do better that random guessing (so guess right with probability larger than 0.5), we say that they have a \textit{non-negligible advantage}, indicating a vulnerability against the type of attack.
 
 Usually, the ``graal'' for encryption schemes is \textsf{CCA2} security (or \textit{adaptative chosen-ciphertext security}). In the corresponding game, the attacker has access to an encryption and a decryption oracle, that they can query both before and after having received the challenge ciphertext, with the exception that they are forbid to query the decryption oracle directly on the challenge ciphertext.
 

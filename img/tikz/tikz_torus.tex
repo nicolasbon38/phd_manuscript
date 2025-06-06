@@ -1,8 +1,8 @@
 % Default sizes
-\def\smallRadiusInner{2.5}
-\def\smallRadiusOuter{3}
-\def\bigRadiusInner{3}
-\def\bigRadiusOuter{3.5}
+\def\smallRadiusInner{3}
+\def\smallRadiusOuter{3.5}
+\def\bigRadiusInner{3.5}
+\def\bigRadiusOuter{4}
 
 
 
@@ -43,7 +43,7 @@
 		(\angleB:\radiusOuter) arc[start angle=\angleB, end angle=\angleA, radius=\radiusOuter] -- cycle;
 		%
 		\ifthenelse{\equal{#4}{true}}{%
-			\node at (\angleMid:\radiusMid) {\small \i};
+			\node[rotate=\angleMid - 90] at (\angleMid:\radiusMid) {\small \i};
 		}{}
 		\ifthenelse{\equal{#5}{true}}{%
 			\draw[dashed] (0,0) -- (\angleA:\radiusInner);
@@ -55,10 +55,305 @@
 }
 
 
+
+
 % Master macro: two rings with separate label/dash flags
 \newcommand{\wrappedTorus}[3]{% q, p, showLabels
 	\begin{tikzpicture}
 		\drawSingleRing{#1}{#2}{big}{#3}{false}{true}
 		\drawSingleRing{#2}{#2}{small}{#3}{true}{true}
 	\end{tikzpicture}
+}
+
+
+
+
+% Core macro: (n_parts, small/big, showLabels, showRadials, drawColors) assume n_parts = n_colors
+\newcommand{\drawHalfRing}[5]{%
+	\pgfmathsetmacro{\p}{#1}
+	% Set radius based on the second parameter (big or small)
+	\ifthenelse{\equal{#2}{small}}{%
+		\def\radiusInner{\smallRadiusInner}
+		\def\radiusOuter{\smallRadiusOuter}
+	}{%
+		\def\radiusInner{\bigRadiusInner}
+		\def\radiusOuter{\bigRadiusOuter}
+	}
+	%
+	\foreach \i in {0,...,\numexpr\p} {
+		\ifthenelse{\equal{\i}{0}}{
+			\pgfmathsetmacro\angleA{0}
+			\pgfmathsetmacro\angleB{90/\p}
+			\pgfmathsetmacro\angleMid{90/\p*0.5}
+			\pgfmathsetmacro\radiusMid{(\radiusInner + \radiusOuter)/2}
+			
+			% Correct hue calculation for each slice
+			\ifthenelse{\equal{#5}{true}}{%
+				% Compute centered color index
+				\pgfmathsetmacro{\hue}{0}
+				% Set HSB color
+				\definecolor{mycolor}{hsb}{\hue,1,1}
+			}{%
+				% Fallback to white (or gray)
+				\definecolor{mycolor}{rgb}{1, 1, 1}
+			}
+			
+			% define the label
+			\edef\labelSector{$f(0)$}
+		}{%else
+			\ifthenelse{\equal{\i}{\p}}{ %then i == p
+				\pgfmathsetmacro\angleA{180 - 180 / \p * 0.5}
+				\pgfmathsetmacro\angleB{180}
+				\pgfmathsetmacro\angleMid{180 - 180 /\p *0.25}
+				\pgfmathsetmacro\radiusMid{(\radiusInner + \radiusOuter)/2}
+				
+				% Correct hue calculation for each slice
+				\ifthenelse{\equal{#5}{true}}{%
+					% Compute centered color index
+					\pgfmathsetmacro{\hue}{0}
+					% Set HSB color
+					\definecolor{mycolor}{hsb}{\hue,1,1}
+				}{%
+					% Fallback to white (or gray)
+					\definecolor{mycolor}{rgb}{1, 1, 1}
+				}
+				
+				% define the label
+				\edef\labelSector{$-f(0)$}
+			}{ %else (i inside)
+				\pgfmathsetmacro\angleA{180/\p*(\i - 0.5)}
+				\pgfmathsetmacro\angleB{180/\p*(\i + 0.5)}
+				\pgfmathsetmacro\angleMid{180/\p*\i}
+				\pgfmathsetmacro\radiusMid{(\radiusInner + \radiusOuter)/2}
+				
+				% Correct hue calculation for each slice
+				\ifthenelse{\equal{#5}{true}}{%
+					% Compute centered color index
+					\pgfmathsetmacro{\hue}{\i / \p}
+					% Set HSB color
+					\definecolor{mycolor}{hsb}{\hue,1,1}
+				}{%
+					% Fallback to white (or gray)
+					\definecolor{mycolor}{rgb}{1, 1, 1}
+				}
+				% define the label
+				\edef\labelSector{$f(\i)$}
+			}
+		}
+		
+		\draw[thick, fill=mycolor, opacity=0.5]
+		(\angleA:\radiusInner) arc[start angle=\angleA, end angle=\angleB, radius=\radiusInner] --
+		(\angleB:\radiusOuter) arc[start angle=\angleB, end angle=\angleA, radius=\radiusOuter] -- cycle;
+		%
+		\ifthenelse{\equal{#3}{true}}{%
+			\node[rotate=\angleMid - 90] at (\angleMid:\radiusMid) {\small \labelSector};
+		}{}
+		\ifthenelse{\equal{#4}{true}}{%
+			\draw[dashed] (0,0) -- (\angleA:\radiusInner);
+			\draw[dashed] (0,0) -- (\angleB:\radiusInner);
+		}{}
+	}
+	
+	\draw[thick] (0,0) circle (\radiusOuter);
+	\draw[thick] (0,0) circle (\radiusInner);
+}
+
+
+
+
+% Core macro: (n_parts, n_colors, small/big, showLabels, showRadials, drawColors)
+\newcommand{\drawSingleRingHalfColor}[6]{%
+	\pgfmathsetmacro{\p}{#1}
+	\pgfmathsetmacro{\pColor}{#2}
+	% Set radius based on the second parameter (big or small)
+	\ifthenelse{\equal{#3}{small}}{%
+		\def\radiusInner{\smallRadiusInner}
+		\def\radiusOuter{\smallRadiusOuter}
+	}{%
+		\def\radiusInner{\bigRadiusInner}
+		\def\radiusOuter{\bigRadiusOuter}
+	}
+	%
+	\foreach \i in {0,...,\numexpr\p-1} {
+		\pgfmathsetmacro\angleA{360/\p*(\i - 0.5)}
+		\pgfmathsetmacro\angleB{360/\p*(\i + 0.5)}
+		\pgfmathsetmacro\angleMid{360/\p*\i}
+		\pgfmathsetmacro\radiusMid{(\radiusInner + \radiusOuter)/2}
+		
+		%		% Correct hue calculation for each slice
+		\pgfmathsetmacro{\halfP}{\p / 2}
+		\ifthenelse{\lengthtest{\i pt > \halfP pt}}{%
+			% Fallback to white (or gray)
+			\definecolor{mycolor}{rgb}{1, 1, 1}
+		}{
+			\ifthenelse{\equal{#6}{true}}{%
+				% Compute centered color index
+				\pgfmathsetmacro{\colorIndex}{floor(\pColor * (2 * \i + (\p / (2 * \pColor))) / \p)}
+				% Convert to hue [0,1]
+				\pgfmathsetmacro{\hue}{\colorIndex / \pColor}
+				% Set HSB color
+				\definecolor{mycolor}{hsb}{\hue,1,1}
+			}{%
+				% Fallback to white (or gray)
+				\definecolor{mycolor}{rgb}{1, 1, 1}
+			}
+		}
+		
+		\draw[thick, fill=mycolor, opacity=0.5]
+		(\angleA:\radiusInner) arc[start angle=\angleA, end angle=\angleB, radius=\radiusInner] --
+		(\angleB:\radiusOuter) arc[start angle=\angleB, end angle=\angleA, radius=\radiusOuter] -- cycle;
+		%
+		\ifthenelse{\equal{#4}{true}}{%
+			\node[rotate=\angleMid - 90] at (\angleMid:\radiusMid) {\small \i};
+		}{}
+		\ifthenelse{\equal{#5}{true}}{%
+			\draw[dashed] (0,0) -- (\angleA:\radiusInner);
+			\draw[dashed] (0,0) -- (\angleB:\radiusInner);
+		}{}
+	}
+	\draw[thick] (0,0) circle (\radiusOuter);
+	\draw[thick] (0,0) circle (\radiusInner);
+}
+
+
+
+
+
+% Core macro: (n_parts, n_colors, small/big, showLabels, showRadials)
+\newcommand{\drawRingOddEncoding}[5]{%
+	\pgfmathsetmacro{\p}{#1}
+	\pgfmathsetmacro{\pColor}{#2}
+	% Set radius based on the second parameter (big or small)
+	\ifthenelse{\equal{#3}{small}}{%
+		\def\radiusInner{\smallRadiusInner}
+		\def\radiusOuter{\smallRadiusOuter}
+	}{%
+		\def\radiusInner{\bigRadiusInner}
+		\def\radiusOuter{\bigRadiusOuter}
+	}
+	%
+	\foreach \i in {0,...,\numexpr\p-1} {
+		\pgfmathsetmacro\angleA{360/\p*(\i - 0.5)}
+		\pgfmathsetmacro\angleB{360/\p*(\i + 0.5)}
+		\pgfmathsetmacro\angleMid{360/\p*\i}
+		\pgfmathsetmacro\radiusMid{(\radiusInner + \radiusOuter)/2}
+		
+		
+%			% Compute centered color index
+
+			\pgfmathsetmacro{\y}{floor((\i + \p / (4 * \pColor)) / (\p / (2 * \pColor)))}
+			
+			\ifthenelse{\isodd{\y}}{ %then
+				\pgfmathsetmacro{\indexColor}{(\pColor + 1) / 2 + (\y - 1) / 2}
+			}{ %else
+				\pgfmathsetmacro{\indexColor}{\y / 2}
+			}
+
+%			% Convert to hue [0,1]
+			\pgfmathparse{mod(\indexColor / \pColor, 1)}
+			\xdef\hueStr{\pgfmathresult}
+			
+%			% Set HSB color
+			\definecolor{mycolor}{hsb}{\hueStr,1,1}
+
+		\draw[thick, fill=mycolor, opacity=0.5]
+		(\angleA:\radiusInner) arc[start angle=\angleA, end angle=\angleB, radius=\radiusInner] --
+		(\angleB:\radiusOuter) arc[start angle=\angleB, end angle=\angleA, radius=\radiusOuter] -- cycle;
+		%
+		\ifthenelse{\equal{#4}{true}}{%
+			\node[rotate=\angleMid - 90] at (\angleMid:\radiusMid) {\small \i};
+		}{}
+		\ifthenelse{\equal{#5}{true}}{%
+			\draw[dashed] (0,0) -- (\angleA:\radiusInner);
+			\draw[dashed] (0,0) -- (\angleB:\radiusInner);
+		}{}
+	}
+	\draw[thick] (0,0) circle (\radiusOuter);
+	\draw[thick] (0,0) circle (\radiusInner);
+}
+
+
+
+%"programmable verison": one can specify red and green sectors
+
+
+% Arguments:
+% #1 = Number of parts (sectors)
+% #2 = Size: "small" or "big"
+% #3 = Show labels (true/false)
+% #4 = Comma-separated list of sector indices to color in green
+% #5 = Comma-separated list of sector indices to color in red
+
+\newcommand{\drawSingleRingGreenRed}[5]{%
+	\pgfmathsetmacro{\p}{#1} % number of parts
+	% Set radius based on size
+	\ifthenelse{\equal{#2}{small}}{%
+		\def\radiusInner{\smallRadiusInner}
+		\def\radiusOuter{\smallRadiusOuter}
+	}{%
+		\def\radiusInner{\bigRadiusInner}
+		\def\radiusOuter{\bigRadiusOuter}
+	}
+	
+	% Parse input lists for green and red
+	\def\greenList{#4}
+	\def\redList{#5}
+	
+	\foreach \i in {0,...,\numexpr\p-1} {
+		\pgfmathsetmacro\angleA{360/\p*(\i - 0.5)}
+		\pgfmathsetmacro\angleB{360/\p*(\i + 0.5)}
+		\pgfmathsetmacro\angleMid{360/\p*\i}
+		\pgfmathsetmacro\radiusMid{(\radiusInner + \radiusOuter)/2}
+	
+
+		% Check if current index is in greenList or redList
+		\foreach \x in \greenList{
+			\ifthenelse{\equal{\i}{\x}}{
+				% Draw sector with the determined color
+				\draw[thick, fill=green, opacity=0.5]
+				(\angleA:\radiusInner) arc[start angle=\angleA, end angle=\angleB, radius=\radiusInner] --
+				(\angleB:\radiusOuter) arc[start angle=\angleB, end angle=\angleA, radius=\radiusOuter] -- cycle;
+				\breakforeach
+			}{}
+		}
+		
+		\foreach \x in \redList{
+			\ifthenelse{\equal{\i}{\x}}{
+				% Draw sector with the determined color
+				\draw[thick, fill=red, opacity=0.5]
+				(\angleA:\radiusInner) arc[start angle=\angleA, end angle=\angleB, radius=\radiusInner] --
+				(\angleB:\radiusOuter) arc[start angle=\angleB, end angle=\angleA, radius=\radiusOuter] -- cycle;
+				\breakforeach
+			}{}
+		}
+		% Optional label
+		\ifthenelse{\equal{#3}{true}}{%
+			\node[rotate=\angleMid - 90] at (\angleMid:\radiusMid) {\small \i};
+		}{}
+		
+		% Radial lines (non optional in this version)
+		\draw[dashed] (0,0) -- (\angleA:\radiusInner);
+		\draw[dashed] (0,0) -- (\angleB:\radiusInner);
+		
+	}
+	\draw[thick] (0,0) circle (\radiusOuter);
+	\draw[thick] (0,0) circle (\radiusInner);
+}
+
+
+% Arguments:
+% #1 = Number of parts (sectors)
+% #2 = Size: "small" or "big"
+% #3 = Show labels (true/false)
+% #4 = Comma-separated list of sector indices to color in green
+% #5 = Comma-separated list of sector indices to color in red
+% #6 = x center
+% #7 = y center
+% #8 = scale
+% #9 = label
+\newcommand{\drawSingleRingGreenRedBox}[9]{
+	\begin{scope}[scale=#8, shift={(#6, #7)}]
+		\drawSingleRingGreenRed{#1}{#2}{#3}{#4}{#5}
+		 \node (#9) at (0,0) {};
+	\end{scope}
 }

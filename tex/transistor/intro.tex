@@ -1,0 +1,18 @@
+\TODO{Relire l'intro}
+
+In the previous chapter, we introduced a technique called transciphering. It adresses the challenge of ciphertext expansion, common with all the FHE scheme.  For example, a plaintext message of a few kilobytes can require tens or even hundreds of megabytes of data, making the processing of large data sets impractical. While compression techniques can help reduce the expansion factor in TFHE ciphertexts, the encrypted data still remains an order or two of magnitude larger than the original plaintext.
+
+
+Transciphering consists in simply encrypting the data using a symmetric encryption cipher, and only encrypting the key of this cipher using the FHE scheme. Then, the server can evaluate the decryption algorithm of the symmetric cipher homomorphically to produce usable FHE ciphertexts. More information on transciphering are given in Section \ref{sec:transciphering}.
+
+
+While \hippo, our implementation of homomorphic AES that we introduced in previous chapter, could in theory be used for such transciphering task, the performances would not be acceptable for large volume of data (which is the use-case targeted by transciphering). We would rather have a symmetric cipher designed specifically to interact well with the FHE scheme. An abundant literature on the topic has appeared during the last few years, leading to the development of new families of ciphers tailored for the different homomorphic scheme on the market.
+
+In this chapter, we present \coolName{}, a stream cipher optimized for transciphering with TFHE. This design is the outcome of a careful study of the constraints and advantages specific to achieving efficient homomorphic evaluations with TFHE. In particular, we argue that operating on elements of $\mathbb{F}_p$, where $p$ is a small prime (4--5 bits), is a good choice for leveraging the full potential of TFHE’s programmable bootstrapping: we chose $p=17$. This choice is independent of the data format supported by the application running on the server, as changes of representations are easily feasible through bootstrapping~\cite{JC:BBBCLO23}.
+
+
+The design of \coolName has been the combination of two very different challenges: ensuring security in the sense of traditional cryptographic security, while being evaluable efficiently homomorphically in the encrypted space. This thesis being about the development of efficient homomorphic operations, we mainly focus on this aspect in this chapter. A full version of this work is available in \cite{EPRINT:BBBBCL25}, giving a more complete vision of the other aspect of the design. In particular, we present a careful analysis of the noise evolution throughout  the homomorphic evaluation of \coolName, to fine-tune the TFHE parameters for optimal performance. Our homomorphic implementation of \coolName{} significantly outperforms the state of the art, achieving a throughput of over 60 bits/s on a standard CPU. This represents a factor 3 speedup compared to \texttt{FRAST}~\cite{ToSC:CCHLOS24}, the fastest previous method, while also achieving a considerably lower error probability and eliminating the need for an expensive initialization phase.
+
+
+The chapter is structured as follows. Section~\ref{sec:constraints} discusses the design constraints for a stream cipher intended for use with TFHE, along with the design choices we made. The specification of \coolName{} and the reasoning behind its design is detailed in Section~\ref{sec:description}. Section~\ref{sec:security} provides a brief high-level summary of the security implications. Finally, Section~\ref{sec:bench} details the homomorphic implementation of our scheme, providing performance metrics and benchmarks.
+

@@ -36,7 +36,7 @@
 				\Return{$\vec{d}_{\text{sol}}$} \Comment*[r]{Propagate valid solution}
 			}
 			\Else{
-				$\vec{d} \gets \vec{d}[:j+1]$ \Comment*[r]{Backtrack}
+				$\vec{d} \gets \vec{d}[:j+1]$ \Comment*[r]{Backtrack by removing $x$ from the solution vector}
 			}
 		}
 		\Return{$\bot$} \Comment*[r]{All possibilities failed}
@@ -83,7 +83,7 @@
 	\Return{$S$}
 \end{algorithm}
 
-\TODO{Problème d'alignement ci-dessus}
+
 
 
 

@@ -1,0 +1,75 @@
+\begin{algorithm}[t!]
+    \caption{\texttt{Transistor.clock} - Produce $r$ encypted elements of the key stream}
+    \label{alg:transistor}
+    
+    % \KwContext{
+    %     $\left\{
+    %     \begin{array}{l}
+    %         \F_p: \text{ The field of embedding.}
+    %     \end{array}
+    %     \right.$
+    % }
+
+    \State{
+        $\left\{
+        \begin{array}{l}
+        	\mathcal K: \text{the LFSR used for the pseudo-keyschedule and its state (cf Algorithm \ref{alg:lsfr}).}\\
+            \mathcal W: \text{the LFSR used for the whitening.}\\	
+            X = \left ( \begin{array}{ccc}
+            x_{1,1} & \dots & x_{1,\sqrt{m}}\\
+            \dots & \dots & \dots\\
+            x_{\sqrt{m},1} & \dots & x_{\sqrt{m},\sqrt{m}}\\
+            \end{array} \right ): \text{ Encrypted state of the FSM} \\
+        \end{array}
+        \right.$
+    }
+
+    \KwResult{
+        $\left\{
+        \begin{array}{l}
+            Y = (y_1, \dots, y_r): \text{ Encryption of $r$ elements of the  key stream } \\
+        \end{array}
+        \right.$
+    }
+
+    % Add vertical space and horizontal line
+    \vspace{0.5em} % adjust the space as needed
+    \hrule
+    \vspace{0.5em} % adjust the space as needed
+
+    \Comment{Compute the pseudo-key schedule and adds it to the FSM}
+    \For{$i \in [1, \sqrt m]$}{
+        \For{$j \in [1, \sqrt m]$}{
+            $k_{i,j} \gets \pseudoKS.\texttt{clock}()$\\
+            $x_{i,j} \gets \texttt{SumTFHE}(x_{ij}, k_{i,j})$\\
+        }
+    }
+    \Comment{Compute $\subWords$ with a layer of PBS}
+    \For{$i \in [1, \sqrt m]$}{
+        \For{$j \in [1, \sqrt m]$}{        
+            $x_{i,j} \gets \texttt{PBS\_TFHE}(x_{i,j}, S)$\\
+        }
+    }
+    \Comment{Extract the output bits and whiten them}
+    $(y_1, \dots, y_r) \gets \phi(X)$\\
+    \For{$i \in [1, r]$}{
+        $w_i \gets \whitening.\texttt{clock}()$\\
+        $y_i \gets \texttt{SumTFHE}(y_i, w_i)$\\
+    }
+    \Comment{Compute $\shiftRows$, (same as in clear)}
+    $X \gets \shiftR(X)$
+
+    \Comment{Compute MixColumns}
+    \For{$i \in [1, \sqrt m]$}{
+        \For{$j \in [1, \sqrt m]$}{
+            $z_{i, j} \gets 0$\\
+            \For{$k \in [1, \sqrt m]$}{
+                $z_{i, j} \gets \texttt{SumTFHE}(z_{i, j}, \texttt{ClearMultTFHE}(x_{k, j}, MC_{i, k}))$\\
+            }
+        }
+    }
+
+    \Return{$Y$}
+
+\end{algorithm}
+

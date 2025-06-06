@@ -1,0 +1,62 @@
+%!TeX root = ../main.tex
+
+\begin{figure}[t!]
+  \centering
+    \footnotesize
+    \begin{tikzpicture}[xscale=0.9,yscale=0.45]
+      % LFSR interactions
+      \draw (-1, -0.5) rectangle (2, 0.5) node[pos=0.5]{$\pseudoKS$ {\tiny \emph{(Key Schedule)}}} ;
+      \draw (-1, 2.5) rectangle (2, 3.5) node[pos=0.5]{$\whitening$ {\tiny \emph{(whitening LFSR)}}} ;
+      \draw (3.5, 0) node[inner sep=0pt](addm){$\boxplus$} ;
+
+      \node at (0.5, -1) {$\sigma_{\text{fresh}}^{2}$};
+      \node at (0.5, 2) {$\sigma_{\text{fresh}}^{2}$};
+
+      \draw (2.7, -0.5) node[inner sep=0pt](varKS){$\sigma_\pseudoKS^2$} ;
+      \draw (4.5, 3.5) node[inner sep=0pt](varW){$\sigma_\whitening^2$} ;
+      \draw (7, -0.5) node[inner sep=0pt](varPBS){$\sigma_{\text{PBS}}^2$} ;
+      \draw (9.7, -0.5) node[inner sep=0pt](varSR){$\sigma_{\text{PBS}}^2$} ;
+      \draw (8, -1.6) node[inner sep=0pt](varMC){$\sigma^2_\mixC$} ;
+      \draw (4.35, 1.3) node(sum) {$\sigma_\pseudoKS^2+\sigma^2_\mixC$};
+      \draw[bend left=60,dashed] (sum) -- (4.2,0);
+      \draw (9, 3.5) node[inner sep=0pt](varout){$\sigma^2_{\text{out}}  = \sigma_\whitening^2 + \sigma_{\text{PBS}}^2$} ;
+
+      \draw[->] (2, 0) -- (addm) ;
+      \draw[->] (2.5, 0) -- (2.5, 1) -- (0.5, 1) -- (0.5, 0.5) ;
+      \draw[->] (2.5, 3) -- (2.5, 4) -- (0.5, 4) -- (0.5, 3.5) ;
+      % FSM
+      \draw[color=blue,style=dashed] (5, -0.5) rectangle (6, 0.5) node[pos=0.5]{$\subW$} ;
+      \draw (8, -0.5) rectangle (9, 0.5) node[pos=0.5]{$\shiftR$} ;
+      \draw (10.3, -0.5) rectangle (11.3, 0.5) node[pos=0.5]{$\mixC$} ;
+      \draw[->] (addm) -- (5, 0) ;
+      \draw[->] (6,0) -- (8, 0) ;
+      \draw[->] (9,0) -- (10.3, 0) ;
+      \draw[->] (11.3,0) -- (11.6, 0) -- (11.6, -2) -- (3.5, -2) -- (addm) ;
+      % extracting
+      \draw (6.5, 1) rectangle (7.5, 2) node[pos=0.5]{$\filter$} ;
+      \draw (7, 3) node[inner sep=0pt](addr){$\boxplus$};
+      \draw(11.3, 3) node(s){$Z_i$} ;
+      \draw[->] (2, 3) -- (addr) ;
+      \draw[->] (7, 0) -- (7, 1) ;
+      \draw[->] (7, 2) -- (addr) ;
+      \draw[->] (addr) -- (s) ;
+      % wire width
+      % \draw (4.45, -0.2) -- (4.55, 0.2) ;
+      % \draw (4.5, -0.5) node{$m$} ;
+      % \draw[color=lightgray] (4.45, 2.8) -- (4.55, 3.2) ;
+      % \draw[color=lightgray] (4.5, 3.5) node{$r$} ;
+    \end{tikzpicture}
+    \caption{\label{fig:noise}
+    Evolution of the noise variance in a homomorphic evaluation of \coolName. Operations involving PBSs are in blue and dashed.}
+\end{figure}
+
+
+% Leo: ce qui suit est pour qu'emacs compile bien l'article, pas touche !
+%%% Local Variables:
+%%% mode: latex
+%%% ispell-local-dictionary: "english"
+%%% TeX-master: "../main"
+%%% End:
+
+
+

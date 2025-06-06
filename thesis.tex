@@ -27,7 +27,7 @@
 \usetikzlibrary{arrows.meta, positioning, fit, calc}
 
 
-
+\usepackage{enumitem}
 \usepackage[algo2e]{algorithm2e} % for algorithms
 \usepackage{algorithm}
 \usepackage{algpseudocode}
@@ -38,24 +38,29 @@
 \usepackage{float}    % optional, for [H] positioning
 
 \usepackage{adjustbox}	% for table in Hippogryph
+\usepackage{mathtools}	% for \vcentcolon
 % --------------------------------------
 
 \definecolor{maincolor}{RGB}{36, 56, 141}
 \colorlet{secondarycolor}{violet}
 
 %%%==============================
-\title{My PhD Thesis}
+\title{Développement d'Opérations Optimisées pour la Cryptographie Homomorphe}
 
 \institute{l’École Normale Supérieure de Paris}
 \doctoralschool{Sciences Mathématiques de\\ Paris Centre}{386}
 \specialty{Informatique}
 
-\author{My Name}
-\date{10 Juin 2022}
-\jurymember{1}{Name 1}{Université 1}{Rapporteur}
-\jurymember{2}{Name 2}{Université 2}{Rapporteur}
-\jurymember{3}{Name 3}{Université 3}{Examinatrice}
-\jurymember{4}{Name 4}{Université 4}{Directeur de thèse}
+\author{Nicolas Bon}
+\date{TBC}
+\jurymember{1}{Caroline FONTAINE}{Université Paris-Saclay}{Rapportrice}
+\jurymember{2}{Pierre-Alain FOUQUE}{Université Rennes 1}{Rapporteur}
+\jurymember{3}{Ilaria CHILLOTI}{Desilo}{Examinatrice}
+\jurymember{4}{Adeline ROUX-LANGLOIS}{Normandie Université}{Examinatrice}
+\jurymember{5}{Renaud SIRDEY}{Commissariat à l'Energie Atomique}{Examinateur}
+\jurymember{6}{David POINTCHEVAL}{Ecole Normale Supérieure}{Directeur de thèse}
+\jurymember{7}{Sonia BELAÏD}{CryptoExperts}{Coencadrante de thèse}
+\jurymember{8}{Matthieu RIVAIN}{CryptoExperts}{Codirecteur de thèse}
 
 % Abstract/Résumé/Mots-clés/Keywords
 \frabstract{
@@ -133,13 +138,14 @@
 \input{tex/p_encodings/main_p_encodings.tex}
 
 
-\chapter{Accelerating AES evaluation}
+\chapter{Accelerating Homomorphic AES Evaluation}
 \label{chap:hyppogriph}
 \input{tex/hippogryph/main_hippogryph.tex}
 
 
-\chapter{More efficient transciphering with Transistor}
-
+\chapter[Better transciphering with Transistor]{Better transciphering with \texttt{Transistor}}
+\label{chap:transistor}
+\input{tex/transistor/main_transistor.tex}
 
 
 \chapter{Accelerating large look-up tables}

@@ -1,5 +1,5 @@
 \section{Algorithms of construction of gadgets}
-\label{sec:search}
+\label{sec:p_encodings_search}
 
 Let $f: \B^\ell \mapsto \B$ a Boolean function with $\ell$ entries. This section addresses the problem of constructing a gadget for $f$. To do so, we pick a value for $p$ and we search a vector of $\ell$ $p$-encodings $\Vec{\Encoding_{in}}$ suitable for $f$. 
 
@@ -11,16 +11,16 @@ While exhaustive search is a first option, it quickly becomes impractical due to
 We introduce two lemmas that will be used to reduce the search space:
 
 \begin{lemma} [Reducibility to singletons]
-    Let $f: \B^\ell \longrightarrow \B$ and let $(\Encoding_1, \dots, \Encoding_l)$ be a vector of $p$-encodings suitable for $f$ and having the form:
+    Let $f: \B^\ell \longrightarrow \B$ and let $(\Encoding_1, \dots, \Encoding_\ell)$ be a vector of $p$-encodings suitable for $f$ and having the form:
     $\forall~i \in \{1, \dots, \ell\}, \Encoding_i = \EncDef{\{x_j^{(i)}\}_{1 \le j \le l_0^{(i)}}}{\{y_j^{(i)}\}_{1 \le j \le l_1^{(i)}}}$.
-    Then any vector of canonical $p$-encodings $(\Encoding'_1, \dots, \Encoding'_l)$ of the form: $ \forall~i \in \{1, \dots, \ell\}, \Encoding'_i = \EncDef{\{x^{(i)}\}}{\{y^{(i)}\}}$ with $x^{(i)} \in \Encoding_i(0)$ and $ y^{(i)} \in \Encoding_i(1)$ is suitable for the function $f$ as well.
+    Then any vector of canonical $p$-encodings $(\Encoding'_1, \dots, \Encoding'_\ell)$ of the form: $ \forall~i \in \{1, \dots, \ell\}, \Encoding'_i = \EncDef{\{x^{(i)}\}}{\{y^{(i)}\}}$ with $x^{(i)} \in \Encoding_i(0)$ and $ y^{(i)} \in \Encoding_i(1)$ is suitable for the function $f$ as well.
     \label{lemma:reduction}
 \end{lemma}
 
 
 \begin{proof}
-Let us assume that the vector $\Encoding = (\Encoding_1, \dots, \Encoding_l)$ of Lemma \ref{lemma:reduction} is suitable for the function $f$. Then the sets $\mathcal{P}_0$ and $\mathcal{P}_1$ constructed like in Equation \ref{def:sets_p} are disjoint.
-Now, let us consider the vector of canonical $p$-encodings $\Encoding' = (\Encoding'_1, \dots, \Encoding'_l)$ respecting the property:
+Let us assume that the vector $\Encoding = (\Encoding_1, \dots, \Encoding_\ell)$ of Lemma \ref{lemma:reduction} is suitable for the function $f$. Then the sets $\mathcal{P}_0$ and $\mathcal{P}_1$ constructed like in Equation \ref{def:sets_p} are disjoint.
+Now, let us consider the vector of canonical $p$-encodings $\Encoding' = (\Encoding'_1, \dots, \Encoding'_\ell)$ respecting the property:
 $$
 \forall~b \ \in \B, \forall 
 ~i \in \{0, \dots, \ell\}, \Encoding'_i(b) \subset \Encoding_i(b).
@@ -30,15 +30,15 @@ As a consequence, if we build the sets $\mathcal{P'}_0$ and $\mathcal{P'}_1$ rel
 
 
 \begin{lemma}[Reducibility to the singleton zero]
-    Let $f: \B^\ell \longrightarrow \B$ and let $(\Encoding_1, \dots, \Encoding_l)$ be a vector of $p$-encodings suitable for $f$ and of the form: $\forall i \in \{1, \dots, \ell\}, \Encoding_i = \EncDef{\{x^{(i)}\}}{\{y^{(i)}\}}$
-    Then any vector of canonical $p$-encodings $(\Encoding'_1, \dots, \Encoding'_l)$ of the form: $\forall~i \in \{1, \dots, \ell\}, \Encoding'_i = \EncDefOne{y^{(i)} - x^{(i)}}$
+    Let $f: \B^\ell \longrightarrow \B$ and let $(\Encoding_1, \dots, \Encoding_\ell)$ be a vector of $p$-encodings suitable for $f$ and of the form: $\forall i \in \{1, \dots, \ell\}, \Encoding_i = \EncDef{\{x^{(i)}\}}{\{y^{(i)}\}}$
+    Then any vector of canonical $p$-encodings $(\Encoding'_1, \dots, \Encoding'_\ell)$ of the form: $\forall~i \in \{1, \dots, \ell\}, \Encoding'_i = \EncDefOne{y^{(i)} - x^{(i)}}$
     is suitable for the function $f$ as well.
     \label{lemma:enczero}
 \end{lemma}
 
 
 \begin{proof}
-Let $f: \B^\ell \longrightarrow \B$ be a function and $\Encoding$ be a vector of canonical $p$-encodings $(\Encoding_1, \dots, \Encoding_l)$ suitable for $f$ with:
+Let $f: \B^\ell \longrightarrow \B$ be a function and $\Encoding$ be a vector of canonical $p$-encodings $(\Encoding_1, \dots, \Encoding_\ell)$ suitable for $f$ with:
 $$
 \forall~i \in \{1, \dots, \ell\}, \Encoding_i = \EncDef{\{x^{(i)}\}}{\{y^{(i)}\}}.
 $$
@@ -59,10 +59,10 @@ By iterating this procedure on each of the $\ell$ elements of $\Encoding$, and b
 Using both Lemmas \ref{lemma:reduction} and \ref{lemma:enczero}, we can restrict the search to the encodings of the form $$\Encoding_i = \EncDefOne{d_i}$$ with $d_i \ne 0$ without any loss of generality. 
 
 
-Moreover, we restrict the solution further: we only consider $p$-encodings with $p$ \emph{odd} and \emph{prime}. The choice of an odd $p$ allows to free ourselves from the negacyclicity constraint (more about that in Section \ref{sec:solving_negacyclicity}). To explain the constraint of primality, we introduce the following lemma, that allows to drastically improve the performances of the search:
+Moreover, we restrict the solution further: we only consider $p$-encodings with $p$ \emph{odd} and \emph{prime}. The choice of an odd $p$ allows to free ourselves from the negacyclicity constraint. To explain the constraint of primality, we introduce the following lemma, that allows to drastically improve the performances of the search:
 
 \begin{lemma}
-    Let $p$ be a prime and $f:\B \longrightarrow \B$ be a Boolean function and let $\Encoding = (\Encoding_1, \dots, \Encoding_l)$ be $p$-encodings suitable for $f$ with: $\forall~i \in \{1, \dots, \ell\}, \Encoding_i = \EncDef{\{x^{(i)}\}}{\{y^{(i)}\}}$. For every $a \in \Z_p \setminus \{0\}$, the vector of $p$-encodings $\Encoding '= (\Encoding'_1, \dots, \Encoding'_l)$ with: $\Encoding'_i = \EncDef{\{[a \cdot x^{(i)}]_p\}}{\{[a \cdot y^{(i)}]_p\}}$
+    Let $p$ be a prime and $f:\B \longrightarrow \B$ be a Boolean function and let $\Encoding = (\Encoding_1, \dots, \Encoding_\ell)$ be $p$-encodings suitable for $f$ with: $\forall~i \in \{1, \dots, \ell\}, \Encoding_i = \EncDef{\{x^{(i)}\}}{\{y^{(i)}\}}$. For every $a \in \Z_p \setminus \{0\}$, the vector of $p$-encodings $\Encoding '= (\Encoding'_1, \dots, \Encoding'_\ell)$ with: $\Encoding'_i = \EncDef{\{[a \cdot x^{(i)}]_p\}}{\{[a \cdot y^{(i)}]_p\}}$
     is suitable for $f$ as well.
     \label{lemma:multiplication_in_prime_group}
 \end{lemma}
@@ -79,7 +79,7 @@ As a consequence, if $p$ is prime (which we shall always choose in practice), an
 
 \subsection{Formalization of the Search Problem}
 
-According to the lemmas from Section \ref{sec:restriction}, we can reduce the problem of finding a vector of $p$-encodings $(\Encoding_1, \dots, \Encoding_l)$ such that $f(\Encoding_1, \dots, \Encoding_l)$ is valid to the problem of finding a vector $\vec{d} = (d_1, \dots, d_l)$ such that $\Encoding_i = \EncDefOne{d_i}$ and $f(\Encoding_1, \dots, \Encoding_l)$ is valid. In the following, we describe an algorithm to find such a vector $\vec d$.
+According to the lemmas from Section \ref{sec:restriction}, we can reduce the problem of finding a vector of $p$-encodings $(\Encoding_1, \dots, \Encoding_l)$ such that $f(\Encoding_1, \dots, \Encoding_\ell)$ is valid to the problem of finding a vector $\vec{d} = (d_1, \dots, d_\ell)$ such that $d_1 = 1$, $\Encoding_i = \EncDefOne{d_i}$ and $f(\Encoding_1, \dots, \Encoding_\ell)$ is valid. In the following, we describe an algorithm to find such a vector $\vec d$.
 
 
 We denote $V$ the matrix of elements of $\B$ of shape $2^\ell \times \ell$ gathering all the possible sequences of entries for the function $f$:
@@ -87,6 +87,7 @@ We denote $V$ the matrix of elements of $\B$ of shape $2^\ell \times \ell$ gathe
 $$V = \left ( \begin{matrix}
 0 & \dots & 0 & 0\\
 0 & \dots & 0 & 1\\
+0 & \dots & 1 & 0\\
 \vdots & \ddots & \vdots & \vdots\\
 1 & \dots & 1 & 1
 \end{matrix}
@@ -95,7 +96,7 @@ $$V = \left ( \begin{matrix}
 Also, we denote by $\Vec{b}$ the vector of all the outputs of the function $f$, sorted in same order as the rows of $V$. Thus, we have: $\forall~i \in \{1, \dots, 2^\ell\}, b_i = f(V_i)$
 for $V_i$ the $i$th row of $V$. Let us define the vector $\vec r$ as: $\Vec{r} = V \vec{d}$. To make $\vec d$ a solution of the problem, $\vec r$ has to verify the following property:
 \[
-\forall~i, j \in \{1, \dots, 2^\ell\}^2, f(V_i) \neq f(V_j) \implies r_i \neq r_j   
+\forall~i, j \in \{1, \dots, 2^\ell\}, f(V_i) \neq f(V_j) \implies r_i \neq r_j   
 \]
 An alternative formulation is: we look for two disjoint subsets $\mathcal{P}_0$ and $\mathcal{P}_1$ of $\Z_p$, such that: $f(V_i) = b \Longleftrightarrow r_i \in \mathcal P_b$.
 
@@ -104,30 +105,30 @@ The following section describes an algorithm finding a solution to this problem.
 \subsection{Algorithm}
 \label{sec:search_algorithm}
 
-We start by constructing two sets $\mathcal F$ and $\mathcal T$ such that: \[\mathcal F = \{V_i \vert b_i = 0\} \text{ and } \mathcal T = \{V_i \vert b_i = 1\}.\]
+We start by constructing two sets $\mathcal F$ and $\mathcal T$ such that: \[\mathcal F = \{V_i ~\vert~ b_i = 0\} \text{ and } \mathcal T = \{V_i ~\vert~ b_i = 1\}.\]
 Each line $V_i$ represents a linear combination of the $d_j$'s, that verifies:
 \[r_i = \sum_{j=0}^{\ell} V_{ij} \cdot d_j \mod p.\]
 The values $r_i$ produced by the elements of $\mathcal{F}$ must be different from the ones produced by $\mathcal{T}$. As a consequence, we can write:
 \[\forall~(V_i, V_j) \in \mathcal F \times \mathcal T, \sum_{k=0}^\ell V_{ik} \cdot d_k \neq \sum_{k=0}^\ell V_{jk} \cdot d_k,\] which is equivalent to writing:
 \[\forall~(V_i, V_j) \in \mathcal F \times \mathcal T, \sum_{k=0}^\ell (V_{ik} - V_{jk}) \cdot d_k \neq 0.\]
-So we can rewrite our constraints in the set $\mathcal C =  \{V_i - V_j \vert (V_i, V_j) \in \mathcal F \times \mathcal T\}.$ $\mathcal{C}$ contains vectors with coordinates in $\{0, 1, -1\}$ representing linear combinations that have to be non-zero. Note that if an element of the set $\mathcal{C}$ is the opposite of an other, it does not bring further constraint and can thus be safely discarded from the set.
+So we can rewrite our constraints in the set $\mathcal C =  \{V_i - V_j ~\vert~ (V_i, V_j) \in \mathcal F \times \mathcal T\}.$ $\mathcal{C}$ contains vectors with coordinates in $\{0, 1, -1\}$ representing linear combinations that have to be non-zero. Note that if an element of the set $\mathcal{C}$ is the opposite of an other, it does not bring further constraint and can thus be safely discarded from the set.
 
 The use of a set in the implementation at this point of the algorithm allows to remove a lot of duplicate constraints and to simplify the next step. Then, the problem reduces to solving a ``linear system of inequalities'' in the ring $\Z_p$: 
 
 $$
 \begin{cases}
-    c_1^{(1)} \cdot d_1 + \dots + c_l^{(1)} \cdot d_l \ne 0 \mod p \\
-    c_1^{(2)} \cdot d_1 + \dots + c_l^{(2)} \cdot d_l \ne 0 \mod p\\
+    c_1^{(1)} \cdot d_1 + \dots + c_l^{(1)} \cdot d_\ell \ne 0 \mod p \\
+    c_1^{(2)} \cdot d_1 + \dots + c_l^{(2)} \cdot d_\ell \ne 0 \mod p\\
     \vdots
 \end{cases} \text{ with }
 c_i^{(j)} \in \{0, \pm 1\}
 $$
 
 
-After filtering, we pack all the elements of $\mathcal{C}$ in $\ell$ matrices $\{C_i\}_{1 \le i \le \ell}$ (each row being a linear combination), where the matrix $C_i$ packs all the constraints involving only the $i$ first inputs (i.e. all the coefficients of column index greater than $i$ are zeros).
+After filtering the duplicates, we pack all the elements of $\mathcal{C}$ in $\ell$ matrices $\{C_i\}_{1 \le i \le \ell}$ (each row being a linear combination), where the matrix $C_i$ packs all the constraints involving only the $i$ first inputs (i.e. all the coefficients of column index greater than $i$ are zeros).
 
 
-We then perform a recursive search (Algorithm \ref{alg:add_element}), affecting at each step of depth $i$ a possible value $d_i$ for the $i$-th input. To do so, we call Algorithm \ref{alg:get_possible_values} to construct the set of all possible values complying with the constraints of the matrix $C_i$ and the previously set values for the preceding inputs. If we reach a dead-end, we backtrack by deleting the preceding input and assigning it the next possible value. Algorithms \ref{alg:add_element} and \ref{alg:get_possible_values} formalize this idea: Algorithm \ref{alg:add_element} is a  basic recursive backtracking algorithm using calls to the set construction function (Algorithm \ref{alg:get_possible_values}) to get the possibilities for the next value of $\vec{d}$. The latter, when called at depth $j+1$, takes as input the 
+We then perform a recursive search (Algorithm \ref{alg:add_element}), affecting at each step of depth $i$ a possible value $d_i$ for the $i$-th input. To do so, we call Algorithm \ref{alg:get_possible_values} to construct the set of all possible values complying with the constraints of the matrix $C_i$ and the previously set values for the preceding inputs. If we reach a dead-end, we backtrack by deleting the previous input and assigning it the next possible value. Algorithms \ref{alg:add_element} and \ref{alg:get_possible_values} formalize this idea: Algorithm \ref{alg:add_element} is a  basic recursive backtracking algorithm using calls to the set construction function (Algorithm \ref{alg:get_possible_values}) to get the possibilities for the next value of $\vec{d}$. The latter, when called at depth $j+1$, takes as input the 
 $j$ values already computed at higher depth for $\vec{d}$ and the matrix of constraints $C_{j+1}$. Each line of $C_{j+1}$ creates a (potentially duplicate) forbidden value for $d_{j+1}$, these values are all computed and the complement of this set in $\Z_p$ is returned by the algorithm (i.e. the set for possible values for $d_{j+1}$ at this point of the search).
 
 \begin{theorem}
@@ -168,11 +169,10 @@ Figure \ref{fig:heatmap_success} shows the rate of success for random Boolean fu
 \end{figure}
 
 
-Figure \ref{fig:lineplot_timings} shows the evolution of the time of execution of the algorithm for random Boolean functions \emph{for which no solution exists}.  It shows the explosion of the complexity for high values of
-$p$, and justifies the need of a more efficient algorithm for those function (we introduce one in Section \ref{sec:graphs}).  
+Figure \ref{fig:lineplot_timings} shows the evolution of the time of execution of the algorithm for random Boolean functions \emph{for which no solution exists}. It shows the explosion of the complexity for high values of $p$, and justifies the need of a more efficient algorithm for those function (we introduce one in Section \ref{sec:p_encodings_graphs}).  
 
 
-\TODO{Harmoniser l'algorithme suivant (commenté)}
+
 \begin{figure}
     \centering
     \begin{minipage}{0.55\textwidth}
@@ -220,7 +220,7 @@ To reduce the amount of samples required to find a solution, we want to avoid sa
 
 
 \input{tex/algorithms/p_encodings/alg_heuristic_matthieu.tex}
-\TODO{Harmoniser ci-dessus}
+
 
 Running this algorithm several times and keeping the smallest returned value for $p$, one gets an upper bound on the minimum $p$ required to evaluate a function with our framework. Note that, on the contrary of the deterministic search algorithm, this heuristic does not require a prime $p$.
 

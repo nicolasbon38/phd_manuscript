@@ -21,7 +21,7 @@ A Boolean function can be represented by its \emph{truth table}, which is simply
     A Boolean circuit associated to the Boolean function $f$ is a finite Directed Acyclic Graph whose edges are \emph{wires} and vertices are \emph{Boolean gates} representing Boolean operations. We consider \texttt{AND} gates and \texttt{XOR} gates, of fan-in 2 and fan-out 1. We also consider copy gates, of fan-in 1 and fan-out $>1$, that outputs several copies of its input. A circuit is further formally composed of input gates of fan-in 0 and fan-out 1, and output gates of fan-in 1 and fan-out 0.
     
     Evaluating a $\ell$-input $m$-output circuit consists in writing an input $\vec{x} \in \B^\ell$ in the input gates, processing the gates from input gates to output gates, then reading the outputs from the output gates.
-
+	\label{def:boolean_circuit}
 \end{definition}
 
 

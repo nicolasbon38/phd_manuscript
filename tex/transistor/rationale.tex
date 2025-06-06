@@ -1,0 +1,57 @@
+
+
+\TODO{Ca c'est à nous donc je peux le laisser tel quel ?}
+% \section{Design Rationale}
+% \label{sec:rationale}
+
+% \lp{cette section ne contient finalement qu'une seule sous-section qui, je pense, pourrait être raccrochée à la section précédent (j'ai tendance à considèrer que la technique de contrôle du bruit fait partie de la description de Transistor)} \lp{J'ai implémenté le changement}
+
+
+\subsection{Controlling the Noise Evolution}% in the Homomorphic Evaluation}
+\label{sec:rationale-controllin-noise}
+
+We first detail the implementation of each building block of the scheme using TFHE, as this is essential to justify our design choices and to understand the evolution of the noise throughout the cipher. We then use this discussion to explain how the noise influences the overall security and efficiency of \coolName.
+
+\paragraph{LFSR.} A naive approach for implementing an LFSR  homomorphically would be to maintain an encrypted state, and update it by computing a linear combination with the feedback coefficients. However, this method would cause the noise in the state to accumulate over time, necessitating periodic use of PBS operations to refresh and control the noise growth. For this reason we introduce the principle of the \emph{silent LFSR}. Every output of an LFSR is a linear combination of the digits in its initial state. By computing on the fly the coefficients of these linear combinations in clear, we can evaluate the output of the LFSR at every clock cycle without updating an encrypted version of the internal state. This way, the noise variance in the output of the silent LFSR remains stable over time. This principle is comparable to the approach of {\tt FLIP}~\cite{EC:MJSC16} and follow-up works, whereby a key state is queried without being updated. 
+
+To bound the noise variance in the output of the silent LFSR, we consider the worst-case scenario in which all the coefficients in the linear combinations are of maximal absolute value, i.e., $\frac{p-1}{2}$.\footnote{Constant coefficients of $\mainField$ are encoded as integers of the interval $[-\frac{p-1}{2}, \frac{p-1}{2}]$ to minimize their absolute value and hence their impact on the noise.} The resulting noise variance is thus equal to the original noise variance multiplied by the worst-case squared $\ell_2$-norm. Specifically, in the output of the key schedule LFSR $\pseudoKS$ and of the whitening LFSR $\whitening$, the noise variances $\sigma_\pseudoKS^2$ and $\sigma_\whitening^2$ satisfy
+\begin{equation}
+  \sigma_\pseudoKS^2 \leq | \pseudoKS | \cdot \left(\frac{p-1}2\right)^2 \cdot \sigma_{\text{fresh}}^2 ~~~\text{and}~~~ \sigma_\whitening^2 \leq | \whitening | \cdot \left(\frac{p-1}2\right)^2 \cdot \sigma_{\text{fresh}}^2,
+\end{equation}
+where $\sigma_{\text{fresh}}^2$ is the noise variance of the encrypted key material in the LFSRs.
+
+\paragraph{SubDigits.} Each digit of the state of the FSM goes through a PBS that evaluates the permutation $\thesbox$. All PBSs can be evaluated in parallel for higher speed. We denote by $\sigma_{\text{PBS}}^2$ the noise variance at the output of $\subWords$ for encrypted digits.
+
+
+\paragraph{ShiftRows.} Since each digit in the state is encrypted in a separate ciphertext digit, this step involves simply rearranging the ciphertext digits within the state. Consequently, it incurs no additional noise growth and no performance impact.
+
+\paragraph{MixColumns.} This operation involves a straightforward linear combination of the digits of the state. The matrix $\mixmat$ has been specifically constructed to minimize the $\ell_2$-norm, considering coefficients in $\F_{17}$. %, while also ensuring optimal diffusion.
+From the homomorphic perspective, this choice is crucial, as the variance of the noise increases proportionally with the square of this $\ell_2$-norm, that we denote $L_{\mixC}$. Namely, the noise variance $\sigma^2_\mixC$ after  $\mixColumns$ satisfies $\sigma^2_\mixC = L_{\mixC }^2 \cdot \sigma_{\text{PBS}}^2.$
+
+
+\paragraph{Sums.} The output of $\mixColumns$ is then added to the next output of the LFSR to be injected again into $\subWords$. The noise variance after the addition step corresponds to the sum of both noise variances. Similarly, the noise variance at the output of the scheme, referred to as $\sigma^2_{\text{out}}$, is equal to the sum $\sigma_\whitening^2 + \sigma_{\text{PBS}}^2$.
+%\medskip
+
+\TODO{Figure Noise à changer}
+%\input{figures/noise}
+
+
+Figure~\ref{fig:noise} illustrates the evolution of the noise variance throughout the operations of \coolName.
+Building on the previous equations, the main constraints influencing the design of \coolName are related to the noise variance at both the input of the PBS and the output of the scheme. Specifically, the noise variance $\sigma_\pseudoKS^2+\sigma^2_\mixC$ at the input of the PBS (i.e., at input of $\subWords$) must remain sufficiently low, otherwise it could lead to a high probability of PBS failure. Additionally, the noise variance $\sigma^2_{\text{out}}  = \sigma_\whitening^2 + \sigma_{\text{PBS}}^2$ at the output stream must remain low enough for subsequent applications, ideally as close as possible to the nominal noise variance at the PBS output $\sigma_{\text{PBS}}^2$. In practical settings, we have $\sigma_{\text{PBS}}^2 \gg \sigma_{\text{fresh}}^2$, the noise variances from both LFSRs are negligible compared to $\sigma_{\text{PBS}}^2$. For example in our implementation, the noise magnitude of $\sigma_{\text{fresh}}$ is around $2^{14}$, while the noise magnitude of $\sigma_{\text{PBS}}$ is around $2^{52}$. Consequently, $\sigma^2_{\text{out}} \approx \sigma_{\text{PBS}}^2$ which validates the second constraint. Similarly, the noise variance at the input of the PBS is close to that at the output of $\mixColumns$. The latter additionally remains low due to the minimized $\ell_2$-norm of the coefficients of the MDS matrix $\mixmat$, thereby validating the first constraint.
+
+
+To wrap up, the design of \coolName{} allows to control the evolution of the noise in the FSM while getting a very low number of PBS per element. To complete our noise analysis, we need to set the parameters of the TFHE scheme to ensure the correctness of the PBS. Concretely, the noise \( \sigma_\pseudoKS^2 + \sigma^2_\mixC \) at the input of \( \subWords \) should be low enough to fail with a negligible probability. Of course, these parameters must ensure that the PBS operates as fast as possible while maintaining the security of the scheme. In Section~\ref{sec:tfhe-parameters}, we detail our method for selecting the parameters.
+
+
+
+
+
+% Leo: ce qui suit est pour qu'emacs compile bien l'article, pas touche !
+%%% Local Variables:
+%%% mode: latex
+%%% ispell-local-dictionary: "english"
+%%% TeX-master: "main"
+%%% End:
+
+
+

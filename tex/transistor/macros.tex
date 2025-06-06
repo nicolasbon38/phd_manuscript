@@ -1,0 +1,182 @@
+% Time-stamp: <2024-10-03 08:20:44 leo>
+
+\usepackage[utf8]{inputenc}
+\usepackage{cmap}
+
+\usepackage[english]{babel}
+
+
+%\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{dsfont}
+\usepackage{mathrsfs}
+
+\usepackage{hyperref}
+%\usepackage[a4paper,hmargin=1.5in,vmargin=1.5in]{geometry}
+\hypersetup{colorlinks = true, urlcolor = blue, linkcolor = blue, citecolor = red}
+\usepackage{cleveref}
+
+\usepackage{graphicx} % including pictures
+\usepackage[export]{adjustbox} % use max width and max height for figures
+
+
+\usepackage{caption}
+\captionsetup{labelfont={bf}}
+\captionsetup[table]{position=top}
+% \captionsetup[table]{format=hang,justification=raggedright,position=bottom,skip=15pt,textfont={sl},labelfont={bf}}
+% \captionsetup[figure]{format=hang,justification=raggedright,position=bottom,skip=15pt,textfont={sl},labelfont={bf}}
+
+\usepackage[algo2e]{algorithm2e} % for algorithms
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\algnewcommand{\LineComment}[1]{\State{\color{gray} \(\triangleright\) #1}}
+\usepackage{listings}
+
+
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{arrows}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{patterns}
+\usetikzlibrary{shapes}
+\usetikzlibrary{shadows}
+\usetikzlibrary{calc}
+\usetikzlibrary{math}
+\tikzstyle{fun}=[draw,very thick,fill=white]
+\tikzstyle{fork}=[shape=circle,inner sep=0pt,minimum size=3pt,fill=black]
+\tikzstyle{op}=[inner sep=2pt]
+
+\usepackage{ifthen}
+\usepackage{comment}
+
+\usepackage{booktabs}
+\usepackage{multirow}
+
+\usepackage{framed}
+\usepackage{fancybox}
+
+\newcommand\titledBox[2]{%
+  \vspace{0.5em}
+  \begin{center}
+    \boxput*(0,1){\colorbox{white}{\bfseries\sffamily #1}}{ %
+      \setlength\fboxsep{12pt}
+      \fbox{\begin{minipage}{12cm}
+          #2
+        \end{minipage}}}
+  \end{center}
+  \vspace{0.5em}
+}
+
+
+% To use monospace font in arrays easily
+\usepackage{array}
+\newcolumntype{t}{>{\tt}c}
+
+\usepackage{xspace}
+
+
+\newcommand\todo[1]{{\color{red}\textbf{TODO:} #1}}
+
+% \theoremstyle{theorem}
+% \newtheorem{theorem}{Theorem}
+% \newtheorem{maintheorem}{Main Theorem}
+% \newtheorem{proposition}{Proposition}
+% \newtheorem{conjecture}{Conjecture}
+% \newtheorem{observation}{Observation}
+% \newtheorem{goal}{Goal}
+% \newtheorem{lemma}{Lemma}
+% \newtheorem{corollary}{Corollary}
+% \newtheorem{openproblem}{Open Problem}
+
+% \theoremstyle{definition}
+% \newtheorem{definition}{Definition}
+% \newtheorem{caution}{Caution}
+
+% \theoremstyle{remark}
+% \newtheorem{remark}{Remark}
+
+\newcommand\constraints{\emph{\color{red}+1}}
+
+\newcommand\LL{\mathcal{L}}
+\newcommand\Z{\mathcal{Z}}
+\newcommand\F{\mathbb{F}}
+\newcommand\ftwo{\mathbb{F}_2}
+\newcommand\field[1]{\mathbb{F}_{#1}}
+\newcommand\Zmod[1]{\mathbb{Z}/ {#1} \mathbb{Z}}
+\newcommand\proba[1]{\mathrm{Pr}\left[ #1  \right]}
+\newcommand\pr[0]{\mathrm{Pr}}
+\newcommand\bigoh{\mathrm{O}}
+\newcommand\trace{\mathrm{Tr}}
+\newcommand\traceSub[1]{\mathrm{Tr}_{#1}}
+\newcommand\charac[1]{\mathds{1}_{#1}}
+
+\newcommand\xor{\textsc{xor}}
+\newcommand\xored{\textsc{xor}ed}
+\newcommand\xors{\textsc{xor}s}
+\newcommand\Tand{\textsc{And}}
+\newcommand\Tands{\textsc{And}s}
+
+\newcommand\kronecker[2]{\delta\left( #1, #2 \right)}
+\newcommand\scalarprod[2]{#1 \cdot #2}
+\newcommand\walsh[1]{\mathcal{W}_{#1}}
+\newcommand\ddt[1]{\delta_{#1}}
+\newcommand\identity{\mathcal{I}}
+\newcommand\hweight[1]{\mathrm{hw}\left( #1 \right)}
+\newcommand\coveredby{\preccurlyeq}
+\newcommand\lat[1]{\mathcal{W}_{#1}}
+
+\newcommand\ind[1]{\mathbf{1}_{#1}}
+\newcommand\linearspan[1]{\langle #1 \rangle}
+\newcommand\rank{\mathrm{rank}}
+\newcommand\extract[1]{\mathcal{X}_{#1}}
+\newcommand\walshZeroes[1]{\mathcal{Z}_{#1}}
+\newcommand\ddtZeroes[1]{\mathcal{Z}^D_{#1}}
+
+\newcommand\spaceInput{\mathcal{V}}
+\newcommand\spaceOutput{\mathcal{V}^{\perp}}
+\newcommand\matSwap[1]{M_{#1}}
+\newcommand\maj{\mathrm{maj}}
+\newcommand\twistable[1]{#1-twistable}
+\newcommand\twotwoMat[4]{\left[ \begin{array}{cc} #1 & #2 \\ #3 & #4 \end{array} \right]}
+
+\newcommand\qualDiff[1]{\mathsf{A}^{\mathrm{d}}_{ #1 }}
+\newcommand\qualLin[1]{\mathsf{A}^{\ell}_{ #1 }}
+
+\newcommand\addeq[2]{#1 \stackrel{\oplus}{\sim} #2}
+\newcommand\multeq[2]{#1 \stackrel{\odot}{\sim} #2}
+
+% \newcommand\jacobian[2]{\mathrm{Jac}_{#2}#1}
+
+
+%% Macros Alain
+%% Vectors
+\newcommand{\word}[1]{\ensuremath{\boldsymbol{#1}}}
+\newcommand{\av}{\word{a}}
+\newcommand{\bv}{\word{b}}
+\newcommand{\cv}{\word{c}}
+\newcommand{\dv}{\word{d}}
+\newcommand{\ev}{\word{e}}
+\newcommand{\gv}{\word{g}}
+\newcommand{\hv}{\word{h}}
+\newcommand{\mv}{\word{m}}
+\newcommand{\pv}{\word{p}}
+\newcommand{\uv}{\word{u}}
+\newcommand{\vv}{\word{v}}
+\newcommand{\wv}{\word{w}}
+\newcommand{\xv}{\word{x}}
+\newcommand{\yv}{\word{y}}
+\newcommand{\zv}{\word{z}}
+
+\newcommand{\GL}[2]{\mathbf{GL}_{#1}(#2)}
+
+\newcommand\numberApprox{\mathcal{A}}
+
+
+%% Comments
+\newcommand{\anne}[1]{\textcolor{green}{\bf [Anne : #1]}}
+\newcommand{\alain}[1]{\textcolor{blue}{\bf [Alain : #1]}}
+\newcommand{\leo}[1]{\textcolor{red}{[Léo : #1]}}
