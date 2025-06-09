@@ -6,6 +6,8 @@
 \definecolor{fhecolorinner}{HTML}{5eaaa9}
 \newcommand{\fhecolor}{fhecolorinner}
 
+\definecolor{fhecolorbisinner}{HTML}{a95eaa}
+\newcommand{\fhecolorbis}{fhecolorbisinner}
 
 
 \pgfmathsetmacro{\sizenode}{1}
@@ -43,11 +45,15 @@
 
 
 \newcommand{\homomorphicoperator}[4]{
-	\node [draw=#1, rectangle, very thick, pattern={Lines[angle=45, line width=1mm, distance=3mm]}, pattern color=\fhecolor!50, minimum width=\sizenode cm, minimum height=\sizenode cm] (#2) at (#3) {#4};
+	\node [draw=#1, rectangle, very thick, pattern={Lines[angle=45, line width=1mm, distance=3mm]}, pattern color=#1!50, minimum width=\sizenode cm, minimum height=\sizenode cm] (#2) at (#3) {#4};
 	
 	% Overlay the smaller image in the lower right corner
 	\node[anchor=south west, inner sep=0pt] at ($(#2.north east) + (-0.3, -0.2)$) {
-		\includegraphics[width=\sizeindice cm]{img/blocks_from_slides/assets/evaluation_key.png} % Smaller image
+		\ifthenelse{\equal{#1}{\fhecolor}}{%then
+				\includegraphics[width=\sizeindice cm]{img/blocks_from_slides/assets/evaluation_key.png} % Smaller image
+		}{%else
+				\includegraphics[width=\sizeindice cm]{img/blocks_from_slides/assets/evaluation_key_bis.png} % Smaller image
+		}
 	};
 }
 
@@ -70,4 +76,8 @@
 \newcommand{\fhedata}[1]{\encryptedvalue{data.png}{\fhecolor}{#1}{data_fhe}}
 \newcommand{\encryptedkey}[1]{\encryptedvalue{red_key.png}{\fhecolor}{#1}{encrypted_key}}
 \newcommand{\fheresult}[1]{\encryptedvalue{results.png}{\fhecolor}{#1}{result_fhe}}
+¨
 
+\newcommand{\bootstrappingkey}[1]{\encryptedvalue{green_key.png}{\fhecolorbis}{#1}{bootstrapping_key}}
+\newcommand{\bootstrapping}[1]{\homomorphicoperator{\fhecolorbis}{bootstrapping}{#1}{$\textsf{Dec}_{\textsf{FHE}}$}}
+\newcommand{\fhedatabis}[1]{\encryptedvalue{data.png}{\fhecolorbis}{#1}{data_fhe_bis}}

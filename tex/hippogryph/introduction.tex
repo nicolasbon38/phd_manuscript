@@ -1,4 +1,4 @@
-The last example of application of the previous chapter was to evaluate homomorphically the AES cipher. But why would someone need to do such a thing ?
+The last example of application of the previous chapter was to evaluate homomorphically the AES cipher.  But why would one want to perform such a computation in the first place?
 
 There are two answers to this question. First,  AES is a particularly interesting benchmark, as an example of a nontrivial algorithm which has eluded ``practical'' FHE execution performances for years. This is part of the reason why it will most likely be selected by NIST as a flagship reference in its upcoming call on threshold (homomorphic) cryptography \cite{call_nist}. Since 2023, the algorithm has thus been the subject of a renewed attention from the FHE community and has served as a playground to test advanced operators\cite{DBLP:conf/wahc/TramaCBS23, ISC:WWLLL23, TCHES:BonPoiRiv24, TCHES:WLWLLW24}. AES is particularly interesting as a benchmark notably because of the tension between boolean- and byte-oriented operations within the algorithm.
 
@@ -10,12 +10,12 @@ In this chapter, we introduce \hippo, the fastest homomorphic implementation of 
 
 \begin{itemize}
 	\item[-] We generalized the $p$-encoding construction introduced in Chapter \ref{chap:p_encodings} to the arithmetic case.
-	\item[-] The LUT-oriented implementation of \cite{DBLP:conf/wahc/TramaCBS23} is extremely efficient to evaluate the large Sbox of AES, so we borrowed this idea as it was.
+	\item[-] The LUT-oriented implementation of \cite{DBLP:conf/wahc/TramaCBS23} is very efficient to evaluate the large Sbox of AES, so we borrowed this idea as it was.
 	\item[-] We associated both previous techniques by developing a framework of conversion between Boolean and arithmetic representations.
 \end{itemize}
 
 
-The result of this work is doubly interesting: first, we manage tu outperform the rest of the literature on homomorphic AES evaluation. Second, we develop a generic framework useful to resolve the recurring tension between Boolean and arithmetic representations within homomorphic circuits, which we believe is of independent interest.
+The result of this work is doubly interesting: first, we manage to outperform the rest of the literature on homomorphic AES evaluation. Second, we develop a generic framework useful to resolve the recurring tension between Boolean and arithmetic representations within homomorphic circuits, which we believe is of independent interest.
 
 
 We start this chapter by introducing the notion of transciphering in Section \ref{sec:transciphering}, which will be a recurring theme in the rest of this manuscript. Then, after some preliminaries on the AES cipher (Section \ref{sec:preliminaries_aes}), we introduce in Section \ref{sec:previous-blocks} some advanced homomorphic operators from \cite{DBLP:conf/wahc/TramaCBS23} that will be useful in this work. We then generalize the $p$-encoding construction of Chapter \ref{chap:p_encodings} to the arithmetic case (Section \ref{sec:generalization_p_encodings}). Finally, Section~\ref{sec:hippogryph_our_work} introduces our new design and Section~\ref{sec:comparison} presents a detailed comparison with existing approaches, supported by relevant benchmarks.

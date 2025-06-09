@@ -1,0 +1,23 @@
+%!TEX root = ../../thesis.tex
+\begin{tikzpicture}
+	\bootstrapping{$(0, 0)$}
+	
+	\fhedatabis{$(bootstrapping.east) + (2, 0)$}
+	
+	\fhedata{$(bootstrapping.west) - (2, 0)$}
+
+	\bootstrappingkey{$(bootstrapping.south) - (0, 2)$}
+	
+	\draw[-latex] (data_fhe) -- (bootstrapping); 
+	\draw[-latex] (bootstrapping) -- (data_fhe_bis);
+	\draw[-latex] (bootstrapping_key) -- (bootstrapping);
+	
+	\node at ($(data_fhe) - (1, -1)$){\verticalgauge{90}};
+	
+	\node at ($(bootstrapping_key) - (1, 1)$){\verticalgauge{20}};
+	
+	\node at ($(data_fhe_bis) - (1, -1)$){\verticalgauge{40}};
+\end{tikzpicture}
+
+
+% #1 = scale, #2 = height, #3 = level (0–100)

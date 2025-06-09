@@ -182,6 +182,8 @@
 		\pgfmathsetmacro{\start}{int(\N * (\p - 0.5) / \p)}
 		\pgfmathsetmacro{\endval}{\N - 1}
 		
+		
+		
 		% Compute centered color index
 		\pgfmathsetmacro{\colorIndex}{0}
 		
@@ -199,6 +201,14 @@
 		anchor=west
 		] at ({\p*\boxwidth}, 0)
 		{\footnotesize $-f(0) X^{\start} + \dots$};
+		
+		% With hatches
+		\path[
+		pattern={Lines[angle=45, distance=4pt, line width=0.7pt]},
+		pattern color=black,
+		opacity=0.5
+		]
+		({\p*\boxwidth}, 0.25) rectangle ++(\boxwidth/2, -0.5); % Adjust vertical size as needed
 			
 	\end{tikzpicture}
 }

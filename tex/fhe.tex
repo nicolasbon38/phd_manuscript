@@ -14,7 +14,7 @@
 
 
 
-\TODO{Citer l'historique des schémas partiellements homomorphes, et des trucs "à niveaux" comme DHGV}
+\TODO{}
 
 
 
@@ -37,19 +37,34 @@ Imagine the server has a ciphertext $\vec c_1$ encrypting the (noisy) message $m
 
 To do so, the client needs to give to the server a \textit{bootstrapping key} $\BSK$. In order to create it, the client can treat the secret key $\vec s_1$ as a message and encrypt it under another secret key $s_2$ to produce $\BSK = \texttt{Enc}_{s_2}(s_1)$. Now, if the server computes \textit{homomorphically} the decryption of $c_1$ using $\BSK$, it retrieves an encryption $\vec c_2$ of the same message under the secret key $\vec s_2$. But because, decryption removes noise, $e_1$ disappears and the ciphertext is fresh again !
 
-Actually, \textit{all} the noise does not get removed (this would not be desirable, because all the security of the encryption relies on the presence of noise in the ciphertexts). As there is some noise in $\BSK$, the result $\vec c_2$ carries some noise $e_2$. But if things are well dimensioned, it is possible to get $e_2 \ll e_1$ and so retrieve some room for further computations.
+Actually, \textit{all} the noise does not get removed (this would not be desirable, because all the security of the encryption relies on the presence of noise in the ciphertexts). As there is some noise in $\BSK$, the result $\vec c_2$ carries some noise $e_2$. But if things are well dimensioned, it is possible to get $e_2 \ll e_1$ and so retrieve some room for further computations. We illustrate the bootstrapping principle in Figure \ref{fig:bootstrapping_principle}.
 
 
 Gentry's original scheme was merely theoretical, because the homomorphic operations and in particular the bootstrapping was extremely slow. But since then, significant improvements have been achieved in FHE efficiency. Modern schemes are on the verge of being usable in practice for some use-cases. In the next section, we give a tour of the modern schemes and libraries that makes the FHE landcape as of today.
 
-\TODO{Faire une figure qui explique l'utilisation classique, l'utilisation du FHE, et une figure qui vulgarise le bootstrapping}
+
 
 \begin{figure}
 	\centering
 	\include{img/blocks_from_slides/simple_fhe.tex}
-	\caption{The classical use of FHE}
+	\captionsetup{singlelinecheck=off}
+	\caption[]{An illustration of the transciphering process: \\
+		\begin{enumerate}
+			\item TOWRITE
+		\end{enumerate}
+		The red color is for symmetric algorithms, green for FHE, and hatched algorithms means that they are evaluated homomorphically.
+	}
 	\label{fig:classical_usage_fhe}
 	\TODO{Détailler caption + compacter pour que l'ensemble tienne sur une page + référencer dans le texte}
+\end{figure}
+
+
+
+\begin{figure}
+	\centering
+	\include{img/blocks_from_slides/bootstrappable_schema.tex}
+	\caption{High-level overview of the bootstrapping principle.}
+	\label{fig:bootstrapping_principle}
 \end{figure}
 
 

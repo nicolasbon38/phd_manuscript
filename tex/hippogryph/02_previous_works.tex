@@ -2,7 +2,6 @@
 \section{Some Building Blocks for LUT-based Evaluation}
 \label{sec:previous-blocks}
 
-\TODO{Réécrire pour éviter le plagiat}
 
 In this section, we present the approach from \cite{DBLP:conf/wahc/TramaCBS23}, some components of which we use for our own work. We formally present some advanced homomorphic primitives used in this work that we reuse as well.
 
@@ -11,14 +10,14 @@ In this section, we present the approach from \cite{DBLP:conf/wahc/TramaCBS23}, 
 
 \subsection{AES Subroutines as LUTs}
 
-The \SubBytes step, which involves the evaluation of an Sbox, is inherently a LUT operation and is therefore naturally implemented in FHE using a PBS. However, it must be evaluated over $\Z_{16}$ rather than $GF(256)$ for efficiency reasons. Converting the other AES steps into LUT evaluations also requires additional effort.
+	The \SubBytes step, which involves the evaluation of an S-box, is inherently a LUT operation and is therefore naturally implemented in FHE using a PBS. However, it must be evaluated over $\Z_{16}$ rather than $\F_{256}$ for efficiency reasons. Converting the other AES steps into LUT evaluations also requires additional effort.
 
-In particular, in the original AES design \cite{aes-original}, the \MixColumns step is computed using a series of XOR operations and multiplications in $GF(256)$. Unfortunately, TFHE’s native cleartext-ciphertext multiplication cannot directly handle these $GF(256)$ multiplications because of the polynomial nature of the elements of this field. As a result, \MixColumns must be reformulated as a LUT evaluation.
+In particular, in the original AES design \cite{aes-original}, the \MixColumns step is computed using a series of XOR operations and multiplications in $\F_{256}$. Unfortunately, TFHE’s native cleartext-ciphertext multiplication cannot directly handle these $\F_{256}$ multiplications because of the polynomial nature of the elements of this field. As a result, \MixColumns must be reformulated as a LUT evaluation.
 
 Additionally, the \AddRoundKey step, which uses XOR as its key operation, presents its own challenges because XOR is a bivariate operation that requires two inputs. Classical bootstrapping, which operates on single inputs, is insufficient for this purpose. To address this, the authors utilize a specialized bootstrapping method that supports operations on multiple encrypted inputs.
 
 \subsection{LUTs Evaluation} 
-Since the AES evaluation involves computing an 8-bit Sbox, a straightforward solution would be to work with 8-bit messages. With such messages, the homomorphic Sbox evaluation would require only one bootstrapping per byte. However, processing messages with more bits significantly slow down the bootstrapping process. For example, with 8-bit inputs, TFHE parameters result in bootstrapping times of approximately 1.5 seconds per byte on a standard laptop, making direct evaluation of the 8-bit Sbox (and other LUTs) infeasible.
+Since the AES evaluation involves computing an 8-bit S-box, a straightforward solution would be to work with 8-bit messages. With such messages, the homomorphic S-box evaluation would require only one bootstrapping per byte. However, processing messages with more bits significantly slow down the bootstrapping process. For example, with 8-bit inputs, TFHE parameters result in bootstrapping times of approximately 1.5 seconds per byte on a standard laptop, making direct evaluation of the 8-bit S-box (and other LUTs) infeasible.
 
 To address this issue, \cite{DBLP:conf/wahc/TramaCBS23} proposes a decomposition approach and demonstrates that the optimal representation of 8-bit inputs for their purpose is in $\Z_{16}$. Specifically, a message $m \in \{0, \cdots, 255\}$ is split into two 4-bit chunks (or \emph{nibbles}) $h$ and $l$ such that $m = 16h+l$. The encryption of $m$ is then represented as two ciphertexts encrypting $h$ and $l$ with the same key $\lweSecretKey$.
 
@@ -62,9 +61,9 @@ Finally, at the cost of a single $\BlindRotate$ and $k$ cleartext-ciphertext GLW
     \label{fig:mvb}
 \end{figure}
 
-This MVB primitive thus allows significant speed-ups in the implementation of \cite{DBLP:conf/wahc/TramaCBS23}, in particular in the evaluation of the Sbox or in the multiplications in $GF(256)$ that occur during the \MixColumns step. Indeed, since each byte is decomposed into two nibbles $h$ and $l$, the LUT corresponding, for instance, to the Sbox must also be decomposed into two tables: one providing the most significant nibble and one providing the least significant nibble. That is to say: 
+This MVB primitive thus allows significant speed-ups in the implementation of \cite{DBLP:conf/wahc/TramaCBS23}, in particular in the evaluation of the S-box or in the multiplications in $\F_{256}$ that occur during the \MixColumns step. Indeed, since each byte is decomposed into two nibbles $h$ and $l$, the LUT corresponding, for instance, to the S-box must also be decomposed into two tables: one providing the most significant nibble and one providing the least significant nibble. That is to say: 
 $$
-\texttt{tab}_{\textsc{msn}}[i] = \left\lfloor \frac{\texttt{Sbox}[i]}{16} \right\rfloor \quad \text{and} \quad \texttt{tab}_{\textsc{lsn}}[i] = \texttt{Sbox}[i] \mod 16.
+\texttt{tab}_{\textsc{msn}}[i] = \left\lfloor \frac{\texttt{S-box}[i]}{16} \right\rfloor \quad \text{and} \quad \texttt{tab}_{\textsc{lsn}}[i] = \texttt{S-box}[i] \mod 16.
 $$
 Each of these tables must be evaluated on an 8-bit payload ciphertext. 
 
@@ -112,7 +111,7 @@ In the implementation described in \cite{DBLP:conf/wahc/TramaCBS23}, this primit
 %
 To further enhance the performance of the TBM, the blind rotations for the accumulators $acc_i(X)$ of \emph{the first layer of the tree} can be performed simultaneously using the MVB technique (as discussed in~\cite{TCHES:GuiBorAra21}). 
 
-Finally, the ``full-LUT'' approach facilitates efficient computation of the Sbox through the Tree-Based Method, as opposed to directly evaluating the corresponding Boolean circuit. However, this approach also requires LUT-based computation of XOR operations and other intermediary steps, which is notably slower when operating in $\Z_{16}$ compared to binary messages. Consequently, our new method \hippo{} proposed in this chapter strategically applies LUT evaluation exclusively where it is most effective and yields the best performance, namely for the evaluation of the Sbox.
+Finally, the ``full-LUT'' approach facilitates efficient computation of the S-box through the Tree-Based Method, as opposed to directly evaluating the corresponding Boolean circuit. However, this approach also requires LUT-based computation of XOR operations and other intermediary steps, which is notably slower when operating in $\Z_{16}$ compared to binary messages. Consequently, our new method \hippo{} proposed in this chapter strategically applies LUT evaluation exclusively where it is most effective and yields the best performance, namely for the evaluation of the S-box.
 
 
 
@@ -128,7 +127,7 @@ In this method, data is encrypted bit per bit and only Boolean operations are pe
 %
 Furthermore, because operations are performed on individual bits, the \ShiftRows transformation can be evaluated for free, as it merely involves rearranging the ciphertexts.
 
-Evaluating \SubBytes is trickier. Using $p=2$, it is impossible to perform a bivariate Boolean gate other than XOR. Thus, evaluating the Boolean circuit of the Sbox cannot be done. Thanks to the notion of $p$-encoding, we embedded the bits into a larger space $\Z_p$ with $p > 2$ to construct other Boolean gates.  
+Evaluating \SubBytes is trickier. Using $p=2$, it is impossible to perform a bivariate Boolean gate other than XOR. Thus, evaluating the Boolean circuit of the S-box cannot be done. Thanks to the notion of $p$-encoding, we embedded the bits into a larger space $\Z_p$ with $p > 2$ to construct other Boolean gates.  
 
 In this chapter, we now generalize this notion beyond the Boolean case by defining the $(o, p)$- encoding construction. Informally, instead of embedding the Boolean space in $\Z_p$, we embed any space $\Z_o$ in $\Z_p$ (with $o < p$). So, what was called $p$-encoding in Chapter \ref{chap:hyppogriph} corresponds to a $(2, p)$-encoding in this one.
 %

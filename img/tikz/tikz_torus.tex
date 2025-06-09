@@ -202,6 +202,15 @@
 		\draw[thick, fill=mycolor, opacity=0.5]
 		(\angleA:\radiusInner) arc[start angle=\angleA, end angle=\angleB, radius=\radiusInner] --
 		(\angleB:\radiusOuter) arc[start angle=\angleB, end angle=\angleA, radius=\radiusOuter] -- cycle;
+	
+		% 2. Hatching pattern on top (with transparency)
+		\pgfmathparse{(\i >= \p/2 - \p/(4 * \pColor)) && \i <= \p/2}
+		\ifnum\pgfmathresult=1
+			\path[pattern=north east lines, pattern color=black, opacity=0.5]
+			(\angleA:\radiusInner) arc[start angle=\angleA, end angle=\angleB, radius=\radiusInner] --
+			(\angleB:\radiusOuter) arc[start angle=\angleB, end angle=\angleA, radius=\radiusOuter] -- cycle;
+		\fi
+		
 		%
 		\ifthenelse{\equal{#4}{true}}{%
 			\node[rotate=\angleMid - 90] at (\angleMid:\radiusMid) {\small \i};
@@ -210,7 +219,9 @@
 			\draw[dashed] (0,0) -- (\angleA:\radiusInner);
 			\draw[dashed] (0,0) -- (\angleB:\radiusInner);
 		}{}
+			
 	}
+	
 	\draw[thick] (0,0) circle (\radiusOuter);
 	\draw[thick] (0,0) circle (\radiusInner);
 }

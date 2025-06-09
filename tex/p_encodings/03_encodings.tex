@@ -302,5 +302,10 @@ These techniques are powerful because they do not require any bootstrapping, so 
 \end{property} 
 
 
+\paragraph{Note for $p = 2$}: The case $p = 2$ is particular: we can observe that valid 2-encodings are automatically negacyclic. Moreover, they allow to evaluate the XOR operation by simply performing an homomorphic sum (so without bootstrapping). So it might be efficient to switch between $2$-encodings for XOR
+operations and $p$-encodings (with odd $p$) for non-linear Boolean functions. We make use
+of this strategy in our implementation of the Keccak permutation in Section \ref{sec:keccak} and for
+the AES in Seciton \ref{sec:p_encodings_aes}.
+
 
 

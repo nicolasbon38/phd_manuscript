@@ -1,0 +1,403 @@
+\begin{tikzpicture}[scale=0.35, transform shape]
+	\definecolor{nibblecolorinner}{HTML}{003f5c}
+	\newcommand{\nibblecolor}{nibblecolorinner}
+	
+	\definecolor{bitcolorinner}{HTML}{ffa600}
+	\newcommand{\bitcolor}{bitcolorinner}
+	
+	\definecolor{operatorcolorinner}{HTML}{ff6361}
+	\newcommand{\operatorcolor}{operatorcolorinner}
+	
+	\definecolor{blockcolorinner}{HTML}{ff6361}
+	\newcommand{\blockcolor}{blockcolorinner}
+	
+	\def\bitsize{1}
+	\def\bitspacing{0.2}
+	\def\nibblewidth{4}
+	\def\nibbleheight{1}
+	\def\nibblespacing{0.8}
+	
+	
+	\pgfmathsetmacro{\halfwidth}{\nibblewidth / 2}
+	
+	
+	\def\metablockspacing{2}
+
+
+	
+	\pgfmathsetmacro{\subbyteswidth}{3 * \nibblewidth + 2 * \nibbleheight + 2 * \nibblespacing}
+	\pgfmathsetmacro{\subbytesheight}{2 * \nibblewidth + 3 * \nibblespacing}
+	
+	\pgfmathsetmacro{\decomposerwidth}{9 * \bitsize + 6 * \bitspacing + 2 * \nibblespacing}
+	\pgfmathsetmacro{\decomposerheight}{3 * \nibblewidth + 2 * \nibblespacing + \nibbleheight + \bitsize}
+	
+	
+	\pgfmathsetmacro{\circuitsize}{11 * \bitsize + 8 * \bitspacing}
+	\pgfmathsetmacro{\linearcircuitwidth}{\circuitsize + 6 * \bitsize + 2 * \bitspacing}
+	\pgfmathsetmacro{\linearcircuitheight}{\circuitsize + 2 * \bitspacing}
+	
+		\pgfmathsetmacro{\recomposerwidth}{9 * \bitsize + 6 * \bitspacing + 2 * \nibblespacing}
+	\pgfmathsetmacro{\recomposerheight}{2 * \nibblespacing + 3 * \nibblewidth + 3 * \bitsize + \nibbleheight}
+	
+	
+	\pgfmathsetmacro{\xsubbytes}{\recomposerwidth + \metablockspacing}
+	\def\ysubbytes{0}
+	
+		\def\xdecomposer{2 * \metablockspacing + \recomposerwidth + \linearcircuitwidth}
+	\def\ydecomposer{- \metablockspacing - \subbytesheight}
+	
+	
+		\def\xlinearcircuit{\recomposerwidth + \metablockspacing}
+	\def\ylinearcircuit{- 2 * \metablockspacing - \recomposerheight - \subbytesheight}
+	
+		\def\xrecomposer{0}
+	\def\yrecomposer{-\subbytesheight - \metablockspacing}
+	
+	
+	
+	% define the syle of teh arrows
+	\tikzset{
+		myarrow/.style={
+    -{Latex[length=6pt, width=8pt]}, % bigger head
+			thick,           % or any line width
+			blue,            % or any color
+			line cap=round,  % optional: smoother arrow ends
+		}
+	}
+	
+	
+	 % Define the "nibble" pic
+	\tikzset{
+		pics/vertical_nibble/.style args={#1}{
+			code={
+				\node[draw, minimum width=\nibbleheight cm, minimum height=\nibblewidth cm, anchor=north west, fill=\nibblecolor, fill opacity=0.2] (#1) at (0,0) {};
+			}
+		}
+	}
+	
+	\tikzset{
+		pics/horizontal_nibble/.style args={#1}{
+			code={
+				\node[draw, minimum width=\nibblewidth cm, minimum height=\nibbleheight cm, anchor=north west, fill=\nibblecolor, fill opacity=0.2] (#1) at (0,0) {};
+			}
+		}
+	}
+	
+	% Define the "bit" pic
+	\tikzset{
+		pics/bit/.style args={#1}{
+			code={
+				\node[draw, minimum width=\bitsize cm, minimum height=\bitsize cm, anchor=north west, fill=\bitcolor, fill opacity=0.2] (#1) at (0,0) {};
+			}
+		}
+	}
+	
+	% Define the "bit" arith pics (I miserably failed to put it in a for loop)
+	\tikzset{
+		pics/bit_arith0/.style args={#1}{
+			code={
+				\node[draw, minimum width=\bitsize cm, minimum height=\bitsize cm, anchor=north west, fill=\nibblecolor, fill opacity=0.2] (#1) at (0,0) {};
+			}
+		}
+	}
+	
+	\tikzset{
+		pics/bit_arith1/.style args={#1}{
+			code={
+				\node[draw, minimum width=\bitsize cm, minimum height=\bitsize cm, anchor=north west, fill=\nibblecolor, fill opacity=0.4] (#1) at (0,0) {};
+			}
+		}
+	}
+	
+	
+	\tikzset{
+		pics/bit_arith2/.style args={#1}{
+			code={
+				\node[draw, minimum width=\bitsize cm, minimum height=\bitsize cm, anchor=north west, fill=\nibblecolor, fill opacity=0.6] (#1) at (0,0) {};
+			}
+		}
+	}
+
+
+
+	\tikzset{
+		pics/bit_arith3/.style args={#1}{
+			code={
+				\node[draw, minimum width=\bitsize cm, minimum height=\bitsize cm, anchor=north west, fill=\nibblecolor, fill opacity=0.8] (#1) at (0,0) {};
+			}
+		}
+	}	
+
+	
+	% Define the "tree_pbs" pic
+	\tikzset{
+		pics/tree_pbs/.style args={#1}{
+			code={
+				\node[draw, minimum width=\nibblewidth cm, minimum height=\nibblewidth cm, anchor=north west, fill=\operatorcolor, fill opacity=0.2] (#1) at (0,0) {};
+				
+				\node[rectangle, minimum width=3cm, minimum height=1.5cm, align=center] 
+				at (\nibblewidth / 2, -2 * \nibblewidth / 5) {\Huge \textbf{Tree}};
+				
+				\node[rectangle, minimum width=3cm, minimum height=1.5cm, align=center] 
+				at (\nibblewidth / 2, -3 * \nibblewidth / 5) {\Huge \textbf{PBS}};
+			}
+		}
+	}
+	
+	
+	% Define the "MVB" pic
+	\tikzset{
+		pics/mvb/.style args={#1}{
+			code={
+				\node[draw, minimum width=\nibblewidth cm, minimum height=\nibblewidth cm, anchor=north west, fill=\operatorcolor, fill opacity=0.2] (#1) at (0,0) {};
+				
+				\node[rectangle, minimum width=3cm, minimum height=1.5cm, align=center] 
+				at (\nibblewidth / 2, -\nibblewidth / 2) {\Huge \textbf{MVB}};
+			}
+		}
+	}
+
+
+	% Define the "PBS" pic
+	\tikzset{
+		pics/pbs/.style args={#1}{
+			code={		
+				\node[draw, minimum width=\nibbleheight cm, minimum height=\halfwidth cm, anchor=north west, fill=\operatorcolor, fill opacity=0.2] (#1) at (0,0) {};
+				
+				\node[rectangle, minimum width=1cm, minimum height=1.5cm, align=center, rotate=90] 
+				at (\nibbleheight / 2, -\nibblewidth / 4) {\huge \textbf{PBS}};
+			}
+		}
+	}
+	
+	
+	% Define the "Sum" pic
+	\tikzset{
+		pics/su/.style args={#1}{
+			code={			
+				\node[draw, minimum width=\nibblewidth cm, minimum height=\halfwidth cm, anchor=north west, fill=\operatorcolor, fill opacity=0.2] (#1) at (0,0) {};
+				
+				\node[rectangle, minimum width=1cm, minimum height=1.5cm, align=center] 
+				at (\nibblewidth / 2, -\nibblewidth / 4) {\scalebox{3}{$\boldsymbol{\sum}$}};
+			}
+		}
+	}
+		
+	%%%%%%%%%%%%%%%%SubBytes%%%%%%%%%%%%%%%%
+		
+	
+	 \node[draw, minimum width=\subbyteswidth cm, minimum height=\subbytesheight cm, anchor=north west] (subbytes) at (\xsubbytes,\ysubbytes) {};
+	 
+	 % Inputs
+	\path (\xsubbytes + \nibblespacing,\ysubbytes - \nibblespacing) pic {vertical_nibble=sb_n1};
+	\path (\xsubbytes + \nibblespacing,\ysubbytes - 2 * \nibblespacing - \nibblewidth) pic {vertical_nibble=sb_n2};
+	  
+	 % Operators
+	 \path (\xsubbytes + \nibblespacing + \nibbleheight + \nibblewidth, \ysubbytes - \nibblespacing) pic {tree_pbs=sb_tree_pbs1};
+	 \path (\xsubbytes + \nibblespacing + \nibbleheight + \nibblewidth, \ysubbytes -2 * \nibblespacing - \nibblewidth) pic {tree_pbs=sb_tree_pbs2};
+	 
+	 % Outputs
+	 \path (\xsubbytes + \nibblespacing + 3 * \nibblewidth,\ysubbytes - \nibblespacing) pic {vertical_nibble=sb_n3};
+	 \path (\xsubbytes + \nibblespacing + 3 * \nibblewidth,\ysubbytes - 2 * \nibblespacing - \nibblewidth) pic {vertical_nibble=sb_n4};
+	 
+	 \draw[myarrow](sb_n1.east) -- (sb_tree_pbs1.west);
+	 \draw[myarrow](sb_n1.east) -- (sb_tree_pbs2.west);
+	 \draw[myarrow](sb_n2.east) -- (sb_tree_pbs1.west);
+	\draw[myarrow](sb_n2.east) -- (sb_tree_pbs2.west);
+	
+	\draw[myarrow](sb_tree_pbs1.east) -- (sb_n3.west);
+	\draw[myarrow](sb_tree_pbs2.east) -- (sb_n4.west);
+	
+	
+	%%%%%%%%%%%%%%%%Decomposer%%%%%%%%%%%%%%%%
+
+	\node[draw, minimum width=\decomposerwidth cm, minimum height=\decomposerheight cm, anchor=north west] (decomposer) at (\xdecomposer,\ydecomposer) {};
+	
+	%%Input
+	\path (\xdecomposer + \nibblespacing + \bitspacing, \ydecomposer - \nibblespacing) pic {horizontal_nibble=dec_n1};
+	\path (\xdecomposer + \nibblespacing + 5 * \bitspacing + \nibbleheight + \nibblewidth, \ydecomposer - \nibblespacing) pic {horizontal_nibble=dec_n2};
+	
+	% Operators
+	\path (\xdecomposer + \nibblespacing + \bitspacing, \ydecomposer - \nibblespacing - \nibblewidth) pic {mvb=mvb1};
+	\path (\xdecomposer + \nibblespacing + 5 * \bitspacing + \nibbleheight + \nibblewidth, \ydecomposer - \nibblespacing - \nibblewidth) pic {mvb=mvb2};
+	
+	\draw[myarrow] (dec_n1.south) -- (mvb1.north);
+	\draw[myarrow] (dec_n2.south) -- (mvb2.north);
+	
+	% Outputs
+	\foreach \i in {0,...,3} {
+		\path 
+		({\xdecomposer + \nibblespacing + \i * (\bitspacing + \bitsize)}, 
+		{\ydecomposer - \nibblespacing - \nibbleheight - 3 * \nibblewidth}) 
+		pic {bit=dec_bit\i};
+		
+		\path 
+		({\xdecomposer + \nibblespacing + \bitsize + (4 + \i) * (\bitspacing + \bitsize)}, 
+		{\ydecomposer - \nibblespacing - \nibbleheight - 3 * \nibblewidth}) 
+		pic {bit=dec_bit{\i+4}};
+		
+		\draw[myarrow] (mvb1.south) -- (dec_bit\i.north);
+		\draw[myarrow] (mvb2.south) -- (dec_bit{\i+4}.north);
+	}
+	
+	
+	
+	%%%%%%%%%%%%%%%%Linear Circuit%%%%%%%%%%%%%%%%
+
+	\node[draw, minimum width=\linearcircuitwidth cm, minimum height=\linearcircuitheight cm, anchor=north west] (linearcircuit) at (\xlinearcircuit, \ylinearcircuit) {};
+	
+	\node at (\xlinearcircuit + \linearcircuitwidth / 2, \ylinearcircuit - \linearcircuitheight / 2 + \linearcircuitheight / 20) {\Huge \textbf{Linear Circuit}};
+	\node at (\xlinearcircuit + \linearcircuitwidth / 2, \ylinearcircuit - \linearcircuitheight / 2 - \linearcircuitheight / 20) {\scalebox{3}{$\mathcal C$}};
+	
+	% Outputs
+	\foreach \i in {0,...,3} {
+		\path 
+		({\xlinearcircuit + \nibblespacing}, 
+		{\ylinearcircuit- 2 * \bitspacing - \i * (\bitspacing + \bitsize) }) 
+		pic {bit=lin_bit\i};
+		
+		\path 
+		({\xlinearcircuit + \nibblespacing}, 
+		{\ylinearcircuit- \bitspacing - (\i+4) * (\bitspacing + \bitsize) - \bitsize}) 
+		pic {bit=lin_bit{\i + 4}};
+		
+		\path 
+		({\xlinearcircuit + \linearcircuitwidth - \nibblespacing - \bitsize}, 
+		{\ylinearcircuit- 2 * \bitspacing - \i * (\bitspacing + \bitsize) }) 
+		pic {bit=lin_bit{\i + 8}};
+		
+		
+		\path 
+		({\xlinearcircuit + \linearcircuitwidth - \nibblespacing - \bitsize}, 
+		{\ylinearcircuit- \bitspacing - (\i+4) * (\bitspacing + \bitsize) - \bitsize}) 
+		pic {bit=lin_bit{\i + 12}};
+		
+
+		\draw[myarrow] (lin_bit{\i + 8}) -- ++(-\nibblewidth, 0);
+		\draw[myarrow] (lin_bit{\i + 12}) -- ++(-\nibblewidth, 0);
+		
+		\draw[myarrow] ($ (lin_bit\i) + (\nibblewidth, 0) $) -- (lin_bit\i);
+		\draw[myarrow] ($ (lin_bit{\i + 4}) + (\nibblewidth, 0) $) -- (lin_bit{\i + 4});
+	}
+	
+	\foreach \i in {0,..., 7}{
+		% Round key
+		\path 
+		({\xlinearcircuit + 2 * \nibblespacing + 2 * \nibbleheight + \bitsize + \i * (\bitsize + \bitspacing)}, 
+		{\ylinearcircuit + 2 * \bitsize + \bitspacing}) 
+		pic {bit=lin_bit{\i + 16}};	
+		
+		\draw[myarrow] (lin_bit{\i + 16}) -- ++(0, -2*\bitsize - \bitspacing);
+	}
+	
+	\draw ({\xlinearcircuit + \nibblespacing + 4 * \bitsize}, {\ylinearcircuit - \bitspacing}) -- ++(-\bitsize, 0) -- ++(0, -\circuitsize) -- ++(\nibblespacing, 0);
+	
+	\draw ({\xlinearcircuit + \linearcircuitwidth - 4 * \bitsize - \nibblespacing}, {\ylinearcircuit - \bitspacing}) -- ++(\bitsize, 0) -- ++(0, -\circuitsize) -- ++(-\nibblespacing, 0);
+	
+	
+	\node at ({\xlinearcircuit + 2 * \nibblespacing + 2 * \nibbleheight + \bitsize + 4 * (\bitsize + \bitspacing) }, 
+	{\ylinearcircuit + 3 * \bitsize + \bitspacing}) 
+	{\Huge \textbf{Round Key}};	
+	
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%Recomposer%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+
+	\node[draw, minimum width=\recomposerwidth cm, minimum height=\recomposerheight cm, anchor=north west] (recomposer) at (\xrecomposer, \yrecomposer) {};
+	
+	
+	\foreach \i in {0,...,3} {
+		% Input	
+		\path 
+		({\xrecomposer + \nibblespacing + \i * (\bitspacing + \bitsize)}, 
+		{\yrecomposer - \recomposerheight +\nibblespacing + \bitsize}) 
+		pic {bit=rec_bit\i};
+		
+		\path 
+		({\xrecomposer + \nibblespacing + (\i + 4) * (\bitspacing + \bitsize) + \bitsize}, 
+		{\yrecomposer - \recomposerheight + \nibblespacing + \bitsize}) 
+		pic {bit=rec_bit{\i + 4}};
+		
+		
+		% PBS layer
+		\path 
+		({\xrecomposer + \nibblespacing + \i * (\bitspacing + \bitsize)}, 
+		{\yrecomposer - \recomposerheight + \nibblespacing + \bitsize + \nibblewidth}) 
+		pic {pbs=rec_pbs\i};
+		
+		
+		\path 
+		({\xrecomposer + \nibblespacing + (\i + 4) * (\bitspacing + \bitsize) + \bitsize}, 
+		{\yrecomposer - \recomposerheight + \nibblespacing + \bitsize + \nibblewidth}) 
+		pic {pbs=rec_pbs{\i + 4}};
+		
+		\draw[myarrow] (rec_bit\i) -- (rec_pbs\i);
+		\draw[myarrow] (rec_bit{\i + 4}) -- (rec_pbs{\i + 4});
+		
+		% bit arith layer
+		\path 
+		({\xrecomposer + \nibblespacing + \i * (\bitspacing + \bitsize)}, 
+		{\yrecomposer - \recomposerheight + \nibblespacing + \bitsize + 1.5 * \nibblewidth + \bitsize}) 
+		pic {bit_arith\i=bit_arith\i1};
+		
+		\path 
+		({\xrecomposer + \nibblespacing + (\i + 4) * (\bitspacing + \bitsize) + \bitsize}, 
+		{\yrecomposer - \recomposerheight + \nibblespacing + \bitsize + 1.5 * \nibblewidth + \bitsize}) 
+		pic {bit_arith\i=bit_arith\i2};
+		
+		\draw[myarrow] (rec_pbs\i) -- (bit_arith\i1);
+		\draw[myarrow] (rec_pbs{\i + 4}) -- (bit_arith\i2);
+	}	
+	
+	
+	\path 
+	({\xrecomposer + \nibblespacing + \bitspacing}, 
+	{\yrecomposer - \recomposerheight + \nibblespacing + \bitsize + 3 * \nibblewidth}) 
+	pic {su=su1};
+	
+	\path 
+	({\xrecomposer + \recomposerwidth - \nibblespacing - \bitspacing - \nibblewidth}, 
+	{\yrecomposer - \recomposerheight + \nibblespacing + \bitsize + 3 * \nibblewidth}) 
+	pic {su=su2};
+	
+	\foreach \i in {0,...,3}{
+		\draw[myarrow]	(bit_arith\i1) -- (su1);
+		\draw[myarrow]	(bit_arith\i2) -- (su2);
+	}
+	
+	
+	%output
+	\path ({\xrecomposer + \nibblespacing + \bitspacing}, 
+	{\yrecomposer - \recomposerheight + \nibblespacing + \bitsize + 3 * \nibblewidth + \nibbleheight + \halfwidth})  pic {horizontal_nibble=rec_n1};
+	
+	\path ({\xrecomposer + \recomposerwidth - \nibblespacing - \bitspacing - \nibblewidth}, 
+	{\yrecomposer - \recomposerheight + \nibblespacing + \bitsize + 3 * \nibblewidth+ \nibbleheight + \halfwidth})  pic {horizontal_nibble=rec_n2};
+	
+	\draw[myarrow] (su1) -- (rec_n1);
+	\draw[myarrow] (su2) -- (rec_n2);
+	
+	
+	
+	\draw[myarrow] (subbytes) -| (decomposer);
+	\draw[myarrow] (decomposer) |- (linearcircuit);
+	\draw[myarrow] (linearcircuit) -| (recomposer);
+	\draw[myarrow] (recomposer) |- (subbytes);
+	
+	%gauges
+	\node at ($(linearcircuit.west) + (-2 * \metablockspacing - \recomposerwidth / 2, 0)$) {\scalebox{3}{\verticalgauge{90}}};
+	
+	\node at ($(linearcircuit.east) + (2 * \metablockspacing + \recomposerwidth / 2, 0)$) {\scalebox{3}{\verticalgauge{40}}};
+	
+	\node at ($(subbytes.east) + (2 * \metablockspacing + \recomposerwidth / 2, 2 * \metablockspacing)$) {\scalebox{3}{\verticalgauge{20}}};
+	
+	\node at ($(subbytes.west) + (-2 * \metablockspacing - \recomposerwidth / 2, 2 * \metablockspacing)$) {\scalebox{3}{\verticalgauge{40}}};
+	
+	\node at ($(recomposer.east) + (\metablockspacing, 0)$) {\scalebox{3}{\verticalgauge{20}}};
+	
+	
+	% Titles
+	\node at ($(subbytes.north) + (0, \metablockspacing / 2)$) {\Huge \textbf{SubBytes}};
+	\node[rotate=-90] at ($(decomposer.east) + (\metablockspacing / 2, 0)$) {\Huge \textbf{Decomposer}};
+	\node[rotate=90] at ($(recomposer.west) + (-\metablockspacing / 2, 0)$) {\Huge \textbf{Recomposer}};
+	
+\end{tikzpicture}

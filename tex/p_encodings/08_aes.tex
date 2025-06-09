@@ -13,6 +13,8 @@ A round of AES can be decomposed into 4 steps:
     \item \texttt{AddRoundKey}: each byte of the state is combined with a byte of the key from the key schedule using a \texttt{XOR}. Still using $p=2$, this can be carried out easily. 
 \end{enumerate}
 
+We refer to Section \ref{sec:preliminaries_aes} for a more in-depth presentation of the algorithm. 
+
 
  The s-box of \texttt{SubBytes} takes 8 bits in input and yields 8 bits of output. It is defined by two substeps: an inversion in $GF(2^8)$ followed by an affine transformation. While the latter is trivial to compute with TFHE, the former is much trickier and thus we did not take advantage of this representation. Using our framework, the obvious-looking solution is to split the full s-box $\B^8 \mapsto \B^8$ into 8 subfunctions $f_0, \dots, f_7: \B^8 \mapsto \B$. We could then give them to the search algorithm of Section \ref{sec:p_encodings_search}. If this would work, we could evaluate the Rjindael s-box in 8 PBS. Unfortunately, the algorithm does not converge for values of $p$ ``reasonable'', that is to say less than 7 bits. 
 

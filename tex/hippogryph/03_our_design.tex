@@ -13,7 +13,16 @@ Building on the foundation of the two previous works, we develop a hybrid approa
 
 Our design for one round of AES is summed up on \ref{fig:our_design}. In the following we explain each of its components.
 
-\input{img/tikz/hippogryph/structure}
+% Previous structure drawing
+%\input{img/tikz/hippogryph/structure}
+
+\begin{figure}
+	\centering
+	\input{img/tikz/hippogryph/clean_structure.tex}
+	\caption{Structure of one round of AES with our method. Ciphertexts in blue live in $\Z_{17}$ while the ones in yellow are in $\Z_2$. Squares represent encryptions of one single bit while rectangles represent nibbles.} 
+	\label{fig:our_design}
+	\TODO{CHoisir des meilleures couleurs}
+\end{figure}
 
 
 \paragraph{\SubBytes.} The \SubBytes step is implemented following the design of \cite{DBLP:conf/wahc/TramaCBS23}. Each 8-bit input is represented by two ciphertexts, each encrypting a 4-bit limb. Two instances of the TBM are then used to compute the limbs of the output. The only modification from the design of \cite{DBLP:conf/wahc/TramaCBS23} is the adoption of the canonical $(16, 17)$-encoding, as specified in Definition~\ref{def:canonical-encoding}:

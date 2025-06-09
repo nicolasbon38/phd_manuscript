@@ -118,6 +118,7 @@ This thesis is mainly about practical instantiations of the scheme. So, for the 
 
 
 \section{Encryption and Decryption in TFHE}
+\label{sec:encryption}
 
 \paragraph{Spaces.}
 
@@ -240,7 +241,7 @@ We start by explaining the $\LWE$-to-$\LWE$ version of keyswitching and then gen
 
 
 \paragraph{Some intuition on keyswitching}
-The rationale behind the keyswitching algorithm is to homomorphically evaluate the linear part of the decryption function (namely $b - \langle \vec a, \lweSecretKey \rangle$), given an encryption of $\lweSecretKey$ under the key $s'$. This ``encrypted secret key'' is called the \textit{keyswitching key} and is denoted by $\KSK$. Even if it looks a lot like a bootstrapping operation, keyswitching is actually quite different. Notably, it \textit{increases} the noise in the ciphertext (see \cite{JC:CGGI20, these_tap} for concrete noise analysis).
+The rationale behind the keyswitching algorithm is to homomorphically evaluate the linear part of the decryption function (namely $b - \langle \vec a, \lweSecretKey \rangle$), given an encryption of $\lweSecretKey$ under the key $\vec s'$. This ``encrypted secret key'' is called the \textit{keyswitching key} and is denoted by $\KSK$. Even if it looks a lot like a bootstrapping operation, keyswitching is actually quite different. Notably, it \textit{increases} the noise in the ciphertext (see \cite{JC:CGGI20, these_tap} for concrete noise analysis).
 
 
 More formally, let $\KSK$ be the vector of encryption of every bit of the key $s$ under the key $s'$:
@@ -386,7 +387,7 @@ In more recent works (for example \cite{AC:CLOT21} and its follow-ups), an alter
 	Let $(\baseDecomp, \levelDecomp)$ an approximate decomposition base. A $\GGSW$ ciphertext encrypting a message $M \in \plaintextRingPoly$ under a GLWE secret key $\glweSecretKey =  (S_0, \dots, S_{k-1}) \in \B_{N, q}[X]^k$ has the form:
 	
 	\begin{equation*}
-		\GGSW_{\glweSecretKey}(M) = \left \lbrace \left ( \GLWE_{\glweSecretKey}\left (-S_\alpha \cdot M \cdot \frac{q}{B^j} \right) \right )_{0 \le j < \levelDecomp} \right \rbrace_{0\le \alpha \le k}
+		\GGSW_{\glweSecretKey}(M) = \left \lbrace \left ( \GLWE_{\glweSecretKey}\left (-S_\alpha \cdot M \cdot \frac{q}{\baseDecomp^j} \right) \right )_{0 \le j < \levelDecomp} \right \rbrace_{0\le \alpha \le k}
 	\end{equation*}
 	
 	with $S_{k+1}$ fixed by convention to -1.
@@ -608,7 +609,7 @@ $\SampleExtract$is actually as a simple rearrangement of the coefficients of the
 
 
 \input{tex/algorithms/alg_sample_extract.tex}
-\TODO{Vérifier l'algo}
+
 
 
 In the PBS, $\SampleExtract$ is run with $\alpha = 0$. After that, we now have a $\LWE$ ciphertext encrypting the right value but with noise smaller than in the input. However, the key of this ciphertext is the flattened version of $\glweSecretKey'$. To close the loop, we need to come back to the original key $\lweSecretKey$. This is done with a simple $\LWE$-to-$\LWE$ keyswitching.
