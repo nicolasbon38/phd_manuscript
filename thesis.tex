@@ -34,10 +34,14 @@
 \usepackage{listings}
 \usepackage{graphicx}
 \usepackage{caption}  % for \captionof if needed
+\usepackage{subcaption}
 \usepackage{float}    % optional, for [H] positioning
 
 \usepackage{adjustbox}	% for table in Hippogryph
 \usepackage{mathtools}	% for \vcentcolon
+\usepackage{stmaryrd} % Where \llbracket and \rrbracket are defined
+
+	
 % --------------------------------------
 
 \definecolor{maincolor}{RGB}{36, 56, 141}
@@ -121,6 +125,7 @@
 \input{img/tikz/tikz_blind_rotate.tex}
 \input{img/tikz/tikz_gauge.tex}
 \input{img/blocks_from_slides/tikz_macros.tex}
+\input{img/tikz/tikz_mvb_tree.tex}
 \input{tex/macros.tex}
 
 
@@ -154,6 +159,8 @@
 
 \chapter{Practical solution to the problem of parameter selection}
 \label{chap:parameters}
+\input{tex/orpheus/main_orpheus.tex}
+
 %...
 %\include{tex/conclusion}
 %\appendix

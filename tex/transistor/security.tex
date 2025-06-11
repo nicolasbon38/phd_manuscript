@@ -1,6 +1,48 @@
-% !TeX root = ./main.tex
+% !TeX root = ../../thesis.tex
 
-\section{Security Analysis}
+\section{A Brief Summary of the Security Analysis}
 \label{sec:security}
 
-\TODO{Faire une petite synthèse de la section des symmétriciens, sans les détails. Faire un renvoi vers le papier}
+\coolName's full paper provides an extensive analysis of the security of the cipher. Even if these considerations are far from the topic of this manuscript, we provide in this section a brief overview of this analysis. We refer to the full paper \cite{transistor} for the developments of the proofs.
+
+
+\paragraph{Time-Memory-Data Trade-Offs}
+
+To dimension the size of the LSFR, we computed a bound to ensure that exhaustive attacks are out of reach even when leveraging trade offs with pre-computation and storage. 
+
+Using $\pseudoKS = 64$ and $\whitening = 32$, the length of the keystream generated from the same key is limited to $2^{31}$ digits. As a result, TMDTO attacks have a time complexity of $2^{296}$ in the single IV-setting, which drops to $2^{130}$ when keystreams generated from $2^{130}$ IVs are available to the attacker.
+
+\paragraph{Guess and Determine}
+
+In this kind of attacks, the attacker links the FSM state $\fsmState{t}$ to the filter output $S_t$ and try to guess the key schedule $K_t$.
+
+Based on an analysis of the filtering procedure of \coolName, we showed that in total the attacker has to guess $\frac{12}{16}|\pseudoKS|$ digits, leading to a complexity \( p^{\frac{3}{4} | \pseudoKS |} \approx 2^{196}\) without taking into account the whitening LFSR. If we consider it, the attacker first has to
+guess its content, leading to an attack with complexity
+\( p^{\frac{3}{4} | \pseudoKS | + | \whitening |} \approx 2^{294}\).
+%
+
+
+\paragraph{Three consecutive outputs are statistically independent of the secret key}
+
+The basic strategy in (fast) correlation attacks against stream ciphers consists in recovering some information about (a part of) the initial state of the cipher from the knowledge of the keystream. 
+In this context, an important quantity is the smallest length of output sequence $(S_t)_{t\in \N}$ that can provide information on the sequence produced by the key-LFSR. In the paper we prove that this length is 4, that is to say 3 consecutive outputs are statistically independent of the secret key. This is a very good performance with respect to the state of the art: the only other cipher with this property is \texttt{Rocca} \cite[Section 4.5]{ToSC:SLNKI21}. However, in this case this property has been derived from an automatic search method, while the structure of \coolName enables us to derive this argument in a very simple way from the MDS property of~$\mixColumns$. 
+
+
+\paragraph{(Fast) Correlation Attacks Using Biased Linear Relations}
+
+
+Our paper also provides an estimation of the minimal data complexity required to recover the internal state of the key-register from the knowledge of the output sequence $(S_t)_{t\in \N}$, given that at least four consecutive outputs $(S_t, S_{t+1}, S_{t+2}, S_{t+3})$ need to be considered together. Applying the so-called Xiao-Massey lemma \cite{add:XiaMas88,add:Bry89}, it is possible to see that as soon as the key-LFSR and the considered segment of the output sequence are not statistically independent, there exists a biased linear relation between the digits of these two sequences.
+
+In the paper, we exhibit an upper bound on the correlation of such linear relation. This bound depends on the minimal number of active S-boxes over $n$ rounds, as well as the modulus of the Fourier coefficients of \coolName's S-box. We show that the design of our S-box brings the correlation down to a value small enough so that the amount of keystream that the attacker has to observe exceed the limit of $2^{31}$ digits fixed by TMDTO trade-offs.
+
+
+\paragraph{Linear Distinguishers}
+
+Another type of attack studied in the paper is linear distinguishing attacks \cite{EC:MeiSta88,EC:CanTra00,FSE:CheJohSme00,C:TIMAZ18}. These attacks do not recover the initial state of the key-register, but the counterpart is that they can use together several keystream segments produced from multiple initial state. They consist in exhibiting a biased linear relation among the keystream digits. Such a relation is typically derived from a \textit{parity-check equation} for the key-LFSR, defined by the multiples of the LFSR feedback polynomial. 
+
+In \coolName's design, this polynomial has been chosen so that it shows good properties regarding the utility of these parity-check equations. The conclusion of our analysis is that such an attack would be more expensive than an exhaustive search for the key .
+
+
+\medskip
+
+The full security analysis also takes into account algebraic attacks; such that Gröbner basis or the use of annihilators of the filtering function.

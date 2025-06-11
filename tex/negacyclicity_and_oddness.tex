@@ -67,6 +67,7 @@ This construction is merely theoretical. Indeed, in practical setting, restricti
 
 
 \section{The classical countermeasure: the bit of padding}
+\label{sec:bit_of_padding}
 
 The first countermeasure, that already appeared in the original TFHE paper, is called the \textit{bit of padding}. As in the ideal case presented in the previous section, it works in an \textbf{even} plaintext space.
 
@@ -183,17 +184,17 @@ This is where the parity of $p$ plays a part: if $p$ is even, then $\modulo{
 
 
 \begin{figure}
-	\begin{minipage}{0.49\linewidth}
-		\    \centering
+	\begin{subfigure}{0.49\linewidth}
+		    \centering
 		\includegraphics[width=0.5\linewidth]{img/to_harmonize/torus_p_even.png}
 		\caption{With $p$ even, the dense spots of each half of the torus are aligned.}
 		\label{fig:torus_p_even}
-	\end{minipage}\hspace{1em}% Adjust the margin width as needed
-	\begin{minipage}{0.49\linewidth}
+	\end{subfigure}\hspace{1em}% Adjust the margin width as needed
+	\begin{subfigure}{0.49\linewidth}
 		\centering
 		\includegraphics[width=0.5\linewidth]{img/to_harmonize/torus_p_odd.png}
 		\caption{With $p$ odd, the dense spots face empty spots, close to the bounds of the $p$-sectors.}
-	\end{minipage}
+	\end{subfigure}
 	\caption{}
 	\label{fig:torus_p_even_vs_odd}
 \end{figure}
@@ -203,7 +204,7 @@ This is where the parity of $p$ plays a part: if $p$ is even, then $\modulo{
 So, by selecting odd values for the plaintext modulus, the negacyclicity problem is naturally neutralized.
 
 
-We present in Definition \ref{def:odd_accumulator} the formula for the accumulator in this case. Note that because $N$ is a power of two and $o$ an odd value, some rounding is required in the quotient $\frac N p$, but we omit it to keep notations lighter, (or )equivalently, the division operator is assumed to include rounding).
+We present in Definition \ref{def:odd_accumulator} the formula for the accumulator in this case. Note that because $N$ is a power of two and $p$ an odd value, some rounding is required in the quotient $\frac N p$, but we omit it to keep notations lighter, (or )equivalently, the division operator is assumed to include rounding).
 
 \begin{definition}(Odd-case Accumulator)
 	\label{def:odd_accumulator}
@@ -245,7 +246,7 @@ For $0 \le \alpha \le \frac{p-1}{2}$, the range of degrees whose coefficients ar
 \end{figure}
 
 
-If we compare this approach to the bit-of-padding one, the windows have half the size. So we may think that the bound on the maximal noise to ensure correctness must be twice tighter. However, because the bit-of-padding accumulator makes use of only one half of the torus, the windows have actually have the same width if we consider the same size of plaintext space. In Section \ref{sec:parametrization}, we elaborate further on how the parametrization of the scheme is handled in this case.
+If we compare this approach to the bit-of-padding one, the windows have half the size. So we may think that the bound on the maximal noise to ensure correctness must be twice tighter. However, because the bit-of-padding accumulator makes use of only one half of the torus, the windows actually have the same width if we consider the same size of plaintext space. In Section \ref{sec:parametrization}, we elaborate further on how the parametrization of the scheme is handled in this case.
 
 
 With this technique, no bit of padding is required. Consequently, it allows to use the linear homomorphisms without worrying about carry propagation. This is a key improvement that is at the root of the works presented in the rest of this thesis.

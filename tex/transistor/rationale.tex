@@ -1,8 +1,4 @@
 
-
-\TODO{Probablement laissable laisser tel quel ?}
-
-
 \subsection{Controlling the Noise Evolution}% in the Homomorphic Evaluation}
 \label{sec:rationale-controllin-noise}
 
@@ -28,8 +24,8 @@ From the homomorphic perspective, this choice is crucial, as the variance of the
 \paragraph{Sums.} The output of $\mixColumns$ is then added to the next output of the LFSR to be injected again into $\subWords$. The noise variance after the addition step corresponds to the sum of both noise variances. Similarly, the noise variance at the output of the scheme, referred to as $\sigma^2_{\text{out}}$, is equal to the sum $\sigma_\whitening^2 + \sigma_{\text{PBS}}^2$.
 %\medskip
 
-\TODO{Figure Noise à changer}
-%\input{figures/noise}
+
+\input{tex/transistor/figures/noise}
 
 
 Figure~\ref{fig:noise} illustrates the evolution of the noise variance throughout the operations of \coolName.

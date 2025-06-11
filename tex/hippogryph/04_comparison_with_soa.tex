@@ -1,6 +1,8 @@
 \section{Experimental Results}
 \label{sec:comparison}
 
+\TODO{Repasser sur cette section en allégeant l'état de l'art ?}
+
 In this section, we compare our new framework to several state-of-the-art homomorphic AES executions, including the ones performed with the two building blocks of our new design.
 We particularly emphasize that \textit{all implementations have been tested on the same machine}, a 12th Gen Intel(R) Core(TM) i7-12700H CPU laptop with 64 Gib total system memory with an Ubuntu 22.04.2 LTS operating system. All execution timings can be found in Table~\ref{tab:comp}.
 Parameter sets used to obtain these results are presented in Table~\ref{tab:params}.
@@ -8,45 +10,42 @@ Depending on the framework, we had to use different implementations of TFHE as a
 
 
 \begin{table}[htbp]
-
-\caption{Parameters sets used for our homomorphic AES evaluation, with $\lambda\approx128$ bits as the security parameter. $P_{\text{err}}$ denotes the probability of bootstrapping failure. $B_\text{PBS}$ and $l$ denote the basis and levels associated with the gadget decomposition in \textsf{KeySwitch}, $B_\text{KS}$ and $t$ denote the decomposition basis and the precision of the decomposition of \textsf{BlindRotate}. $\sigma_\text{LWE}$ and $\sigma_\text{GLWE}$ are the standard deviations of noises used in LWE and GLWE ciphertexts, respectively.}
+\caption{Parameters sets used for our homomorphic AES evaluation, with $\lambda\approx128$ bits as the security parameter. $\perr$ denotes the probability of bootstrapping failure. $\baseDecompKS$ and $\levelDecompKS$ denote the basis and levels associated with the gadget decomposition in \KeySwitch, $\baseDecompPBS$ and $\levelDecompPBS$ denote the decomposition basis and the precision of the decomposition of \BlindRotate. $\lweSigma$ and $\glweSigma$ are the standard deviations of noises used in $\LWE$ and $\GLWE$ ciphertexts, respectively.}
 \label{tab:params}
 \begin{adjustbox}{center}
 \begin{tabular}{|c||c|c|c|c|c|c|c|c|c|}
 \hline
- $P_{\text{err}}$ &  $n$   & $N$ & $k$   & $l$ & $B_\text{PBS}$ & $B_\text{KS}$ & $t$ & $\sigma_\text{LWE}$ & $\sigma_\text{GLWE}$ \\ \hline
+ $\perr$ &  $n$   & $N$ & $k$   & $\levelDecompPBS$ & $\baseDecompPBS$ & $\baseDecompKS$ & $\levelDecompKS$ & $\lweSigma$ & $\glweSigma$ \\ \hline
   $2^{-40}$ & 754     &    1024  & 1  &  2   &    $2^{23}$   &   $2^4$     &   3  &  $2^{46.4}$       &    $2^{16.7}$       \\ \hline  
     $2^{-128}$ &   900    &   4096   & 1  &   2  &   $2^{15}$   &    $2^3$    &  6 &    $2^{44.5}$      &    $2^2$      \\ \hline  
 \end{tabular}
 \end{adjustbox}
 \end{table}
-%\SB{est-ce que tous les paramètres ont été définis (e.g., $\sigma_{RLWE}$) ?}
 
+%
 \begin{table}[ht]
 \centering
 \caption{Comparison of our method with different state-of-the art approaches \emph{on a single core}. The only execution timing that was not obtained on our machine is marked with a $^*$, i.e. for Thunderbird, making the comparison more in favor of that method. See the discussion at the end of Section \ref{sec:thunderbird}.}
 \label{tab:comp}
-\begin{tabular}{|>{\centering\arraybackslash}p{0.8cm}|>{\centering\arraybackslash}p{1.8cm}|>{\centering\arraybackslash}p{4.5cm}|>{\centering\arraybackslash}p{2cm}|>{\centering\arraybackslash}p{2cm}|}
+\begin{tabular}{|>{\centering\arraybackslash}p{0.8cm}|>{\centering\arraybackslash}p{3.2cm}|>{\centering\arraybackslash}p{4cm}|>{\centering\arraybackslash}p{2cm}|>{\centering\arraybackslash}p{2cm}|}
 \hline
 \textbf{Year} & \textbf{Reference} & \textbf{Framework} & \textbf{Library} & \textbf{Timings (s)} \\
 \hline
-\multirow{3}{*}{2023} & \cite{DBLP:conf/wahc/TramaCBS23} & Tree-Based Method (TBM) & \texttt{TFHElib} & 270\\
+\multirow{3}{*}{2023} & \cite{DBLP:conf/wahc/TramaCBS23} & Tree-Based Method (TBM) & \texttt{TFHElib} \footnote{https://tfhe.github.io/tfhe/} & 270\\
 \cline{2-5}
-& \cite{TCHES:BonPoiRiv24} & $p$-encoding method & \texttt{tfhe-rs} & 90\\
+& \cite{TCHES:BonPoiRiv24}, Chap. \ref{chap:p_encodings} & $p$-encoding method & \texttt{tfhe-rs}\footnote{https://github.com/zama-ai/tfhe-rs} & 90\\
 \cline{2-5}
-& \cite{ISC:WWLLL23} & Fregata & \texttt{TFHEpp} & 87\\
+& \cite{ISC:WWLLL23} & Fregata & \texttt{TFHEpp} \footnote{https://github.com/virtualsecureplatform/TFHEpp} & 87\\
 \hline
-2024 & \cite{TCHES:WLWLLW24} & Thunderbird & \texttt{TFHEpp} & $46^*$ \\
+2024 & \cite{TCHES:WLWLLW24} & Thunderbird & \texttt{TFHEpp} \footnote{https://github.com/virtualsecureplatform/TFHEpp} & $46^*$ \\
 \hline \hline
-2025 & this work & \hippo & \texttt{tfhe-rs} & 32\\
+2025 & this work & \hippo & \texttt{tfhe-rs}\footnote{https://github.com/zama-ai/tfhe-rs} & 32\\
 \hline
 \end{tabular}
 \end{table}
-%\footnote{https://tfhe.github.io/tfhe/}
-%\footnote{https://github.com/virtualsecureplatform/TFHEpp}
-%\footnote{https://github.com/zama-ai/tfhe-rs}
 
-The implementation of \hippo and the unified software test bench for AES execution over TFHE, which we used to obtain the consistent same-machine experimental results presented in this paper, are available as open-source Git repositories\footnote{\url{https://github.com/CryptoExperts/Hippogryph} and \url{https://github.com/daphnetrm/Benchmark-of-AES-Evaluation-with-TFHE}.}.
+
+The implementation of \hippo~and the unified software test bench for AES execution over TFHE, which we used to obtain the consistent same-machine experimental results presented in this paper, are available as open-source Git repositories\footnote{\url{https://github.com/CryptoExperts/Hippogryph} and \url{https://github.com/daphnetrm/Benchmark-of-AES-Evaluation-with-TFHE}.}.
 
 
 \subsection{State-Of-The-Art Homomorphic AES Executions}
@@ -138,7 +137,7 @@ To obtain a fair comparison, we use parameters equivalent to those used in the s
 \label{tab:bonus}
 \begin{tabular}{|c|c|c|c|}
 \hline
-Machine       &  \# cores    & $P_{\text{err}}$          & Timings (s) \\ \hline
+Machine       &  \# cores    & $\perr$          & Timings (s) \\ \hline
 laptop        &  1           & $2^{-40}$          &  32         \\ \hline
 laptop        &  1           & $2^{-128}$         &  463        \\ \hline
 laptop        &  6           & $2^{-40}$          &  4.6        \\ \hline

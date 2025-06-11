@@ -9,5 +9,6 @@
 *.pdf
 *.bbl
 *.blg
+*.fls
 cryptobib/
 thesis.brf

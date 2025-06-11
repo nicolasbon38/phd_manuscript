@@ -1,12 +1,10 @@
 \section{Design of \hippo}
 \label{sec:hippogryph_our_work}
 
-\TODO{A revoir pour changer les références, mais devrait être globalement OK}
-
-Building on the foundation of the two previous works, we develop a hybrid approach, \hippo, that not only combines their respective strengths but also introduces new contributions to enable their effective integration. The guiding principles of this design are outlined below:
+Building on the primitives presented in Section \ref{sec:previous-blocks} and \ref{sec:generalization_p_encodings}, we develop a hybrid approach, \hippo, that not only combines their respective strengths but also introduces new contributions to enable their effective integration. The guiding principles of this design are outlined below:
 
 \begin{itemize}
-    \item The \SubBytes step, which was the weak point of \cite{TCHES:BonPoiRiv24}, is evaluated using the strategy of \cite{DBLP:conf/wahc/TramaCBS23}.
+    \item The \SubBytes step, which was the weak point of our implementation in Chapter \ref{chap:p_encodings}, is evaluated using the strategy of \cite{DBLP:conf/wahc/TramaCBS23}.
     \item Conversely, the linear steps (namely \ShiftRows, \MixColumns and \AddRoundKey) are computed using a trivial $(2, 2)$-encoding, which makes them extremely fast.
     \item Since the two aforementioned points rely on different data representations (arithmetic for \SubBytes and Boolean for the other steps), a decomposition layer and a recomposition layer are necessary to transition from one to another. The decomposition and recomposition steps are denoted by \texttt{Decomposer} and \texttt{Recomposer}, respectively. %To make them work, we make use of a $(o, p)$-encoding for the \SubBytes step. This will be explained in further details in this section.
 \end{itemize}
@@ -19,7 +17,7 @@ Our design for one round of AES is summed up on \ref{fig:our_design}. In the fol
 \begin{figure}
 	\centering
 	\input{img/tikz/hippogryph/clean_structure.tex}
-	\caption{Structure of one round of AES with our method. Ciphertexts in blue live in $\Z_{17}$ while the ones in yellow are in $\Z_2$. Squares represent encryptions of one single bit while rectangles represent nibbles.} 
+	\caption{Structure of one round of AES with our method. Ciphertexts in blue live in $\Z_{17}$ while the ones in yellow are in $\Z_2$. Squares represent encryptions of one single bit while rectangles represent nibbles. Indicative noise levels at different spots of the circuit are indicated by the gauges.} 
 	\label{fig:our_design}
 	\TODO{CHoisir des meilleures couleurs}
 \end{figure}
@@ -30,18 +28,18 @@ Our design for one round of AES is summed up on \ref{fig:our_design}. In the fol
     \Encoding_{17}: \Z_{16} &\rightarrow \Z_{17}\\
      i &\mapsto i.
 \end{align*}
-This modification is introduced to ensure compatibility with the \texttt{Recomposer} operation, a point which will be explained in the dedicated paragraph. In \ref{fig:our_design}, ciphertexts encrypted under this $(16, 17)$-encoding are represented by blue rectangles. This process is repeated 16 times, once for each byte of the AES state.
+This modification is introduced to ensure compatibility with the \texttt{Recomposer} operation, a point which will be explained in the dedicated paragraph. In Figure \ref{fig:our_design}, ciphertexts encrypted under this $(16, 17)$-encoding are represented by blue rectangles. This process is repeated 16 times, once for each byte of the AES state.
 An additional improvement comes from the fact that the two TBM are using a MVB to evaluate the first step. So, the same common factor can be used for both evaluations, requiring only one \texttt{BlindRotate} per byte for this first step. 
 
 
-\paragraph{Linear Circuit.} For this part, we follow the design of \cite{TCHES:BonPoiRiv24}. The ciphertexts manipulated in this block are encoded under the trivial $(2, 2)$-encoding $\Encoding_2$, and encrypt a single bit each. They are represented by yellow squares on \ref{fig:our_design}. Consequently, this circuit takes 256 inputs (one for each of the 128 bits in an AES block, and one for each of the 128 bits in the current round key), and outputs a new state of 128 bits, by combining the three following steps:
+\paragraph{Linear Circuit.} For this part, we follow the design of Chapter \ref{chap:p_encodings}. The ciphertexts manipulated in this block are encoded under the trivial $(2, 2)$-encoding $\Encoding_2$, and encrypt a single bit each. They are represented by yellow squares on \ref{fig:our_design}. Consequently, this circuit takes 256 inputs (one for each of the 128 bits in an AES block, and one for each of the 128 bits in the current round key), and outputs a new state of 128 bits, by combining the three following steps:
 \begin{itemize}
     \item \ShiftRows: This step is trivially implemented in FHE by permuting the input ciphertexts according to the AES specifications.
     \item \MixColumns: Here, we use the XOR-only circuit representation of \cite{EPRINT:Maximov19}. Evaluating a XOR on ciphertexts under $\Encoding_2$ is simply done using the native addition of TFHE \texttt{SumTFHE}.
     \item \AddRoundKey: This step is a simple XOR between the state and the round key.
 \end{itemize}
 
-Evaluating the sums within this circuit increases the noise in the ciphertexts. However, this problem can actually be overlooked: using $p=2$, there is plenty of room for the noise to grow, so the bottleneck of the construction in terms of noise is actually the TBM in $\Z_{17}$. In our experimentations, we made sure to select parameters ensuring correctness up to the target probability of success.
+Evaluating the sums within this circuit increases the noise in the ciphertexts. However, this problem can actually be overlooked: using $p=2$, there is plenty of room for the noise to grow, so the bottleneck of the construction in terms of noise is actually the intermediate layer inside the TBM in $\Z_{17}$. In our experimentations, we made sure to select parameters ensuring correctness up to the target probability of success.
 
 
 \paragraph{Decomposer.} From the \SubBytes step to the linear circuit steps, a switch of representation is needed at two levels. First, we need to decompose each ciphertext of a 4-bit limb into 4 ciphertexts each encrypting a single bit. Secondly, we need to switch the encoding from $\Encoding_{17}$ to $\Encoding_2$. Fortunately, by combining the MVB primitive and the encoding switching primitive (from Definition~\ref{def:encoding-switching}), it is possible to do both changes at once for each nibble with a single PBS. Formally, the MVB will evaluate the four functions:
@@ -66,7 +64,7 @@ To achieve this efficiently, we introduce four intermediary $(2, 17)$-encodings,
     \end{cases}.
 \end{align*}
 %
-Using little-endian representation, we perform an encoding switching (\ref{def:encoding-switching}) on the $i$-th bit of each nibble, transitioning from $\Encoding_2$ to $\Encoding_{17}^{(i)}$. In \ref{fig:our_design}, the resulting ciphertexts are representing by squares filled with different shades of blue. Once the bits are expressed in this intermediary representation, we simply sum them to reconstruct the result in $\Encoding_{17}$.
+Using little-endian representation, we perform an encoding switching (\ref{def:encoding-switching}) on the $i$-th bit of each nibble, transitioning from $\Encoding_2$ to $\Encoding_{17}^{(i)}$. In Figure \ref{fig:our_design}, the resulting ciphertexts are representing by squares filled with different shades of blue. Once the bits are expressed in this intermediary representation, we simply sum them to reconstruct the result in $\Encoding_{17}$.
 
 \paragraph{Necessity of an odd modulo in \SubBytes:} 
 The inputs to the \texttt{Recomposer} are encrypted modulo 2. Since no padding bits are used, the negacyclicity problem necessitates that the PBS in the \texttt{Recomposer} evaluates a negacyclic function. As stated in Property~\ref{prop:oddness_in_recomposition}, the existence of a Boolean recomposition algorithm relying solely on PBS and linear operations depends on the parity of the output plaintext modulus.
@@ -78,9 +76,9 @@ The inputs to the \texttt{Recomposer} are encrypted modulo 2. Since no padding b
 
 
 \begin{proof}
-Let $p$ be an integer. Let $(b_0, \dots, b_{d-1})$ be the bits to encrypt, and let $(c_0, \dots, c_{d - 1})$ denote their corresponding ciphertexts, encoded with the trivial $(2, 2)$-encoding $\Encoding_2$. We aim to construct a \texttt{Recomposer} that uses only one programmable bootstrapping (PBS) per bit and linear operations to homomorphically compute an encryption of the message $m = \sum_{i=0}^{d-1} b_i 2^i$ under the canonical $(2^d, p)$-encoding $\Encoding_p$. The purpose of this proof is to demonstrate how the parity of $p$ influences the existence of such an algorithm.
+Let $p$ be an integer. Let $(b_0, \dots, b_{d-1})$ be the bits to encrypt, and let $(\vec c_0, \dots, \vec c_{d - 1})$ denote their corresponding ciphertexts, encoded with the trivial $(2, 2)$-encoding $\Encoding_2$. We aim to construct a \texttt{Recomposer} that uses only one programmable bootstrapping (PBS) per bit and linear operations to homomorphically compute an encryption of the message $m = \sum_{i=0}^{d-1} b_i 2^i$ under the canonical $(2^d, p)$-encoding $\Encoding_p$. The purpose of this proof is to demonstrate how the parity of $p$ influences the existence of such an algorithm.
 
-To do so, following the blueprint introduced earlier in the section, we want to bootstrap the ciphertext $c_i$ into $\Z_p$ with the $p$-encoding $\Encoding_p^{(i)} = \EncDefCanonicalBinary{p}{0}{2^{i+1}}$. Once we have those, a simple sum will reconstruct the message under the canonical $(2^d, p)$-encoding. Let us analyze if this bootstrapping is possible.
+To do so, following the blueprint introduced earlier in the section, we want to bootstrap the ciphertext $\vec c_i$ into $\Z_p$ with the $p$-encoding $\Encoding_p^{(i)} = \EncDefCanonicalBinary{p}{0}{2^{i+1}}$. Once we have those, a simple sum will reconstruct the message under the canonical $(2^d, p)$-encoding. Let us analyze if this bootstrapping is possible.
 
 As the ciphertexts are encrypted modulo $2$, there is no bit of padding. So, if we send them modulo $p$ with a PBS, the result will necessarily be encoded under a negacyclic $(2, p)$-encoding, that is to say of the form: $\Encoding^{\text{(neg)}} = \EncDefCanonicalBinary{p}{\gamma}{[-\gamma]_p}$ with $\gamma \in \Z_p$.
 

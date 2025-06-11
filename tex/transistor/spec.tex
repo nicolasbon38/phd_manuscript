@@ -1,12 +1,10 @@
+% !TeX_ROOT=../../thesis.tex
 \section{Description of \coolName}
 \label{sec:description}
 
-\TODO{Ici, je ne sais pas si onn peut beaucoup compresser, mais relire quand même}
-
 
 Bringing everything together, we designed the stream cipher \coolName{}.
-Its overall structure is presented in Section~\ref{sec:description-structure}, its details are explained in Section~\ref{sec:sepc-details}, and the influence of noise is discussed in Section~\ref{sec:rationale-controllin-noise}. A reference implementation can be found at
-  \url{https://github.com/CryptoExperts/Transistor/}.
+Its overall structure is presented in Section~\ref{sec:description-structure}, its details are explained in Section~\ref{sec:sepc-details}, and the influence of noise is discussed in Section~\ref{sec:rationale-controllin-noise}. A reference implementation can be found at \url{https://github.com/CryptoExperts/Transistor/}.
 
 \subsection{Overall Structure}
 \label{sec:description-structure}
@@ -14,22 +12,10 @@ Its overall structure is presented in Section~\ref{sec:description-structure}, i
 
 \paragraph{Usage.}
 \label{sec:usage}
-%\lp{j'ai encore bidouillé cette partie, qu'en pensez-vous?}
-\coolName{} is a stream cipher that generates a keystream consisting of elements from \( \mainField = \mathbb{F}_{17} \), referred to as {\em digits}.  It is intended for transciphering, i.e., for the type of protocol we summarized in the introduction\ifeprint (see Figure~\ref{fig:transciphering-principle})\fi.
+
+\coolName{} is a stream cipher that generates a keystream consisting of elements from \( \mainField = \mathbb{F}_{17} \), referred to as {\em digits}.  It is intended for transciphering, i.e., for the type of protocol we summarized in Section \ref{sec:transciphering}.
 More precisely, a 128-bit master key and an IV are used to initialize the internal state of \coolName{} using  a PRF (namely, {\tt SHAKE}~\cite{add:SHA3}), as suggested in~\cite{FSE:BerGil07}. This initialization  is only performed on the client side, and in particular is not evaluated homomorphically, meaning that its cost is negligible. On the other hand, it ensures for example that related IVs cannot be exploited. The entire resulting internal state is then encrypted using TFHE and sent alongside the ciphertext. This ciphertext is obtained by casting the plaintext message to a string of digits of $\mainField$, which is added digit by digit to the keystream produced by \coolName{} using the group law of $\mainField$.
 
-
-
-% \ac{My two cents: Il faut qu'on dise clairement s'il y a une IV ou non. Plus je réfléchis, moins je trouve convaincant de dire qu'il n'y a pas d´IV, car cela veut dire qu'on tire une nouvelle clef au hasard à chaque msg. Ca n'est pas top, non ? Par contre, on peut dire que son coût n'est pas important, et donc qu'on peut choisir une initiation coûteuse, car elle n'est jamais faite côté serveur.}
-
-  
-
-%\lp{j'ai pensé parler ici de l'overhead impliqué par l'envoi de la clef maître mais en fait on en parle déjà et dans l'intro et dans les benchmarks...}
-
-% \lp{@cryptoExperts: ça serait cool de remettre une couche ici sur le fait qu'on puisse choisir $p$ comme ça nous arrange, histoire qu'on ne se reprenne pas un reviewer chafouin persuadé que notre choix de $p$ nous condamne à l'inutilité}
-% \nicolas{ajouté ci-dessous}
-% \ac{Je pense que cette argumentation doit aller ailleurs, peut-etre ds la section précédente sur le choix de \(p\) mais pas ici.}
-%\lp{j'ai gardé la toute première phrase de la discussion sur $p$ ici et j'ai bougé le reste de cette discussion plus haut, dans le paragraphe ``The parity of the plaintext space''}\yr{Modifié des trucs mineurs ici dans le paragraphe ci-dessus}
 
 
 \paragraph{Internal State.}
@@ -49,33 +35,22 @@ have the following components:
 \item a filter $\filter : \mainField^{16} \to \mainField^4$ that extracts $4$ digits from the FSM.
 \end{itemize}
 
-%\lp{j'ai rajouté le texte ci-dessous pour spécifier l'initialisation et le claim de sécurité.}
+
 
 The FSM state is initialized to all zeros, and each LFSR is initialized using digits derived from the 128-bit master key and IV using SHAKE~\cite{add:SHA3}. 
-\ifeprint
-  We provide a detailed algorithm in Appendix~\ref{app:spec} which specifies, among other things, the processing of the master key and the LFSR taps. 
-\fi
 
 
-\paragraph{Security Claim.} \coolName{} is a stream cipher providing 128
-bits of security, meaning any attack should require at least $2^{128}$
-elementary operations, assuming no more than $2^{31}$ digits (about
-1~GB) are generated with each IV.  We allow up to $2^{128}$ digits in
-total per key, corresponding to the multi-initial-state setting.
+\paragraph{Security Claim.} \coolName{} is a stream cipher providing 128 bits of security, meaning any attack should require at least $2^{128}$ elementary operations, assuming no more than $2^{31}$ digits (about 1~GB) are generated with each IV.  We allow up to $2^{128}$ digits in total per key, corresponding to the multi-initial-state setting.
 
 
-% \MR{J'ai ajouté les longueurs des LFSR. A valider.}
-% \leo{normalement ce qui est écrit maintenant est correct (j'ai changé la longueur du masquage en $w=32$, et non $w=16$ puisque nos mots font 4 bits et non 8... Désolé)}
-
-\TODO{ICI, décommenter la structure}
-%\input{figures/structure}
+\input{tex/transistor/figures/structure}
 
 
 \subsection{Detailed Description}
 \label{sec:sepc-details}
 
 Obviously taking inspiration from the AES, the state of the FSM is organized into a two-dimensional array of size $4\times 4$, where each entry corresponds to a digit in $\F_p$. With this representation, the successive operations applied to the state can be defined as follows.
-% \jb{il y a un truc qui cloche avec cette phrase/cette liste ?}\lp{pas sûr de ce que tu veux dire, j'ai fait quelques modifs ceci dit}\yr{modifié matrix -> array pour pas confondre avec une matrice qui est une application}\jb{Ca me semble mieux ! (Le commentaire datait de la soumission EC)}
+
 \begin{description}
 \item[$\subWords~(\subW)$] is an S-box layer: the permutation $\thesbox$ is applied on each digit.
 \item[$\mixColumns~(\mixC)$] applies to each column an MDS matrix $\mixmat$ over \(\F_p\).
@@ -86,8 +61,8 @@ Obviously taking inspiration from the AES, the state of the FSM is organized int
 In what follows, we provide a more detailed description of each step, using the notation summarized in~Figure~\ref{fig:notations}. The keystream output at clock $t \geq 0$ consists of a tuple $Z_t \in \mainField^4$, called a block. The internal state of the FSM, just before the filter is applied, is denoted by $\fsmState{t}$ (so that $S_t = \filter(\fsmState{t})$). As a consequence, $\fsmState{t+1} = \subW\left(K_{t+1} + \left(\mixC \circ \shiftR (\fsmState{t})\right)\right)$, where $K_t$ is obtained by concatenating 16 successive digits generated by the key-schedule LFSR $\pseudoKS$. The FSM is initialized with the all-zero value and its initial state is denoted by $X_{-1} \vcentcolon= 0$.
 
 
-\TODO{Ici figure sur les notations à décommenter}
-%\input{./figures/notations}
+
+\input{tex/transistor/figures/notations}
 
 
 
@@ -188,14 +163,3 @@ We verified that there is no MDS matrix in  $\mathbb{F}_{17}$ with coefficients 
 
 \paragraph{Master Key Processing.}
 We generate the digits in $\pseudoKS$ first, and then those in $\whitening$. To generate them, we concatenate the 128-bit long master key with an IV and then a byte set to 1. The result is fed into \textsf{SHAKE128}, and the output byte stream of this primitive is used to generate digits of $\mathbb{F}_{17}$ using rejection sampling: if a byte $x$ is equal to 255, we discard it; otherwise, we generate the digit $\lfloor x / 15 \rfloor$. Since $15 \times 17 = 255$, this results in an unbiased transformation.
-
-
-% Leo: ce qui suit est pour qu'emacs compile bien l'article, pas touche !
-%%% Local Variables:
-%%% mode: latex
-%%% ispell-local-dictionary: "english"
-%%% TeX-master: "main"
-%%% End:
-
-
-

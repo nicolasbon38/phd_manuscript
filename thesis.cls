@@ -14,7 +14,7 @@
 \RequirePackage{caption}
 \renewcommand{\captionfont}{\it \small}
 
-\RequirePackage{subfigure}
+
 
 \RequirePackage[svgnames]{xcolor}
 

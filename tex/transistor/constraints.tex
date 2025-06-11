@@ -3,7 +3,7 @@
 \label{sec:constraints}
 
 
-\TODO{Compresser ça en se concentrant sur les aspects homomorphes}
+
 %\subsection{State-of-the-Art}
 %\label{sec:soa}
 %
@@ -35,27 +35,20 @@ Conversely to linear operations, the programmable Bootstrapping (PBS) is a slow 
 
 \paragraph{The arrangement of operations.} The PBS produces ciphertexts with a nominal noise level, which is typically lower than that of the input ciphertexts but still significantly higher than the noise in a fresh ciphertext. This implies that if the input bits are fresh encrypted data, they can undergo complex linear operations (specifically with potentially high $\ell_2$-norms). In contrast, the linear functions applied to the outputs of each PBS should involve somewhat limited linear operations in their resulting  $\ell_2$-norms in order to limit the noise growth.
 
-\paragraph{The size of the plaintext space.} The choice of the plaintext space $\mathbb{Z}_p$ has a significant impact on the PBS. Indeed, execution time of the PBS grows exponentially with $p$, which is therefore usually limited to a few bits.
-\ifeprint Figure~\ref{fig:cost_pbs_odd} illustrates the quick degradation of the PBS performance with respect to the bit-size of $p$. \fi
-Although some recent works (\cite{GBA21,AC:CLOT21,EPRINT:CZBSG22,KluSch24}) introduce more sophisticated techniques for efficiently evaluating larger LUTs, their performance in terms of bits per second remains less favorable compared to using lower precision. %Therefore, to offer competitive performance, we have chosen to limit the plaintext space to a maximum of 5 bits.
-
-\paragraph{The parity of the plaintext space.} A common choice for TFHE is using a small power of $2$ for the modulus $p$ of the plaintext space, aligning with the format of (small-precision) binary numbers. However, selecting such an even modulus introduces an additional constraint: any function $f:\mathbb{Z}_p \to \mathbb{Z}_p$ used within a PBS must be \emph{negacyclic}, meaning it must satisfy $f(x + p/2) = - f(x)$ for all $x \in \mathbb{Z}_p$. To circumvent this issue, a possible approach consists in keeping a bit of padding to $0$, effectively embedding $\mathcal{P} = \mathbb{Z}_p$ into $\mathbb{Z}_{2p}$. However, this padding leads to an important overhead: linear operations are no longer virtually free, as frequent bootstrappings become necessary to maintain the padding bit cleared. 
-
-An alternative is to use the \emph{Without Padding PBS} (WoP-PBS) proposed in~\cite{AC:CLOT21}, but the latter is slower than a standard PBS, which is not ideal from a performance standpoint. Another option in the context of TFHE-friendly transciphering is to design a cipher with non-linear functions (S-boxes) that are inherently negacyclic. This strategy, as exemplified in \texttt{Elisabeth}~\cite{AC:CHMS22}, imposes strict constraints on the design of the S-boxes, which may introduce weaknesses~\cite{AC:GBJR23}. 
-
-Another solution is to adopt an odd modulus $p$, which completely eliminates the negacyclicity problem. This approach, recently suggested in~\cite{BPR24}, requires only a minor modification of the bootstrapping algorithm, specifically in the construction of the accumulator polynomial, but allows for arbitrary PBS functions $f:\mathbb{Z}_p \to \mathbb{Z}_p$ without the need for a padding bit. 
+\paragraph{The size of the plaintext space.} The choice of the plaintext space $\mathbb{Z}_p$ has a significant impact on the PBS. Indeed, execution time of the PBS grows exponentially with the number of bits of $p$, which is therefore usually limited to a few bits. Although some recent works (\cite{TCHES:GuiBorAra21,AC:CLOT21,EPRINT:CZBSG22,TCHES:KluSch23}) introduce more sophisticated techniques for efficiently evaluating larger LUTs, their performance in terms of bits per second remains less favorable compared to using lower precision.
 
 
-Using an odd modulus may seem unsuitable for manipulating bits or groups of bits. Indeed, it may lead to data expansion, as an element of \( \mathbb{Z}_p \) cannot perfectly encode a group of bits. To mitigate this issue, one can select an odd $p$ that is slightly larger but close to $2^\ell$ for some $\ell$, allowing for the efficient embedding of $\ell$-bit chunks into elements of $\mathbb{Z}_p$. 
+\paragraph{The parity of the plaintext space.} Following the general line of work of this thesis, we chose an odd plaintext modulus $p$ to get rid of the negacyclicity problem. But using an odd modulus may seem unsuitable for manipulating bits or groups of bits. Indeed, it may lead to data expansion, as an element of \( \mathbb{Z}_p \) cannot perfectly encode a group of bits. To mitigate this issue, one can select an odd $p$ that is slightly larger but close to $2^\ell$ for some $\ell$, allowing for the efficient embedding of $\ell$-bit chunks into elements of $\mathbb{Z}_p$. 
 
 
 \subsubsection{Our design choices.} 
+
 We deduce the following guidelines for our design:
 \begin{enumerate}
 \item The plaintext space of the scheme will be reduced to a few bits to take advantage of the relative speed of the PBS at small precision. Specifically, we chose $p=17$ which meets our constraints as being odd (no negacyclicity) and the closest to a low power of $2$ (thus well suited to encode nibbles of data). Besides, letting $p$ be a prime number eases the design and security analysis thanks to the field structure of $\mathbb{Z}_p = \mathbb{F}_p$.
   
 Moreover, operating in $\F_{17}$ does not constrain the server-side application to this field. Once the server retrieves the homomorphic ciphertexts, they can be efficiently converted to any other space with a bootstrapping. We elaborate more on this point in Section~\ref{sec:data_representation}. 
-%  security analysis as well as the search for good components, e.g., MDS matrices. %\MR{Est-ce que le fait que $p$ soit premier peut faciliter le design ou l'analyse du design en terme de sécurité ?} \ac{Oui, cela facilite l'analyse, et meme la construction, e.g. pour le code MDS je pense.}
+
 
   \item The non-linearity comes from a layer of S-boxes, each computing a function $\mainField \to \mainField$  giving rise to one PBS evaluation. Given our fixed choice of $p$, the number of PBS per element of the output stream represents the main performance metric which we search to minimize. 
 
@@ -70,92 +63,5 @@ Moreover, operating in $\F_{17}$ does not constrain the server-side application 
   released. This way, the TFHE ciphertexts obtained after the stream-cipher decryption keep a noise level as close to nominal as possible.
 \end{enumerate}
 
-% \subsection{Constraints from Symmetric Considerations}
 
-% Building a block cipher means building a round function, a key schedule, and choosing a number of rounds. Designers can rely on a significant body of research to guide their choices, as well some well known design strategies (such as in particular the \emph{wide-trail strategy} used in the AES~\cite{AES}). The round function is then either a Substitution Permutation Network (SPN), a Feistel network, or a variant of either.
-
-% \paragraph{Stream Ciphers Structures.} In contrast, the design of stream ciphers is less well understood. Abstractly, all stream ciphers consist of an internal state, an update function that is applied on said internal state, and a filter function that is applied to the internal state at each clock cycle to extract some bits of keystream. The update function, filter function, or the initialization of the internal state must be key (and possibly nonce/IV) dependent. This very general view covers for example the case of a block cipher in counter mode, % !FIXREF!
-% in which case the internal state is a block cipher plaintext $x_t$, the update function is a simple addition, and the filter is a very complex key-dependent function (namely, a full block cipher $E_k$), as summarized in Figure~\ref{fig:counter-mode}. It also covers the case of a sponge-based stream cipher, % !FIXREF!
-% in which case the filter function is trivial (simply copying the bits in the rate/outer part of the sponge), but the update function is extremely sophisticated (a cryptographic permutation $\pi$), see Figure~\ref{fig:sponge-mode}. More ``classical'' constructions that are based on LFSRs, NLFSRs,  \emph{Finite State Machine (FSM)} and Boolean functions are also covered, as we will discuss later.
-
-% \begin{figure}[h!tb]
-%   \centering
-%   \begin{subfigure}[t]{0.3\textwidth}
-%     \centering
-%     \begin{tikzpicture}[xscale=0.8,yscale=0.7]
-%       \draw (0, 0) rectangle (3, 1) node[pos=0.5]{$x_t$};
-%       \draw (1.5, -1) node(bc){$E_K$} ;
-%       \draw (1.5, -2) node(s){$s_t$} ;
-%       \draw (-0.5, -0.5) node(add){$+1$} ;
-%       \draw[->] (1.5, 0) -- (bc) ;
-%       \draw[->] (bc) -- (s) ;
-%       \draw[->] (0.5, 0) -- (0.5, -0.5) -- (add) ;
-%       \draw[->] (add) -- (-0.5, 0.5) -- (0, 0.5) ;
-%     \end{tikzpicture}
-%     \caption{\label{fig:counter-mode}Counter mode.}
-%   \end{subfigure}
-%   \hfill
-%   \begin{subfigure}[t]{0.3\textwidth}
-%     \centering
-%     \begin{tikzpicture}[xscale=0.8,yscale=0.7]
-%       \draw (0, 0) rectangle (3, 1) node[pos=0.5]{$x_t$};
-%       \draw (1.5, -0.8) node(bc){$\pi$} ;
-%       \draw (2.5, -1.5) node(s){$s_t$} ;
-%       \draw[->] (1.5, 0) -- (bc) ;
-%       \draw[->] (bc) -- (1.5, -1.5) -- (-0.5, -1.5) -- (-0.5, 0.5) -- (0, 0.5) ;
-%       \draw[style=dashed] (2, 0) -- (2, 1) ;
-%       \draw[->] (2.5, 0) -- (s) ;
-%     \end{tikzpicture}    
-%     \caption{\label{fig:sponge-mode}Permutation-based.}
-%   \end{subfigure}
-%   \hfill
-%   \begin{subfigure}[t]{0.35\textwidth}
-%     \centering
-%     \begin{tikzpicture}[xscale=0.8,yscale=0.8]
-%       \footnotesize
-%       \draw (0.5, 0) rectangle (4, 0.5) node[pos=0.5]{LFSR} ;
-%       \draw (1, -1.5) rectangle (3, -1) node[pos=0.5]{FSM} ;
-%       \draw (0, -1.25) node(nl){$U$} ;
-%       \draw (3.8, -1.25) node(phi){$\phi$} ;
-%       \draw (3.8, -2.2) node(s){$s_t$} ;
-%       \draw[->] (1, 0) -- (1, -0.5) -- (0, -0.5) -- (0, 0.25) -- (0.5, 0.25) ;
-%       \draw[->] (0, -0.5) -- (nl) ;
-%       \draw[->] (1, -1.25) -- (nl) ;
-%       \draw[->] (nl) -- (0, -2) -- (2, -2) -- (2, -1.5) ;
-%       \draw[->] (3, -1.25) -- (phi) ;
-%       \draw[->] (3.8, 0) -- (phi) ;
-%       \draw[->] (phi) -- (s) ;
-%     \end{tikzpicture}    
-%     \caption{\label{fig:classical-stream}LFSR and FSM.}
-%   \end{subfigure}
-%   \caption{Different types of stream ciphers structures.}
-%   \label{fig:streams}
-% \end{figure}
-
-% The design techniques that lead to secure and efficient block cipher- and permutation-based constructions are well known. However, they rely on the application of non-linear functions (S-boxes) on the full internal state. In the case of TFHE, these operations are by far the costliest, we therefore discard such approaches and instead focus on the other types of structures.
-
-% Grain % !FIXREF!
-% and SNOW  % !FIXREF!
-% are good examples of stream ciphers that are neither block cipher- nor permutation-based. In both cases, a large part of the internal state consists of one or several LFSRs that are updated using simple linear operations. The only part of the state that undergoes a non-linear update is the FSM, which has as a state size much smaller than the LFSRs, and which is updated using a non-linear function that takes as input the content of LFSRs as well as its own memory. The filter function then extract information from both the LFSR and the FSM to generate the key stream. This structure is summarized in Figure~\ref{fig:classical-stream}, where $U$ is the FSM update function, and $\phi$ is the filter.
-
-
-% \paragraph{Security Contraints.}
-% %!CONTINUE! finish security constraints part 
-% \begin{itemize}
-% \item The internal state needs to be large enough that attacks based on time-memory or time-memory-data trade-offs are not feasible. % !FIXREF!
-% \item algebraic immunity? % !FIXREF!
-% \item no observable correlation between keystream bits (mention Brice's stuff on AEGIS)% !FIXREF!
-% \item correlation-immunity order.% !FIXREF!
-% \end{itemize}
-
-
-
-
-
-
-% Leo: ce qui suit est pour qu'emacs compile bien l'article, pas touche !
-%%% Local Variables:
-%%% mode: latex
-%%% ispell-local-dictionary: "english"
-%%% TeX-master: "main"
-%%% End:
+\TODO{Peut être ici (ou en intro) réécrire un petit paragraphe sur pourquoi un stram plutôt qu'un bloc (présent ici dans le papier mais trop abstrait)}

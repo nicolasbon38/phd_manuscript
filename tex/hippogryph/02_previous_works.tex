@@ -10,16 +10,14 @@ In this section, we present the approach from \cite{DBLP:conf/wahc/TramaCBS23}, 
 
 \subsection{AES Subroutines as LUTs}
 
-	The \SubBytes step, which involves the evaluation of an S-box, is inherently a LUT operation and is therefore naturally implemented in FHE using a PBS. However, it must be evaluated over $\Z_{16}$ rather than $\F_{256}$ for efficiency reasons. Converting the other AES steps into LUT evaluations also requires additional effort.
+The \SubBytes step, which involves the evaluation of an S-box, is inherently a LUT operation and is therefore naturally implemented in FHE using a PBS. However, PBS is too slow in $\F_{256}$ (as we have seen in Section \ref{sec:pbs_performances}). So, they rely on a construction evaluating PBS over $\Z_{16}$ rather than $\F_{256}$. Moreover, converting the other AES steps into LUT evaluations also requires additional effort.
 
-In particular, in the original AES design \cite{aes-original}, the \MixColumns step is computed using a series of XOR operations and multiplications in $\F_{256}$. Unfortunately, TFHE’s native cleartext-ciphertext multiplication cannot directly handle these $\F_{256}$ multiplications because of the polynomial nature of the elements of this field. As a result, \MixColumns must be reformulated as a LUT evaluation.
+In particular, in the original AES design \cite{aes-original}, the \MixColumns step is computed using a series of XOR operations and multiplications in $\F_{256}$. Unfortunately, TFHE’s native multiplication \texttt{ClearMultTFHE} cannot directly handle these $\F_{256}$ multiplications because of the polynomial nature of the elements of this field. As a result, \MixColumns must be reformulated as a LUT evaluation.
 
 Additionally, the \AddRoundKey step, which uses XOR as its key operation, presents its own challenges because XOR is a bivariate operation that requires two inputs. Classical bootstrapping, which operates on single inputs, is insufficient for this purpose. To address this, the authors utilize a specialized bootstrapping method that supports operations on multiple encrypted inputs.
 
 \subsection{LUTs Evaluation} 
-Since the AES evaluation involves computing an 8-bit S-box, a straightforward solution would be to work with 8-bit messages. With such messages, the homomorphic S-box evaluation would require only one bootstrapping per byte. However, processing messages with more bits significantly slow down the bootstrapping process. For example, with 8-bit inputs, TFHE parameters result in bootstrapping times of approximately 1.5 seconds per byte on a standard laptop, making direct evaluation of the 8-bit S-box (and other LUTs) infeasible.
-
-To address this issue, \cite{DBLP:conf/wahc/TramaCBS23} proposes a decomposition approach and demonstrates that the optimal representation of 8-bit inputs for their purpose is in $\Z_{16}$. Specifically, a message $m \in \{0, \cdots, 255\}$ is split into two 4-bit chunks (or \emph{nibbles}) $h$ and $l$ such that $m = 16h+l$. The encryption of $m$ is then represented as two ciphertexts encrypting $h$ and $l$ with the same key $\lweSecretKey$.
+Since the AES evaluation involves computing an 8-bit S-box, a straightforward solution would be to work with 8-bit messages. With such messages, the homomorphic S-box evaluation would require only one bootstrapping per byte. However, processing messages with more bits significantly slow down the bootstrapping process. To address this issue, \cite{DBLP:conf/wahc/TramaCBS23} proposes a decomposition approach and demonstrates that the optimal representation of 8-bit inputs for their purpose is in $\Z_{16}$. Specifically, a message $m \in \{0, \cdots, 255\}$ is split into two 4-bit chunks (or \emph{nibbles}) $h$ and $l$ such that $m = 16h+l$. The encryption of $m$ is then represented as two ciphertexts encrypting $h$ and $l$ with the same key $\lweSecretKey$.
 
 However, bootstrapping these decomposed inputs requires a method capable of handling multiple encrypted inputs. The authors explore several approaches for this, namely the chain-based method and the tree-based method \cite{TCHES:GuiBorAra21}. Their analysis concludes that the Tree-Based Method (TBM) is the most suitable for their needs. They also relies on the Multi-Value Bootstrapping (MVB) to produce several outputs for the cost of one PBS. We provide details about TBM and MVB in the following:
 
@@ -32,7 +30,7 @@ $$
 $$
 The factorization then splits it into two parts: 
 $$
-    acc_i(X) = v_0(X) \cdot v_i(X) \mod (X^N + 1),
+    \textsf{acc}_i(X) = v_0(X) \cdot v_i(X) \mod (X^N + 1),
 $$
 where $v_0(X)$ is a common factor shared across all accumulators set as:
 $$
@@ -51,14 +49,28 @@ By leveraging this factorization and as illustrated on Figure~\ref{fig:mvb}, mul
 \item Computing a $\BlindRotate$ operation on an accumulator polynomial initialized with the value of $v_0$.
 \item Then multiplying with \texttt{ClearMultTFHE} the obtained rotated polynomial by each $v_i(X)$ corresponding to the LUT of $f_i$ to obtain the respective $\textsf{acc}_i(X)$.
 \end{enumerate}
-Finally, at the cost of a single $\BlindRotate$ and $k$ cleartext-ciphertext GLWE multiplications, one can obtain the evaluation of $k$ different LUTs on one single encrypted input. Moreover, this specific choice of factorization allows for a very-low norm for the vectors $v_i$'s (which in practice are very sparse), and so a very-low noise expansion.
+Finally, at the cost of a single $\BlindRotate$ and $k$ \texttt{clearMultTFHE} operations (on $\GLWE$), one can obtain the evaluation of $k$ different LUTs on one single encrypted input. Moreover, this specific choice of factorization allows for a very-low norm for the vectors $v_i$'s (which in practice are very sparse), and so a very-low noise expansion.
 
-\TODO{Refaire ma propre figure}
 \begin{figure}
-    \centering
-%    \includegraphics[width=0.8\textwidth]{figures/mvb.pdf}
-    \caption{Difference between classic bootstrapping of several LUTs on a single input (a) and the use of MVB (b). Pink arrows represent cleartext-ciphertext RLWE multiplications. Figure extracted from \cite{DBLP:conf/wahc/TramaCBS23}.)}
-    \label{fig:mvb}
+	\centering
+	\begin{subfigure}[t]{\linewidth}
+		\centering
+		\mvbFigureA % <-- Replace with your TikZ or figure content
+		\caption{Classic bootstrapping method to evaluate several LUTs on a single input}
+		\label{fig:mvbA}
+	\end{subfigure}
+	
+	\vspace{1.5em} % vertical space between figures
+	
+	\begin{subfigure}[t]{\textwidth}
+		\centering
+		\mvbFigureB % <-- Replace with your TikZ or figure content
+		\caption{MVB method}
+		\label{fig:mvbB}
+	\end{subfigure}
+	
+	\caption{Difference between the classical approach and the MVB. Pink arrows represent \texttt{clearMultTFHE} operations (on $\GLWE$).}
+	\label{fig:mvb}
 \end{figure}
 
 This MVB primitive thus allows significant speed-ups in the implementation of \cite{DBLP:conf/wahc/TramaCBS23}, in particular in the evaluation of the S-box or in the multiplications in $\F_{256}$ that occur during the \MixColumns step. Indeed, since each byte is decomposed into two nibbles $h$ and $l$, the LUT corresponding, for instance, to the S-box must also be decomposed into two tables: one providing the most significant nibble and one providing the least significant nibble. That is to say: 
@@ -75,7 +87,7 @@ Let $B, B', d \in \mathbb N^*$. The Tree-Based Method (TBM) allows to evaluate a
 $$
     m = \sum_{i=0}^{d-1} m_i B^i, \quad \text{with } m_i \in \mathbb{Z}_B,
 $$
-and that are represented by $d$ ciphertexts $(c_0, c_1, \dots, c_{d-1})$ corresponding to the $d$ message components $(m_0, m_1, \dots, m_{d-1})$. 
+and that are represented by $d$ ciphertexts $(\vec c_0, \vec c_1, \dots, \vec c_{d-1})$ corresponding to the $d$ message components $(m_0, m_1, \dots, m_{d-1})$. 
 %
 To evaluate $f$, we encode a LUT for $f$ using $B^{d-1}$ accumulators, each represented by a polynomial $\textsf{acc}_i(X)$. These accumulators encode the functions:
 %
@@ -84,17 +96,17 @@ To evaluate $f$, we encode a LUT for $f$ using $B^{d-1}$ accumulators, each repr
              x &\mapsto f(i + x \cdot B^{d-1})
     \end{align*}
 %
-Next, we apply a $\sf{BlindRotate}$ and a $\sf{SampleExtract}$ to each accumulator $acc_i(X)$, using $c_{d-1}$ as the selector. This operation produces $B^{d-1}$ LWE ciphertexts, each encrypting $f (i + m_{d-1} \cdot B^{d-1})$ for $i \in \Z_{B^{d-1}}$.
+Next, we apply a $\sf{BlindRotate}$ and a $\sf{SampleExtract}$ to each accumulator $\textsf{acc}_i(X)$, using $\vec c_{d-1}$ as the selector. This operation produces $B^{d-1}$ LWE ciphertexts, each encrypting $f (i + m_{d-1} \cdot B^{d-1})$ for $i \in \Z_{B^{d-1}}$.
 %    
 Finally, a $\sf{Keyswitch}$ operation from LWE to GLWE aggregates these ciphertexts into $B^{d-2}$ GLWE encryptions, representing the LUT of $h$, defined as:
     \begin{align*}
         h &: (\Z_{B})^{d-1} \mapsto \Z_B' \\
-          & (a_0, \dots, a_{d-1}) \mapsto f \circ g(a_0, \dots, a_{d-2}, m_{d-1})
+          & (u_0, \dots, u_{d-1}) \mapsto f \circ g(u_0, \dots, u_{d-2}, m_{d-1})
     \end{align*}
 using the bijection $g$, which reverses the decomposition:
     \begin{align*}
         g: (\Z_B)^d &\rightarrow \Z_{B^d} \\
-           (a_0, \dots, a_{d-1}) &\mapsto \sum_{i=0}^{d-1} a_i \cdot B^i
+           (u_0, \dots, u_{d-1}) &\mapsto \sum_{i=0}^{d-1} u_i \cdot B^i
     \end{align*} 
 
 This process is repeated iteratively, using the next ciphertext at each step, until a single LWE ciphertext encrypting $f(m_0, \dots, m_{d-1})$ is obtained.  
@@ -103,7 +115,7 @@ This process is repeated iteratively, using the next ciphertext at each step, un
 \begin{figure}
     \centering
 %    \includegraphics[width=0.8\textwidth]{figures/tree_method.pdf}
-    \caption{Illustration of the tree-based method on messages  $m_1 = 1, m_2=2$ in the space  $\mathbb{Z}_4$. The corresponding ciphertexts are $c_1 \in \mathrm{}(m_1)$ and $c_2 \in \mathrm{LWE}(m_2)$. We apply the addition in $\mathbb{Z}_4$ via programmable bootstrapping. Red arrows indicate bootstrappings. (Figure inspired by \cite{DBLP:conf/wahc/TramaCBS23}.)}
+    \caption{Illustration of the tree-based method on messages  $m_1 = 1, m_2=2$ in the space  $\mathbb{Z}_4$. The corresponding ciphertexts are $\vec c_1 \in \mathrm{}(m_1)$ and $\vec c_2 \in \mathrm{LWE}(m_2)$. We apply the addition in $\mathbb{Z}_4$ via programmable bootstrapping. Red arrows indicate bootstrappings. (Figure inspired by \cite{DBLP:conf/wahc/TramaCBS23}.)}
     \label{fig:my_label}
 \end{figure}
 
@@ -119,17 +131,9 @@ Finally, the ``full-LUT'' approach facilitates efficient computation of the S-bo
 \section{Generalization of $p$-encodings to Arithmetic Case}
 \label{sec:generalization_p_encodings}
 
-\TODO{Repasser sur cette sections}
+In Chapter \ref{chap:p_encodings} of this thesis, we introduced the notion of $p$-encodings and used it in Section \ref{sec:p_encodings_aes} to evaluate AES homomorphically. In this method, data was encrypted bit per bit and only Boolean operations were performed. It leveraged the fact that, in the plaintext space $\Z_2$, the \texttt{SumTFHE} operation actually performs a XOR. Thus, the linear operations \MixColumns and \AddRoundKey could be efficiently performed with minimal cost, using only the homomorphic sum of TFHE. To be able to evaluate $\SubBytes$ under Boolean representation, we used $p$-encodings to evaluate the circuits of \SubBytes with a minimal number of bootstrappings. While this has brought some improvements, evaluating the LUT of AES as a Boolean circuit is still suboptimal, and in this chapter we attempt at doing it using arithmetic representation.
 
-In Chapter \ref{chap:p_encodings} of this thesis, we presented the a construction that we called $p$-encodings and used it in Section \ref{sec:p_encodings_aes} to evaluate AES homomorphically. 
-
-In this method, data is encrypted bit per bit and only Boolean operations are performed. It leverages the fact that, in the plaintext space $\Z_2$, the \texttt{SumTFHE} operation actually performs a XOR. Thus, the linear operations \MixColumns and \AddRoundKey can be efficiently performed with minimal cost, using only the homomorphic sum of TFHE.
-%
-Furthermore, because operations are performed on individual bits, the \ShiftRows transformation can be evaluated for free, as it merely involves rearranging the ciphertexts.
-
-Evaluating \SubBytes is trickier. Using $p=2$, it is impossible to perform a bivariate Boolean gate other than XOR. Thus, evaluating the Boolean circuit of the S-box cannot be done. Thanks to the notion of $p$-encoding, we embedded the bits into a larger space $\Z_p$ with $p > 2$ to construct other Boolean gates.  
-
-In this chapter, we now generalize this notion beyond the Boolean case by defining the $(o, p)$- encoding construction. Informally, instead of embedding the Boolean space in $\Z_p$, we embed any space $\Z_o$ in $\Z_p$ (with $o < p$). So, what was called $p$-encoding in Chapter \ref{chap:hyppogriph} corresponds to a $(2, p)$-encoding in this one.
+To achieve that, we generalize $p$-encodings beyond the Boolean case by defining the $(o, p)$- encoding construction. Informally, instead of embedding the Boolean space in $\Z_p$, we embed any space $\Z_o$ in $\Z_p$ (with $o < p$). So, what was called $p$-encoding in Chapter \ref{chap:p_encodings} corresponds to a $(2, p)$-encoding in this one.
 %
 Definition \ref{def:encoding} formalizes this generalization.
 
@@ -159,11 +163,11 @@ In this work, we focus exclusively on cases where $p=2$ or $p$ is an odd prime. 
 \end{definition}
 
 
-In Chapter \ref{chap:p_encodings} the Boolean space is used (so $o=2$). The \SubBytes circuit is evaluated using $(2,11)$-encoding, while the rest is evaluated with a $(2, 2)$-encoding (\ie~the trivial encoding of TFHE). Consequently, an \textit{Encoding Switching} operation is required. This operation can be straightforwardly performed using a PBS.
+In Chapter \ref{chap:p_encodings} the Boolean space is used (so $o=2$). The \SubBytes circuit is evaluated using $(2,11)$-encoding, while the rest is evaluated with a $(2, 2)$-encoding (\ie~the trivial encoding of TFHE with plaintext space $\Z_2$). Consequently, an \textit{Encoding Switching} operation is required. This operation can be straightforwardly performed using a PBS.
 
 \begin{definition}[Encoding Switching]
 	\label{def:encoding-switching}
-	Let $c$ be a ciphertext encrypting a message $m \in \Z_o$ under the $(o, p)$-encoding $\Encoding$. Its encoding can be switched to the $(o, p')$-encoding $\Encoding'$ by applying a PBS on $c$ evaluating the function:
+	Let $\vec c$ be a ciphertext encrypting a message $m \in \Z_o$ under the $(o, p)$-encoding $\Encoding$. Its encoding can be switched to the $(o, p')$-encoding $\Encoding'$ by applying a PBS on $\vec c$ evaluating the function:
 	
 	\begin{align*}
 		\texttt{Cast}_{\Encoding \mapsto \Encoding'}: \Z_p &\rightarrow \Z_{p'}\\

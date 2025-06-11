@@ -16,14 +16,14 @@ In this chapter we provide an in-depth presentation of the TFHE scheme. We intro
 
 \paragraph{Original $\LWE$ problem}
 
-In 2005, Regev laid the foundations for an important part of modern lattice-based cryptography by defining the Learning With Errors ($\LWE$) problem in \cite{regev_lwe}. With this work, he . The version usually used in FHE literature is presented in Definition \ref{def:LWE}:
+In 2005, Regev laid the foundations for an important part of modern lattice-based cryptography by defining the Learning With Errors ($\LWE$) problem in \cite{regev_lwe}. The version usually used in FHE literature is presented in Definition \ref{def:LWE}:
 
 
 \begin{definition}
-	(Learning with Errors). Let $q$ and $n$ two integers, respectively called \textit{modulus} and \textit{dimension}.  and let $\chi_s$ and $\chi_e$ be distributions over \textit{small} values of $\lweRing$. We consider a secret vector, sampled as: $\lweSecretKey = (s_0, \dots, s_{n-1}) \drawfrom \chi_s^n$. The $\LWE$ distribution $\mathcal{D}_{q, n, \chi_s, \chi_e}^{\LWE}$ is defined as:
+	(Learning with Errors). Let $q$ and $n$ two integers, respectively called \textit{modulus} and \textit{dimension}.  Let $\chi_s$ and $\chi_e$ be distributions over \textit{small} values of $\lweRing$. We consider a secret vector, sampled as: $\lweSecretKey = (s_0, \dots, s_{n-1}) \drawfrom \chi_s^n$. The $\LWE$ distribution $\mathcal{D}_{q, n, \chi_s, \chi_e}^{\LWE}(\lweSecretKey)$ is defined as:
 	
 	 \[
-	 \mathcal{D}_{q, n, \chi_s, \chi_e}^{\LWE} = \left \{(\vec a, b) \;\middle|\; \vec a = (a_0, \dots, a_{n-1}) \drawfrom \unif{\lweRing}^n, e \drawfrom \chi_e, b = \innerProduct{\vec a}{\vec s} + e \right \}
+	 \mathcal{D}_{q, n, \chi_s, \chi_e}^{\LWE}(\lweSecretKey) = \left \{(\vec a, b) \;\middle|\; \vec a = (a_0, \dots, a_{n-1}) \drawfrom \unif{\lweRing}^n, e \drawfrom \chi_e, b = \innerProduct{\vec a}{\vec s} + e \right \}
 	  \]
 	 
 	 The \textit{decisional} version of the problem is to distinguish this distribution from a uniformely random one, namely:
@@ -32,7 +32,7 @@ In 2005, Regev laid the foundations for an important part of modern lattice-base
 	\mathcal{D}^{(\textsf{random})} = \left \{(\vec a, r) \;\middle|\; \vec a \drawfrom \unif{\lweRing}^n, r \drawfrom \unif{\lweRing} \right\}
 	\]
 
-	The \emph{search} version of the problem is to recover $\lweSecretKey$ from samples of $\mathcal{D}_{q, n, \chi_s, \chi_e}^{\LWE}$. 
+	The \emph{search} version of the problem is to recover $\lweSecretKey$ from samples of $\mathcal{D}_{q, n, \chi_s, \chi_e}^{\LWE}(\lweSecretKey)$. 
 	\label{def:LWE}
 \end{definition}
 
@@ -54,10 +54,10 @@ Most implementations of TFHE select a uniform distribution on $\{0, 1\}$ for the
 Looking for more efficient solutions, $\LWE$ problem has been declined in a \textit{ring variant} named $\RLWE$ in \cite{rlwe}. A generalized version over rings named $\GLWE$, first formalized in \cite{EPRINT:BraGenVai11} and used by TFHE, is presented below. It is very similar to the $\LWE$ one, but deals with polynomial values instead of integers:
 
 \begin{definition}
-	(Generalized Learning with Errors) Let $q$, $k$ and $N$ three integers, respectively called \textit{modulus}, \textit{dimension} and \textit{degree}. We consider the polynomial ring $\glweRingFull$, that we denote in short $\glweRing$. Let $\chi_S$ and $\chi_E$ be distributions over the small values of $\glweRing$, (that is to say, polynomials with small coefficients). We consider a secret vector $\glweSecretKey$, sampled as $\glweSecretKey = (S_0, \dots, S_{k-1}) \drawfrom \chi_S^k$. The $\GLWE$ distribution $\mathcal{D}_{q, k, N, \chi_S, \chi_E}^{\GLWE}$ is defined as:
+	(Generalized Learning with Errors) Let $q$, $k$ and $N$ three integers, respectively called \textit{modulus}, \textit{dimension} and \textit{degree}. We consider the polynomial ring $\glweRingFull$, that we denote in short $\glweRing$. Let $\chi_S$ and $\chi_E$ be distributions over the small values of $\glweRing$, (that is to say, polynomials with small coefficients). We consider a secret vector $\glweSecretKey$, sampled as $\glweSecretKey = (S_0, \dots, S_{k-1}) \drawfrom \chi_S^k$. The $\GLWE$ distribution $\mathcal{D}_{q, k, N, \chi_S, \chi_E}^{\GLWE}(\glweSecretKey)$ is defined as:
 	
 	\[
-	\mathcal{D}_{q, k, N, \chi_S, \chi_E}^{\GLWE} = \left \{ (\vec A, B) \;\middle|\; \vec A = (A_0, \dots, A_{k-1}) \drawfrom \unif{\glweRing}^k, E \drawfrom \chi_E, B = \innerProduct{\vec A}{\vec S} + E \right \}
+	\mathcal{D}_{q, k, N, \chi_S, \chi_E}^{\GLWE}(\glweSecretKey) = \left \{ (\vec A, B) \;\middle|\; \vec A = (A_0, \dots, A_{k-1}) \drawfrom \unif{\glweRing}^k, E \drawfrom \chi_E, B = \innerProduct{\vec A}{\vec S} + E \right \}
 	\]
 	
 	The \textit{decisional} version of the problem is to distinguish this distribution from a uniformely random one, namely:
@@ -66,9 +66,8 @@ Looking for more efficient solutions, $\LWE$ problem has been declined in a \tex
 	\mathcal{D}^{(\textsf{random})} = \left \{(\vec A, R) \;\middle|\; \vec A \drawfrom \unif{\glweRing}^k, R \drawfrom \unif{\glweRing} \right\}
 	\]
 	
-	The \emph{search} version of the problem is to recover $\lweSecretKey$ from samples of $\mathcal{D}_{q, k , N, \chi_S, \chi_E}^{\GLWE}$. 
+	The \emph{search} version of the problem is to recover $\lweSecretKey$ from samples of $\mathcal{D}_{q, k , N, \chi_S, \chi_E}^{\GLWE}(\glweSecretKey)$. 
 	\label{def:GLWE}
-	
 \end{definition}
 
 Note that if we fix $k = 1$, we fall back on the classical $\RLWE$ problem, notably used in BGV \cite{bgv}. Also, taking $N=1$ produces a $\LWE$ instance with $n = k$. 
@@ -85,7 +84,7 @@ General consensus is that hardness of an instance $\GLWE_{(q, k, N, \sigma)}$ is
 The T in TFHE stands for \textit{Torus}, because in the seminal paper of TFHE \cite{JC:CGGI20}, authors worked with torus-based variants of $\LWE$ and $\GLWE$.
 
 
-The torus $\T = \R / \Z$ corresponds to the integers modulo 1. Algebraically, this space does not have a ring structure, but actually is a \textit{$\Z$-module} one, which means that:
+The torus $\T = \R / \Z$ corresponds to the reals modulo 1. Algebraically, this space does not have a ring structure, but actually is a \textit{$\Z$-module} one, which means that:
 
 \begin{itemize}
 	\item The sum of two torus elements is well-defined, and yields another torus element.
@@ -102,7 +101,7 @@ This brings two advantages:
 
 \begin{itemize}
 	\item $\LWE$ over the torus is \textit{scale-invariant}, which makes the analysis of the security and of the noise much simpler.
-	\item The $\Z$-module structure propagate in the ring versions, as well as in matrices spaces. Thus, it allows for very powerful generalizations of homomorphic schemes on a wide variety of spaces, like in \cite{chimera, chimera2}.
+	\item The $\Z$-module structure propagates in the ring versions, as well as in matrices spaces. Thus, it allows for very powerful generalizations of homomorphic schemes on a wide variety of spaces, like in \cite{chimera, chimera2}.
 \end{itemize} 
 
 
@@ -272,7 +271,7 @@ Hopefully, there is a well-known way to improve the noise growth in the scalar m
 To begin with, we introduce an \textit{exact} version of the gadget decomposition for clarity. The variant used in TFHE is an \textit{approximate} one, which is conceptually only slightly more complex.
 
 
-Recall that we want to compute the scalar product $a_i \cdot \LWE{\lweSecretKey}(m)$, with $a_i$ a potentially large value in $\lweRing$, without noise explosion.
+Recall that we want to compute the scalar product $a_i \cdot \LWE_{\lweSecretKey}(m)$, with $a_i$ a potentially large value in $\lweRing$, without noise explosion.
 
 The core idea is to work with a \textit{decomposition} of the constant $a_i$ in some basis. Let $(\baseDecomp, \levelDecomp)$ be two integers such that $\baseDecomp^\levelDecomp = q$. We denote the decomposition of $a_i$ in this basis by:
 
@@ -286,7 +285,7 @@ In parallel, instead of working with a single ciphertext $\LWE_{\lweSecretKey}(m
 	\left \lbrace \LWE_{\lweSecretKey}(m \cdot \baseDecomp^j) \right \rbrace_{0 \le j < \levelDecomp}
 \]
 
-Now, observe that instead of directly performing the product $a_i \cdot \LWE{\lweSecretKey}(m)$, we can instead performs the sum 
+Now, observe that instead of directly performing the product $a_i \cdot \LWE_{\lweSecretKey}(m)$, we can instead performs the sum 
 
 \[
 	\sum_{j=0}^{\levelDecomp - 1} a_{i,j} \cdot \LWE_{\lweSecretKey}(m \cdot \baseDecomp^j) \text{ with: } \decomp{\baseDecomp}{\levelDecomp}{a_i} = (a_{i, 0}, \dots, a_{i, \ell-1})
@@ -324,7 +323,7 @@ and we replace the simple scalar multiplications in the keyswitching algorithm b
 \paragraph{Generalization to $\GLWE$}
 
 
-We introduced keyswitching in its $\LWE$-to-$\LWE$ form, but everything generalizes nicely to construct a $\LWE$-to-$\GLWE$ flavour. Here, $\KSK$ is a collection of GLWE ciphertexts, and the decomposition is applied coefficient-wise on the polynomials. The resulting $\GLWE$ ciphertext encrypts a polynomial whose degree-zero coefficient encodes the original message.
+We introduced keyswitching in its $\LWE$-to-$\LWE$ form, but everything generalizes nicely to construct a $\LWE$-to-$\GLWE$ flavour. Here, $\KSK$ is a collection of $\GLWE$ ciphertexts, and the decomposition is applied coefficient-wise on the polynomials. The resulting $\GLWE$ ciphertext encrypts a polynomial whose degree-zero coefficient encodes the original message.
 
 
 It is then possible to pack several $\LWE$ ciphertexts into a single $\GLWE$ one, by multiplying the results by different monomials to move the encoded coefficient in a higher degree. They can then be summed. This is known in the literature as the $\PackingKeySwitch$. As this will be useful particularly in Chapter \ref{chap:hyppogriph}, we detail it in Algorithm \ref{alg:packing_keyswitching}.
@@ -473,7 +472,7 @@ Let $v(X) = \displaystyle \sum_{i=0}^{N-1} v_i X^i$ be an element of the ring $\
 
 What we can take away from this is that the monomial multiplication simply performs a \textit{rotation} of the polynomial's coefficients (overlooking the red minus signs). In the blind rotation, what we are really interested in is the value of the degree-zero coefficient. If we want to rotate the polynomial such that the $\mu$-th coefficient is brought into the degree-zero one, we just have to multiply the polynomial by the monomial $X^{-\mu}$.
 
-But there's a problem here. When the coefficients are ``sent to the other side '' of the polynomial, they get an extra minus sign. So actually, a multiplication by $X^N$ does not yield the initial polynomial, but rather the ``opposite'' one. To make a complete round trip, it requires to multiply instead by $X^{2N}$. This is natural because $X$ has order $2N$ in $\glweRing$. In the literature, this problem is called \textit{the negacyclicity problem} and we dive deeper into it in Chapter \ref{chap:negacyclicity}.
+But there's a problem here. When the coefficients are ``sent to the other side'' of the polynomial, they get an extra minus sign. So actually, a multiplication by $X^N$ does not yield the initial polynomial, but rather the ``opposite'' one. To make a complete round trip, it requires to multiply instead by $X^{2N}$. This is natural because $X$ has order $2N$ in $\glweRing$. In the literature, this problem is called \textit{the negacyclicity problem} and we dive deeper into it in Chapter \ref{chap:negacyclicity}.
 
 The goal here is to introduce blind rotation without the complexity induced by the negacyclicity problem. So for now, we assume that the exponent of the monomial lives in $\lbrace 0, \dots, N-1 \rbrace$. As we are only interested in the value of the degre-zero coefficient, we can safely overlook these minus signs as they can not reach it.
 
@@ -537,7 +536,7 @@ The server requires a \textit{bootstrapping key}, that we denote by $\BSK$, defi
 	\BSK = \left \lbrace \GGSW_{\glweSecretKey}(s_i) \right \rbrace_{0 \le i < n}
 \]
 
-where $\glweSecretKey'$ is a $\GLWE$ secret key, of shape $(k, N)$.
+where $\glweSecretKey$ is a $\GLWE$ secret key, of shape $(k, N)$.
 
 \bigskip
 TFHE's bootstrapping algorithm can be broken down into three steps: \ModSwitch, \texttt{BlindRota\-te} and \SampleExtract.
