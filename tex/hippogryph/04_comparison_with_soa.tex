@@ -1,8 +1,6 @@
 \section{Experimental Results}
 \label{sec:comparison}
 
-\TODO{Repasser sur cette section en allégeant l'état de l'art ?}
-
 In this section, we compare our new framework to several state-of-the-art homomorphic AES executions, including the ones performed with the two building blocks of our new design.
 We particularly emphasize that \textit{all implementations have been tested on the same machine}, a 12th Gen Intel(R) Core(TM) i7-12700H CPU laptop with 64 Gib total system memory with an Ubuntu 22.04.2 LTS operating system. All execution timings can be found in Table~\ref{tab:comp}.
 Parameter sets used to obtain these results are presented in Table~\ref{tab:params}.
@@ -92,7 +90,7 @@ As a consequence, for this specific building block only, we relied on the theore
 %We thus assume that comparing the execution timings of our new framework to those given in the Thunderbird paper results in a slightly unfair comparison for \hippo.}
 
 \subsection{Results}
-To measure the performances of our method, we implemented it using a fork of \texttt{tfhe-rs} \cite{tfhe-rs} that supports odd moduli. The results were then compared against the current state-of-the-art frameworks.
+To measure the performances of our method, we implemented it using our fork of \texttt{tfhe-rs} \cite{tfhe-rs}, modified to support odd moduli (see Section \ref{sec:library}). The results were then compared against the current state-of-the-art frameworks.
 
 For a fair comparison, all implementations were tested on the same machine, \emph{using a single core}. As shown in Table \ref{tab:comp}, our novel framework achieves the lowest latency when evaluating the AES as the evaluation of the algorithm only takes about 30 seconds. Hence, \hippo{} is between 1.44 and 1.87 times faster than the best-in-class Thunderbird approach (depending, as discussed above, whether we respectively consider the 46 secs timing given in the Thunderbird paper or a timing of 60 secs as measured with our implementation).
 Moreover, when enabling several cores on our 12th Gen Intel(R) Core(TM) i7-12700H CPU laptop, we can reach an execution time that is smaller than $5$ seconds, using only 6 cores, and further reduce this timing to 1.1 seconds by using 32 cores on a more powerful machine as discussed below.

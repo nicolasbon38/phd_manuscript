@@ -1,11 +1,11 @@
 \begin{tikzpicture}[scale=0.35, transform shape]
-	\definecolor{nibblecolorinner}{HTML}{003f5c}
+	\definecolor{nibblecolorinner}{HTML}{00a058}
 	\newcommand{\nibblecolor}{nibblecolorinner}
 	
 	\definecolor{bitcolorinner}{HTML}{ffa600}
 	\newcommand{\bitcolor}{bitcolorinner}
 	
-	\definecolor{operatorcolorinner}{HTML}{ff6361}
+	\definecolor{operatorcolorinner}{HTML}{b8a99a}
 	\newcommand{\operatorcolor}{operatorcolorinner}
 	
 	\definecolor{blockcolorinner}{HTML}{ff6361}
@@ -70,7 +70,7 @@
 	\tikzset{
 		pics/vertical_nibble/.style args={#1}{
 			code={
-				\node[draw, minimum width=\nibbleheight cm, minimum height=\nibblewidth cm, anchor=north west, fill=\nibblecolor, fill opacity=0.2] (#1) at (0,0) {};
+				\node[draw, minimum width=\nibbleheight cm, minimum height=\nibblewidth cm, anchor=north west, fill=\nibblecolor, fill opacity=0.5] (#1) at (0,0) {};
 			}
 		}
 	}
@@ -78,7 +78,7 @@
 	\tikzset{
 		pics/horizontal_nibble/.style args={#1}{
 			code={
-				\node[draw, minimum width=\nibblewidth cm, minimum height=\nibbleheight cm, anchor=north west, fill=\nibblecolor, fill opacity=0.2] (#1) at (0,0) {};
+				\node[draw, minimum width=\nibblewidth cm, minimum height=\nibbleheight cm, anchor=north west, fill=\nibblecolor, fill opacity=0.5] (#1) at (0,0) {};
 			}
 		}
 	}
@@ -87,7 +87,7 @@
 	\tikzset{
 		pics/bit/.style args={#1}{
 			code={
-				\node[draw, minimum width=\bitsize cm, minimum height=\bitsize cm, anchor=north west, fill=\bitcolor, fill opacity=0.2] (#1) at (0,0) {};
+				\node[draw, minimum width=\bitsize cm, minimum height=\bitsize cm, anchor=north west, fill=\bitcolor, fill opacity=0.5] (#1) at (0,0) {};
 			}
 		}
 	}
@@ -133,7 +133,7 @@
 	\tikzset{
 		pics/tree_pbs/.style args={#1}{
 			code={
-				\node[draw, minimum width=\nibblewidth cm, minimum height=\nibblewidth cm, anchor=north west, fill=\operatorcolor, fill opacity=0.2] (#1) at (0,0) {};
+				\node[draw, minimum width=\nibblewidth cm, minimum height=\nibblewidth cm, anchor=north west, fill=\operatorcolor, fill opacity=0.5] (#1) at (0,0) {};
 				
 				\node[rectangle, minimum width=3cm, minimum height=1.5cm, align=center] 
 				at (\nibblewidth / 2, -2 * \nibblewidth / 5) {\Huge \textbf{Tree}};
@@ -149,7 +149,7 @@
 	\tikzset{
 		pics/mvb/.style args={#1}{
 			code={
-				\node[draw, minimum width=\nibblewidth cm, minimum height=\nibblewidth cm, anchor=north west, fill=\operatorcolor, fill opacity=0.2] (#1) at (0,0) {};
+				\node[draw, minimum width=\nibblewidth cm, minimum height=\nibblewidth cm, anchor=north west, fill=\operatorcolor, fill opacity=0.5] (#1) at (0,0) {};
 				
 				\node[rectangle, minimum width=3cm, minimum height=1.5cm, align=center] 
 				at (\nibblewidth / 2, -\nibblewidth / 2) {\Huge \textbf{MVB}};
@@ -162,7 +162,7 @@
 	\tikzset{
 		pics/pbs/.style args={#1}{
 			code={		
-				\node[draw, minimum width=\nibbleheight cm, minimum height=\halfwidth cm, anchor=north west, fill=\operatorcolor, fill opacity=0.2] (#1) at (0,0) {};
+				\node[draw, minimum width=\nibbleheight cm, minimum height=\halfwidth cm, anchor=north west, fill=\operatorcolor, fill opacity=0.5] (#1) at (0,0) {};
 				
 				\node[rectangle, minimum width=1cm, minimum height=1.5cm, align=center, rotate=90] 
 				at (\nibbleheight / 2, -\nibblewidth / 4) {\huge \textbf{PBS}};
@@ -175,7 +175,7 @@
 	\tikzset{
 		pics/su/.style args={#1}{
 			code={			
-				\node[draw, minimum width=\nibblewidth cm, minimum height=\halfwidth cm, anchor=north west, fill=\operatorcolor, fill opacity=0.2] (#1) at (0,0) {};
+				\node[draw, minimum width=\nibblewidth cm, minimum height=\halfwidth cm, anchor=north west, fill=\operatorcolor, fill opacity=0.5] (#1) at (0,0) {};
 				
 				\node[rectangle, minimum width=1cm, minimum height=1.5cm, align=center] 
 				at (\nibblewidth / 2, -\nibblewidth / 4) {\scalebox{3}{$\boldsymbol{\sum}$}};

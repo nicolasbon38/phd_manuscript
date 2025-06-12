@@ -21,6 +21,25 @@ The result of this work is doubly interesting: first, we manage to outperform th
 We start this chapter by introducing the notion of transciphering in Section \ref{sec:transciphering}, which will be a recurring theme in the rest of this manuscript. Then, after some preliminaries on the AES cipher (Section \ref{sec:preliminaries_aes}), we introduce in Section \ref{sec:previous-blocks} some advanced homomorphic operators from \cite{DBLP:conf/wahc/TramaCBS23} that will be useful in this work. We then generalize the $p$-encoding construction of Chapter \ref{chap:p_encodings} to the arithmetic case (Section \ref{sec:generalization_p_encodings}). Finally, Section~\ref{sec:hippogryph_our_work} introduces our new design and Section~\ref{sec:comparison} presents a detailed comparison with existing approaches, supported by relevant benchmarks.
 
 
-\TODO{Mettre la table récapitulative du papier ici ?}
+\begin{table}[ht]
+	\centering
+	\caption{State-of-the-art \emph{single-core} homomorphic evaluation of AES. The table indicates both the original timings, in seconds, provided in the papers and, in brackets, the timings obtained on our single machine test bench (a 12th Gen Intel(R) Core(TM) i7-12700H CPU laptop).}
+	\label{tab:soa}
+	\begin{tabular}{|>{\centering\arraybackslash}p{1.5cm}|>{\centering\arraybackslash}p{3.7cm}|>{\centering\arraybackslash}p{6cm}|>{\centering\arraybackslash}p{2.5cm}|}
+		\hline
+		\textbf{Year} & \textbf{Reference} & \textbf{Method} & \textbf{Timings} \\
+		\hline
+		\multirow{3}{*}{2023} & \cite{DBLP:conf/wahc/TramaCBS23} & Tree-Based Method (TBM) & 270 (270) s\\
+		\cline{2-4}
+		& \cite{TCHES:BonPoiRiv24} (Chapter \ref{chap:p_encodings}) & $p$-encoding method & 135 (90) s\\
+		\cline{2-4}
+		& \cite{ISC:WWLLL23} & TFHE in ``LHE'' mode  & 86 (87) s\\
+		\hline
+		2024 & \cite{TCHES:WLWLLW24} & TFHE in ``LHE'' mode & 46 (60) s\\
+		\hline \hline
+		2025 & This work & Combined TBM/$p$-encodings & 32 s\\
+		\hline
+	\end{tabular}
+\end{table}
 
 

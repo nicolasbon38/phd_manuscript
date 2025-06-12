@@ -51,8 +51,7 @@ $$\sigma_0^2  = \frac{(2^\ell - 1)^2}{12} \approx \frac{2^{2\ell}}{12} \approx 0
 
 In the context of transciphering with \coolName, the trade-off provided by the second option gives rise to an initialization procedure which consists in decompressing and bootstrapping the wrapped key. 
 
-
-
+This kind of compression has been more extensively studied in the concurrent work \cite{EPRINT:BCCS24}.
 
 \begin{table}[t!]
 	\centering
@@ -83,7 +82,7 @@ In the context of transciphering with \coolName, the trade-off provided by the s
 \subsection{Transciphering vs. Data Representation}
 \label{sec:data_representation}
 
-Managing data representation is a common challenge when working with TFHE. Since this scheme is only efficient at very low precision, an abstraction layer is required to construct practical data types (e.g., 8-, 32-, or 64-bit integers) from smaller encrypted chunks. Common constructions include radix-based decompositions and Chinese Remainder Theorem (CRT) representations, leading to different efficiency trade-offs. Carry propagation in radix-based representations is notoriously slow due to the large number of required bootstrappings, while CRT representations impose constraints on feasible operations. These constructions have been studied in~\cite{JC:BBBCLOT23}. 
+Managing data representation is a common challenge when working with TFHE. Since this scheme is only efficient at very low precision, an abstraction layer is required to construct practical data types (e.g., 8-, 32-, or 64-bit integers) from smaller encrypted chunks. Common constructions include radix-based decompositions and Chinese Remainder Theorem (CRT) representations, leading to different efficiency trade-offs. Carry propagation in radix-based representations is notoriously slow due to the large number of required bootstrappings, while CRT representations impose constraints on feasible operations. These constructions have been studied in~\cite{JC:BBBCLO23}. 
 
 As a result, there is no universal representation that is optimal for all homomorphic operations. Thankfully, the representation of data in the transciphering algorithm can be chosen independently of that of the homomorphic application running on the server. If the representation in $\mathbb Z_p$ does not suit the application, the server can convert the ciphertexts to the desired representation before running the application. %Such a conversion can be either applied to the TFHE ciphertexts obtained by the server after transciphering, or directly on the keystream (in this case, the symmetric ciphertexts are encoded directly in the desired representation, and the encryption/decryption operation is performed in the corresponding space). In both cases, it simply requires a bootstrapping for each element of $\mathbb Z_p$. 
 We stress that this additional step of conversion would be necessary for any transciphering algorithm, as the data format desired in output of transciphering is completely application-dependent.
@@ -122,61 +121,39 @@ We suggest the \emph{silent LFSR} approach for the homomorphic evaluation of LFS
 
 \subsection{TFHE Parameters} 
 \label{sec:tfhe-parameters}
-\TODO{Trouver une solution pour harmoniser avec Orpheus (mais écrire le chapitre en question d'abord)}
 
-\ifeprint
-\else
-	The details of the homomorphic implementation of \coolName{} are given in the full version~\cite{EPRINT:BBBBCL25}. In short, the LFSRs are clocked in a silent way (see Section \ref{sec:rationale-controllin-noise}), and the implementation of the rest of the algorithm is straightforward using the basics operations provided by the TFHE scheme (see Section~\ref{sec:preliminaries}). 
-\fi
 
-We discuss hereafter the selection of the different TFHE parameters involved in the homomorphic implementation of \coolName. Here is the list of the different parameters to be considered:
-\begin{itemize}
-	\item $q$: the modulo used for the ciphertexts,
-	\item $n_{\text{short}}$: the dimension of the LWE ciphertexts used within the PBS algorithm,
-	\item $k$: the dimension of GLWE ciphertexts,
-	\item $N$: the degree of the polynomials in GLWE ciphertexts,
-	\item $n_{\text{long}} = k \cdot N$: the dimension of the LWE ciphertexts extracted from GLWE ciphertexts,
-	\item $\sigma_{\text{short}}, \sigma_{\text{long}}$: the standard deviation of the Gaussian distribution of fresh noise in the ciphertexts of dimension respectively $n_{\text{short}}$ and  $n_{\text{long}}$,
-	\item $B_{KS}$ and $B_{BR}$: the bases used in the gadget decompositions occurring in respectively the \textsf{Keyswitching} and the \textsf{BlindRotate} phases,
-	\item $\ell_{KS}$ and $\ell_{BR}$: the levels of those decompositions.
-\end{itemize}
+We discuss hereafter the selection of the different TFHE parameters involved in the homomorphic implementation of \coolName. An extensive presentation of the TFHE parameters and their role within the scheme can be found in Section \ref{sec:about_problem}.
 
-Throughout the homomorphic evaluation of \coolName, the manipulated ciphertexts can be of three different types: LWE ciphertexts of dimension $n_{\text{short}}$, LWE ciphertexts of dimension $n_{\text{long}}$, or GLWE ciphertexts of dimension $k$ and polynomial degree $N$. \ifeprint{
-	Figure \ref{fig:structure_fhe} shows the ciphertext format at the different steps of the homomorphic evaluation.
+Figure \ref{fig:structure_fhe} shows the ciphertext format at the different steps of the homomorphic evaluation of \coolName. It shows that the manipulated ciphertexts can be of three different types: LWE ciphertexts of dimension $n_{\text{short}}$, LWE ciphertexts of dimension $n_{\text{long}}$, or GLWE ciphertexts of dimension $k$ and polynomial degree $N$.
 	
-	\input{tex/transistor/figures/structure_fhe.tex}
-}
-\else %{Appendix~\ref{sec:schema_structure_fhe} shows the ciphertext format at the different steps of the homomorphic evaluation.
 
-\fi
+\input{tex/transistor/figures/structure_fhe.tex}
+
 
 \paragraph{Optimization of the TFHE parameters.}
-To generate a set of parameters, we use the method developed in~\cite{JC:BBBCLOT23}. Given the negligible noise contribution from the LFSRs, the FSM can be modeled using the \emph{atomic pattern} introduced in~\cite{JC:BBBCLOT23} (specifically the instance referred to as $\mathcal{A}^{(\text{CJP21})}$), which is a pattern of homomorphic operators taking a set of ciphertexts in input, computing linear combinations of those ciphertexts and applying a programmable bootstrapping to each of them. The FSM round in \coolName which composes a multiplication by a constant matrix ($\mixColumns$), followed by a bootstrapping step ($\subWords$) is precisely an instance of such an atomic pattern. The framework proposed in~\cite{JC:BBBCLOT23} generates parameters that guarantee a specified security level $\lambda$ for the LWE encryption and target error probability $p_{\text{err}}$, while optimizing the PBS to be as fast as possible. 
-\ifeprint{
-		Table \ref{tab:parameters} shows the parameters used for our experiments, all ensuring 128 bits of security. The obtained security levels $\lambda_{\text{short}}$ et $\lambda_{\text{long}}$ have been estimated using the \texttt{lattice estimator}~\cite{lattice-estimator}.
-		
-		\begin{table}[t!]
-		\centering
-		\caption{TFHE Parameters used in our experiments}.
-		\label{tab:parameters}
-		\renewcommand{\arraystretch}{1.3}  % Adjust row spacing
-		\scalebox{1}{
-			\begin{tabular}{|c||*{12}{>{\centering\arraybackslash}p{0.8cm}|}}
-				\hline
-				$p_{\text{err}}$ & $q$ & $n_{\text{short}}$ & $k$ & $N$ & $\sigma_{\text{short}}$ & $\sigma_{\text{long}}$ & $B_{BR}$ & $\ell_{\text{BR}}$ & $B_{KS}$ & $\ell_{\text{KS}}$ & $\lambda_{\text{short}}$ & $\lambda_{\text{long}}$\\
-				\hline
-				$2^{-40}$ & $2^{64}$ & 788 & 2 & 1024 & $2^{47}$ & $2^{14}$ & $2^{23}$ & 1 & $2^4$ & 3 & 131.8 & 128.9\\
-				\hline
-				$2^{-128}$ & $2^{64}$ & 774 & 1 & 2048 & $2^{47}$ & $2^{14}$ & $2^{23}$ & 1 & $2^3$ & 5 & 131.8 & 128.9\\
-				\hline
-		\end{tabular}
-		}
+To generate a set of parameters, we use the method developed in~\cite{JC:BBBCLO23}. Given the negligible noise contribution from the LFSRs, the FSM can be modeled using the \emph{atomic pattern} introduced in~\cite{JC:BBBCLO23} (specifically the instance referred to as $\mathcal{A}^{(\text{CJP21})}$), which is a pattern of homomorphic operators taking a set of ciphertexts in input, computing linear combinations of those ciphertexts and applying a programmable bootstrapping to each of them. The FSM round in \coolName which composes a multiplication by a constant matrix ($\mixColumns$), followed by a bootstrapping step ($\subWords$) is precisely an instance of such an atomic pattern. The framework proposed in~\cite{JC:BBBCLO23} generates parameters that guarantee a specified security level $\lambda$ for the LWE encryption and target error probability $p_{\text{err}}$, while optimizing the PBS to be as fast as possible. 
+
+Table \ref{tab:parameters} shows the parameters used for our experiments, all ensuring 128 bits of security. The obtained security levels $\lambda_{\text{short}}$ et $\lambda_{\text{long}}$ have been estimated using the \texttt{lattice estimator}~\cite{lattice-estimator}.
+
+\begin{table}[t!]
+\centering
+\caption{TFHE Parameters used in our experiments}.
+\label{tab:parameters}
+\renewcommand{\arraystretch}{1.3}  % Adjust row spacing
+\scalebox{1}{
+	\begin{tabular}{|c||*{12}{>{\centering\arraybackslash}p{0.8cm}|}}
+		\hline
+		$p_{\text{err}}$ & $q$ & $n_{\text{short}}$ & $k$ & $N$ & $\sigma_{\text{short}}$ & $\sigma_{\text{long}}$ & $B_{BR}$ & $\ell_{\text{BR}}$ & $B_{KS}$ & $\ell_{\text{KS}}$ & $\lambda_{\text{short}}$ & $\lambda_{\text{long}}$\\
+		\hline
+		$2^{-40}$ & $2^{64}$ & 788 & 2 & 1024 & $2^{47}$ & $2^{14}$ & $2^{23}$ & 1 & $2^4$ & 3 & 131.8 & 128.9\\
+		\hline
+		$2^{-128}$ & $2^{64}$ & 774 & 1 & 2048 & $2^{47}$ & $2^{14}$ & $2^{23}$ & 1 & $2^3$ & 5 & 131.8 & 128.9\\
+		\hline
+\end{tabular}
+}
 	\end{table}
-}
-\else{
-    The parameters we use in our implementation for the two different error probabilities $p_{\text{err}}$: $2^{-40}$ and $2^{-128}$ are specified in the full version~\cite{EPRINT:BBBBCL25}.
-}
-\fi
+
 
 
 \paragraph{Encryption security.} 
@@ -184,8 +161,9 @@ The security level (in bits) of the LWE ciphertexts is a function of the modulus
 
 
 
-\paragraph{Correctness of the PBS.} To compute the error probability $p_{\text{err}}$, we have to evaluate the variances occurring inside the programmable bootstrapping of the $\subWords$ layer\ifeprint. We provide such an analysis in Appendix \ref{sec:pbs_variance_analysis}. \else (see full version~\cite{EPRINT:BBBBCL25}).\fi
-\TODO{Dans l'appendix, il y a l'analyse du bruit dans le PBS. A merger avec ORPHEUS}
+\paragraph{Correctness of the PBS.} To compute the error probability $p_{\text{err}}$, we have to evaluate the variances occurring inside the programmable bootstrapping of the $\subWords$ layer. This reasoning will be more detailed in Chapter \ref{chap:parameters} (with additional bits in Appendix \ref{sec:cjp_details}). Here, we provide a short reasoning sufficient for our purpose.
+
+
 In the following, we denote the maximum error probability of the bootstrapping by $p_{\text{err}} := 2^{-\kappa}$. We aim to choose parameters such that the PBS outputs a correct ciphertext with probability at least $1-p_{\text{err}}$. This translates to the following constraint:
 $$\sigma^2_{\text{in-}\textsf{BR}} \leq  C(\kappa) \cdot \left(\frac1{4p}\right)^2 ~~~\text{with}~~~C(\kappa) := \left(\frac{1}{\sqrt{2} \cdot \mathsf{erfc}^{-1}(2^{-\kappa})}\right)^2 ~.$$
 Under the Gaussian assumption, the noise in input of the \textsf{BlindRotate} is lower than $\mathsf{erfc}^{-1}(2^{-\kappa}) \cdot \sqrt{\sigma^2_{\text{in-}\textsf{BR}}}$ with probability $1-2^{-\kappa}$. The above constraint thus implies that, with probability $1-2^{-\kappa}$, the noise is lower than $1/{4p}$ which ensures the correctness of the PBS. 
@@ -197,7 +175,7 @@ As $|\mathcal W| \leq |\mathcal K|$, we can check that we always have $\sigma^2_
 
 We provide hereafter some benchmarks of our implementation of \coolName for two sets of parameters tailored for two different error probabilities. We first consider $\perr = 2^{-40}$, which is a common choice in the literature to benchmark homomorphic implementations. Our results for this error probability allow a fair comparison with the state of the art. While such an error probability theoretically allows transciphering to be error-free with a large amount of data with good probability, some recent works have shown that non-negligible error probabilities could be exploited by an adversary in some contexts~\cite{EPRINT:CSBB24,EPRINT:CCPSS24}. Thus, we also provide another set of parameters and associated benchmark for $\perr =  2^{-128}$.
 
-Our implementation relies on a customized version of \texttt{tfhe-rs}~\cite{tfhe-rs} which has been adapted to support odd $p$ (size of the plaintext space) as described in Chapter \ref{chap:p_encodings}. \TODO{Trouver où mettre l'adaptation de la lib dans le manuscrit et le référencer dans chaque partie impléméntation}. The experiments were carried on a processor 12th Gen Intel(R) Core(TM) i5-1245U with 4.4 GHz. Table \ref{tab:perfs} summarizes the obtained timings for the two sets of parameters. The throughput is computed assuming that $\log_2(17)$ bits are encoded on one element of $\F_{17}$. Encoding 4 bits on each element would scale the throughput by a factor $4/\log_2(17) \approx 0.98$.
+Our implementation relies on our customized version of \texttt{tfhe-rs}~\cite{tfhe-rs} which has been adapted to support odd $p$ (size of the plaintext space), that we described in Section \ref{sec:library}. The experiments were carried on a processor 12th Gen Intel(R) Core(TM) i5-1245U with 4.4 GHz. Table \ref{tab:perfs} summarizes the obtained timings for the two sets of parameters. The throughput is computed assuming that $\log_2(17)$ bits are encoded on one element of $\F_{17}$. Encoding 4 bits on each element would scale the throughput by a factor $4/\log_2(17) \approx 0.98$.
 
 \begin{table}[t!]
 	\centering

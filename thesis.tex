@@ -119,6 +119,8 @@
 %% ====   Corps du texte   === %%
 \mainmatter
 
+\input{tex/macros.tex}
+
 \input{tex/algorithms/algorithms_settings.tex}
 \input{img/tikz/tikz_torus.tex}
 \input{img/tikz/tikz_accumulator.tex}
@@ -126,7 +128,7 @@
 \input{img/tikz/tikz_gauge.tex}
 \input{img/blocks_from_slides/tikz_macros.tex}
 \input{img/tikz/tikz_mvb_tree.tex}
-\input{tex/macros.tex}
+
 
 
 
@@ -163,8 +165,10 @@
 
 %...
 %\include{tex/conclusion}
-%\appendix
-%\include{tex/appendix}
+
+\appendix
+\chapter{Supplementary Material on Parameter Selection}
+\input{tex/orpheus/appendix_example_cjp.tex}
 
 % =============================================
 %                 END

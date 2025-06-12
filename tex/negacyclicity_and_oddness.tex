@@ -117,7 +117,7 @@ An example of such an accumulator is shown on Figure \ref{fig:negacyclic_accumul
 
 The drawbacks of the bit-of-padding padding makes very challenging the development of homomorphic applications. A vast literature on how to circumvent this problem exist and is introduced in Section \ref{sec:soa_against_negacyclicity}. In this thesis, we focus on a method we introduced in \cite{TCHES:BonPoiRiv24}: \textit{the odd plaintext modulus}.
 
-\section{A new solution: the odd plaintext modulus}
+\section{Our contribution: the odd plaintext modulus}
 
 Negacyclicity has a quite different effect depending of the parity of the plaintext modulus $p$. Recall that $\mu = m + e \in \Z_q$, with $e$ sampled from a small centered Gaussian. Because the error is small, $\mu$ does not take all the values of $\Z_q$ with the same probability: in particular, the densest parts in terms of probability over $\Z_q$ are the one close to the ``noiseless'' encodings of $m$, namely $\left \{ \rounding{\frac {k q}{p}} ~\middle |~ k \in \Z_p \right \}$. We illustrate this distribution on Figure \ref{fig:density_of_phase}. We call these sections of the torus the \emph{dense spots}.
 
@@ -255,7 +255,7 @@ With this technique, no bit of padding is required. Consequently, it allows to u
 
 
 
-\section{A tour of other solutions}
+\section{A Tour of Other Solutions}
 \label{sec:soa_against_negacyclicity}
 \TODO{
 - Schild

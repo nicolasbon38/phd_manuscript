@@ -1,6 +1,7 @@
 % !TeX_ROOT=../thesis.tex
 
 \chapter{Presentation of the TFHE Scheme}
+\label{chap:spec_tfhe}
 
 The previous chapter presented insights on Fully Homomorphic Encryption in general, but this thesis will exclusively cover the TFHE scheme.
 
@@ -294,7 +295,7 @@ Now, observe that instead of directly performing the product $a_i \cdot \LWE_{\l
 which yields the correct result. Computing the product this way makes the noise grow only by a factor $\baseDecomp \cdot \levelDecomp$ instead of $a_i$ (at the cost of storing $\levelDecomp$ ciphertexts instead of one).
 
 \Question{Et-ce que ça vaut le coup d'écrire les formules de bruits précises ? Sachant que je le ferai probablement dans la section dédiée au paramétrage}
-
+\david{Non, mais donner des valuers concrètes de taille des objets}
 
 Note that what we just presented here was a very simple case. A rigorous formalism of gadget decomposition is developed in \cite{EC:GenMicPol19}, and some more analysis can be found in \cite{AC:Joye21}.
 
