@@ -4,10 +4,9 @@
 
 
 
-\section{Motivation and Use-Cases}
+\section{Motivation and Background}
 
-
-
+\TODO{Ecrire la motivation et les use-cases}
 
 
 
@@ -33,22 +32,17 @@ Figure \ref{fig:classical_usage_fhe} demonstrates a procedure of private outsour
 \end{figure}
 
 
-\section{Historical Background}
+\paragraph{Historical Background}
 
-\TODO{Relire ça et en faire quelque chose de sensé. J'ai écrit automatiquement}
+The initial appearance of the notion of homomorphic encryption in the scientific literature can be traced back to 1978, in a paper by Rivest, Adleman and Dertouzos \cite{RAD78}. They theorize the existence of \textit{privacy homomorphism}, which are \textit{encryption functions which permit encrypted data to be operated on without preliminary decryption}.
 
-The initial appearance of the notion of homomorphic encryption in the scientific literature can be traced back to 1978, in a paper by Rivest, Adleman and Dertouzos \cite{RAD78}. They theorize the existence of ``privacy homomorphism'', which are ``encryption functions which permit encrypted data to be operated on without preliminary decryption''. 
+Over the following decades, research focused primarily on the development of partially homomorphic schemes, which support only a single homomorphic operation, typically either addition or multiplication. Additive homomorphisms were particularly favored in applications like electronic voting. One of the most well-known examples is the Paillier cryptosystem \cite{EC:Paillier99}.
 
-The following decades saw the development of \textit{partially} homomorphic encryption schemes, that allow to evaluate homomorphically only one mathematical operation. The targeted operation was often addition, and the application was for electronic voting schemes. The most well-known example of such scheme is the Paillier, introduced in \cite{}.
+In parallel, a different class of schemes emerged: leveled (or somewhat) homomorphic encryption schemes. These allow for both addition and multiplication, but only a limited number of operations can be performed sequentially. Notable examples include the DGHV scheme \cite{EC:DGHV10} and the original BGV scheme \cite{bgv}\footnote{Although these schemes were actually shown to be bootstrappable (see Section \ref{sec:gentry_bootstrapping}), the bootstrapping process was too inefficient to be practical.}.
 
+Interestingly, the bounded depth of computation in these schemes arises from distinct causes. In DGHV, the size of the integers in the ciphertexts grows with each operation, eventually becoming computationally prohibitive. In BGV, it is the noise introduced during encryption that increases until it overwhelms the signal, rendering the ciphertext undecipherable. In both cases, a critical resource (either magnitude or noise) accumulates irreversibly, ultimately preventing further computation.
 
-Another class of restricted homomorphic scheme was developed in parallel: those are \textit{leveled} (or \textit{somewhat}) homomorphic schemes. With those, both additive and multiplicative homomorphisms are available, but only a bounded number of these operations can be performed in a row. Example of those schemes include DHGV \cite{EC:DGHV10} and the original BGV scheme\footnote{These schemes have actually be shown to be bootstrappable, but the bootstrapping operation were too slow to be actually used in practice.} \cite{bgv}
-
-Interestingly, two different phenomenons explain why these schemes were only partially homomorphic, but actually carry the same metaphorical signification: in DHGV the integers carrying the ciphertexts becomes bigger and bigger as homomoprhic operations until becoming untractable, while in BGV it is an additional Gaussian noise that grows until it detroys the information in the ciphertexts. In both case, a growing metric made impossible to evaluate unbounded computational circuits.
-
-
-
-The story of \textit{actual} FHE begins in 2009, with a breakthrough contribution by Craig Gentry that changeed everything in the field. We explain it in next section.
+This bound was suddenly removed in 2009 in a groundbreaking construction by Gentry, wich opened the door to a very fast development of the field in the following years. We present this transformative result in the next section.
 
 \section{The bootstrapping : breakthrough construction}
 \label{sec:gentry_bootstrapping}

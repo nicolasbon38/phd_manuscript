@@ -1,4 +1,4 @@
-% !TeX_ROOT=../thesis.tex
+%!TeX_ROOT=../thesis.tex
 
 \chapter{Presentation of the TFHE Scheme}
 \label{chap:spec_tfhe}
@@ -15,7 +15,7 @@ In this chapter we provide an in-depth presentation of the TFHE scheme. We intro
 \label{sec:hardness_assumptions}
 
 
-\paragraph{Original $\LWE$ problem}
+\paragraph{Original $\LWE$ problem.}
 
 In 2005, Regev laid the foundations for an important part of modern lattice-based cryptography by defining the Learning With Errors ($\LWE$) problem in \cite{regev_lwe}. The version usually used in FHE literature is presented in Definition \ref{def:LWE}:
 
@@ -27,7 +27,7 @@ In 2005, Regev laid the foundations for an important part of modern lattice-base
 	 \mathcal{D}_{q, n, \chi_s, \chi_e}^{\LWE}(\lweSecretKey) = \left \{(\vec a, b) \;\middle|\; \vec a = (a_0, \dots, a_{n-1}) \drawfrom \unif{\lweRing}^n, e \drawfrom \chi_e, b = \innerProduct{\vec a}{\vec s} + e \right \}
 	  \]
 	 
-	 The \textit{decisional} version of the problem is to distinguish this distribution from a uniformely random one, namely:
+	 The \textit{decisional} version of the problem is to distinguish this distribution from a uniformly random one, namely:
 	
 	\[
 	\mathcal{D}^{(\textsf{random})} = \left \{(\vec a, r) \;\middle|\; \vec a \drawfrom \unif{\lweRing}^n, r \drawfrom \unif{\lweRing} \right\}
@@ -42,14 +42,14 @@ Regev proved that the search and decisional problems are reducible to each other
 
 The hardness of this problem depends on the parameters $q$, $n$, $\chi_s$ and $\chi_e$, and so does the security of the schemes built upon it. There is not yet in the literature simple guidelines to construct secure instances of the problem. Common practice in the field is to derive an approximate concrete security level $\lambda$ for a given parameter set with a tool named \texttt{lattice-estimator} \cite{lattice-estimator}. Users can input concrete values and distributions for the parameters, and the tool evaluates the security of the underlying $\LWE$ instance by running simulations of attacks of the literature.
 
-In Definition \ref{def:LWE}, we did not precise the shapes of the distributions $\chi_s$ and $\chi_e$ (beyond the fact they yields small values). Several distributions are possible: a discrete Gaussian with a small variance, a uniform distribution restricted on a small interval, or a binomial. Some versions with sparse secrets also exist. The choice of the right distribution depends of the considered use-case, each possibilities offering different trade-offs in matter of security and efficiency \cite{AFRICACRYPT:BGPW16, DBLP:conf/ccs/CurtisP19, EPRINT:BGPT19, EPRINT:SLZS24}.
+In Definition \ref{def:LWE}, we did not specify the shapes of the distributions $\chi_s$ and $\chi_e$ (beyond the fact they yields small values). Several distributions are possible: a discrete Gaussian with a small variance, a uniform distribution restricted on a small interval, or a binomial. Some versions with sparse secrets also exist. The choice of the right distribution depends of the considered use-case, each possibilities offering different trade-offs in matter of security and efficiency \cite{AFRICACRYPT:BGPW16, DBLP:conf/ccs/CurtisP19, EPRINT:BGPT19, EPRINT:SLZS24}.
 
 
-Most implementations of TFHE select a uniform distribution on $\{0, 1\}$ for the secret, and a Gaussian with a small variance $\lweSigma$ for the noise. We will use these distributions in this thesis, and will use the notation $\LWE_{(q, n, \sigma)}$ for these instances.
+Most implementations of TFHE select a uniform distribution on $\{0, 1\}$ for the secret, and a Gaussian with a small variance $\lweSigma^2$ for the noise. We will use these distributions in this thesis, and will use the notation $\LWE_{(q, n, \sigma)}$ for these instances.
 
 
 
-\paragraph{Extension to the Polynomials}
+\paragraph{Extension to the Polynomials.}
 
 
 Looking for more efficient solutions, $\LWE$ problem has been declined in a \textit{ring variant} named $\RLWE$ in \cite{rlwe}. A generalized version over rings named $\GLWE$, first formalized in \cite{EPRINT:BraGenVai11} and used by TFHE, is presented below. It is very similar to the $\LWE$ one, but deals with polynomial values instead of integers:
@@ -61,7 +61,7 @@ Looking for more efficient solutions, $\LWE$ problem has been declined in a \tex
 	\mathcal{D}_{q, k, N, \chi_S, \chi_E}^{\GLWE}(\glweSecretKey) = \left \{ (\vec A, B) \;\middle|\; \vec A = (A_0, \dots, A_{k-1}) \drawfrom \unif{\glweRing}^k, E \drawfrom \chi_E, B = \innerProduct{\vec A}{\vec S} + E \right \}
 	\]
 	
-	The \textit{decisional} version of the problem is to distinguish this distribution from a uniformely random one, namely:
+	The \textit{decisional} version of the problem is to distinguish this distribution from a uniformly random one, namely:
 	
 	\[
 	\mathcal{D}^{(\textsf{random})} = \left \{(\vec A, R) \;\middle|\; \vec A \drawfrom \unif{\glweRing}^k, R \drawfrom \unif{\glweRing} \right\}
@@ -134,17 +134,18 @@ We need a way to encode plaintext values into the ciphertext space. To do so, le
 
 The image of this mapping only reaches $p$ elements in $\lweRing$, forming the set $\left \{ \rounding{\frac {k q}{p}} \mid k \in \plaintextRing \right \}$. These elements are distributed around $\lweRing$ and form what we refer to as \emph{sectors of $\lweRing$}, defined as: \[
 \left\{ \left( \frac{(2k - 1)q}{2p}, \frac{(2k + 1)q}{2p} \right) ~\middle|~ k \in \mathbb{Z} \right\}
-\]
+\]. A representation of such a mapping is shown on Figure \ref{fig:example_encoding}.
 
-To encode a given plaintext element into the ciphertext space, we use the corresponding center of sector. However, decoding is more permissive: every elements of a sector are decoded by the corresponding plaintext element. This will be useful to remove the noise in ciphertexts.
+To encode a given plaintext element $m$ into the ciphertext space, we use the corresponding center of sector $\rounding{\frac{mq}{p}}$. However, decoding is more permissive: every elements of a sector are decoded by the corresponding plaintext element. This will be useful to remove the noise in ciphertexts.
 
 \begin{figure}[htbp]
 	\centering
-	\wrappedTorus{50}{8}{true}
-	\caption{An example of embedding of $\Z_8$ into $\Z_{50}$}
+	\wrappedTorus{64}{8}{true}
+	\caption{An example of embedding of $\Z_8$ into $\Z_{64}$}
+	\label{fig:example_encoding}
 \end{figure}
 
-We can now move to the actual encryption and decryption algorithms. TFHE features two main types of encryption that share similar structural patterns but operate within different mathematical spaces.
+We can now move to the actual encryption and decryption algorithms. TFHE features two main types of encryption: $\LWE$ encryption and $\GLWE$ encryption. Both share similar structural patterns but operate within different mathematical spaces.
 
 \paragraph{LWE Encryption.}
 $\LWE$ encryption deals with scalar values. The plaintext space is $\plaintextRing$ and the secret key is sampled uniformly at random from $\B^n$. We denote by $q$ the ciphertext modulus. We also need 
@@ -158,7 +159,7 @@ $\chi_{\lweSigma}$, a centered Gaussian distribution of standard deviation $\lwe
 	\end{equation}
 	where:
 	\begin{itemize}
-		\item the elements $\vec a = (a_0, \dots, a_{n-1})$ are sampled uniformely at random in $\lweRing$.
+		\item the elements $\vec a = (a_0, \dots, a_{n-1})$ are sampled uniformly at random in $\lweRing$.
 
 		\item $\tilde m$ is the message encoded in the ciphertext space: $\tilde m = \rho(m) \in \lweRing$.
 		\item $e$ is a small random Gaussian noise sampled from $\chi_{\lweSigma}$.
@@ -194,7 +195,7 @@ The encryption procedure outputs a ciphertext $\vec C$ of form:
 	\end{equation*}
 	where:
 	\begin{itemize}
-		\item the elements $\vec A = (A_0, \dots, A_{k-1})$ are sampled uniformely at random in $\glweRing$.
+		\item the elements $\vec A = (A_0, \dots, A_{k-1})$ are sampled uniformly at random in $\glweRing$.
 		\item $\tilde M$ is the message encoded in the ciphertext space: $\tilde M = \rho(M)$.
 		\item $E$ is a polynomial with small Gaussian coefficients, that are sampled from $\chi_{\glweSigma}$.
 	\end{itemize}
@@ -231,26 +232,25 @@ These notations will be used throughout this manuscript. However, sometimes when
 
 
 
-\section{A first advanced operation: the Key Switching (and a motivation for gadget decomposition)}
+\section{Key Switching}
 \label{sec:keyswitch}
 
-We now introduce a more advanced operation: the $\KeySwitch$. Let $\vec c = \LWE_{\lweSecretKey}(m) = (a_0, \dots, a_{n-1}, b)$ be a $\LWE$ ciphertext encrypting a message $m$ under the secret key $\lweSecretKey$. $\KeySwitch$ allows the server to homomorphically transform $c$ into a new ciphertext $c'$ encrypting the same message $m$ under another secret key $\lweSecretKey'$. This operation is very useful in practical settings, because it allows to switch between different ciphertext types and shapes to speed up some computations, particularly in the bootstrapping algorithm.
+We now introduce a more advanced operation: the $\KeySwitch$. Let $\vec c = \LWE_{\lweSecretKey}(m) = (a_0, \dots, a_{n-1}, b)$ be a $\LWE$ ciphertext encrypting a message $m$ under the secret key $\lweSecretKey$. $\KeySwitch$ allows the server to homomorphically transform $c$ into a new ciphertext $c'$ encrypting the same message $m$ under another secret key $\lweSecretKey'$. This operation is very useful in practical settings: for example it allows to switch between different ciphertext types and shapes to speed up some computations, particularly in the bootstrapping algorithm. It is also central in some multi-client use-cases.
 
 We start by explaining the $\LWE$-to-$\LWE$ version of keyswitching and then generalize to the ring case.
-
 
 
 \paragraph{Some intuition on keyswitching}
 The rationale behind the keyswitching algorithm is to homomorphically evaluate the linear part of the decryption function (namely $b - \langle \vec a, \lweSecretKey \rangle$), given an encryption of $\lweSecretKey$ under the key $\vec s'$. This ``encrypted secret key'' is called the \textit{keyswitching key} and is denoted by $\KSK$. Even if it looks a lot like a bootstrapping operation, keyswitching is actually quite different. Notably, it \textit{increases} the noise in the ciphertext (see \cite{JC:CGGI20, these_tap} for concrete noise analysis).
 
 
-More formally, let $\KSK$ be the vector of encryption of every bit of the key $s$ under the key $s'$:
+More formally, let $\KSK$ be the vector of encryption of every bit of the key $\lweSecretKey$ under the key $\lweSecretKey'$:
 
 \[
 	\KSK = \left \{ \LWE_{\lweSecretKey'}(s_i ) \right \}_{0 \le i < n}
 \]
 
-Notice how, if we treat the coefficients $a_i$ of the mask of $c$ as scalar constants, we can homomorphically evaluate the product $- \langle \vec a ,\lweSecretKey \rangle$ with the basic linear operation of TFHE. Moreover, adding the constant $b$ is easy if we remark that the trivial ciphertext $\TrivialLWE(b) = (0, \dots, 0, b)$ is a valid instance of $\LWE_{\lweSecretKey'}(b)$. So the operation $b - \langle \vec a, \lweSecretKey \rangle$ is equivalent in the encrypted world to:
+Notice how, if we treat the coefficients $a_i$ (the mask of $\vec c$) as scalar constants, we can homomorphically evaluate the product $- \langle \vec a ,\lweSecretKey \rangle$ with the basic linear operation of TFHE. Moreover, adding the constant $b$ is easy if we remark that the trivial ciphertext $\TrivialLWE(b) = (0, \dots, 0, b)$ is a valid instance of $\LWE_{\lweSecretKey'}(b)$. So the operation $b - \langle \vec a, \lweSecretKey \rangle$ is equivalent in the encrypted world to:
 
 
 \begin{align*}
@@ -265,7 +265,7 @@ and we effectively get a new encryption of $m$ under $\lweSecretKey'$ (at the co
 
 However, there is a problem with this approach: recall that the $a_i$'s are uniformly distributed in the ring $\lweRing$. So they have in average a very large magnitude (about $\frac q 4$). Also recall that the scalar multiplication of TFHE increases the noise by the same factor as the multiplicative constant. So if one uses this first version of keyswitching, the noise would completely skyrocket and the result would be unusable.
 
-Hopefully, there is a well-known way to improve the noise growth in the scalar multiplication: it is called \textit{gadget decomposition}. We introduce it below:
+Thankfully, there is a well-known way to improve the noise growth in the scalar multiplication: it is called \textit{gadget decomposition}. We introduce it below:
 
 \paragraph{Gadget Decomposition}
 
@@ -303,7 +303,7 @@ Note that what we just presented here was a very simple case. A rigorous formali
 One of the innovations of TFHE is the realization that approximating the decomposition yields a significant performance improvement, at the cost of only a slight degradation of the noise. So instead of taking exactly $\baseDecomp^\levelDecomp = q$, we pick smaller values in TFHE such that $\baseDecomp^\levelDecomp < q$.
 
 
-\paragraph{Back for a better keyswitching}
+\paragraph{Back to a better keyswitching}
 
 Coming back to the keyswitching algorithm, we pick decomposition parameters $(\baseDecomp$, $\levelDecomp)$ and add a dimension to the keyswitching key to store each scaled version. So $\KSK$ becomes:
 
@@ -339,7 +339,7 @@ More possibilities exist in the literature: notably generalizing Algorithm \ref{
 \section{External Products}
 \label{sec:external_products}
 
-In the previous section, we showed how the use of gadget decomposition allowed for practical multiplications by constant. Actually, we can push it further: by using decompositions of ciphertexts themselves, it becomes possible to multiply two ciphertexts together ! By reference to the original GSW scheme \cite{C:GenSahWat13}, these decomposed ciphertexts are called $\GGSW$ ciphertexts (for \textit{Generalized GSW}).
+In the previous section, we showed how the use of gadget decomposition allowed for practical multiplications by constant. Actually, we can push it further: by using decompositions of ciphertexts themselves, it becomes possible to multiply two ciphertexts together! By reference to the original GSW scheme \cite{C:GenSahWat13}, these decomposed ciphertexts are called $\GGSW$ ciphertexts (for \textit{Generalized GSW}).
 
 
 We start by formalizing a bit more the notion of gadget decomposition: while several decomposition algorithms exist on the literature, we focus in this thesis on the most classical one (called \textit{canonical} in the seminal paper of TFHE). We recall its definition:
@@ -372,6 +372,7 @@ Using this matrix, it is possible to define a new type of ciphertexts, called $\
 
 
 \begin{definition}($\GGSW$ ciphertexts)
+	\label{def:ggsw}
 	Let $(\baseDecomp, \levelDecomp)$ an approximate decomposition base. A $\GGSW$ ciphertext $\mat C$ encrypting a message $M \in \plaintextRingPoly$ under a GLWE secret key $\glweSecretKey =  (S_0, \dots, S_{k-1}) \in \B_{N, q}[X]^k$ has the form:
 	\begin{equation*}
 		\mat C = \mat Z + M \cdot \mat H
@@ -384,6 +385,7 @@ Using this matrix, it is possible to define a new type of ciphertexts, called $\
 In more recent works (for example \cite{AC:CLOT21} and its follow-ups), an alternative (but equivalent) definition is used. We reproduce it here as well:
 
 \begin{definition}($\GGSW$ ciphertext, second definition)
+	\label{def:ggsw2}
 	Let $(\baseDecomp, \levelDecomp)$ an approximate decomposition base. A $\GGSW$ ciphertext encrypting a message $M \in \plaintextRingPoly$ under a GLWE secret key $\glweSecretKey =  (S_0, \dots, S_{k-1}) \in \B_{N, q}[X]^k$ has the form:
 	
 	\begin{equation*}
@@ -394,7 +396,7 @@ In more recent works (for example \cite{AC:CLOT21} and its follow-ups), an alter
 \end{definition}
 
 
-These ciphertexts allow the definition of an \textit{external product}. It is possible to multiply a $\GGSW$ ciphertext with a $\GLWE$ one to obtain another $\GLWE$. We denote this operation by:
+These ciphertexts allow the definition of an \textit{external product}. It is possible to multiply a $\GGSW$ ciphertext with a $\GLWE$ one to obtain another $\GLWE$ ciphertext. We denote this operation by:
 
 \begin{equation*}
 		\boxdot: \GGSW \times \GLWE \rightarrow \GLWE
@@ -422,6 +424,7 @@ The line of work of \cite{chimera, AC:BCGGJ24} gives a nice mathematical overvie
 Beyond adding a new homomorphic capabilities in TFHE's arsenal, external products are more importantly the workhorse of the whole bootstrapping algorithm that will be introduced in Section \ref{sec:pbs}. An external product can be used to construct a CMUX operation, defined like;
 
 \begin{definition}(\CMUX)
+	\label{def:cmux}
 	Let $\mat C_{sel}$ be a $\GGSW$ ciphertext encrypting a bit $b \in \B$ (the \textit{selector}). Let $\vec C_0$ and $\vec C_1$ be two $\GLWE$ ciphertexts. The CMUX operation allows to homomorphically select one of these two messages according to the value of the ``selector'' bit $b$ by computing:
 	\begin{equation*}
 		\vec C_b = \mat C_{sel} \boxdot (\vec C_1 - \vec C_0) + \vec C_0
@@ -458,7 +461,7 @@ In TFHE, for a $\LWE$ ciphertext $\vec c$ of form $(a_0, \dots, a_{n-1}, b)$, en
 
 Performing the first step homomorphically is quite simple to do (in fact, this is exactly what we do in the key-switching algorithm). But performing the rounding is trickier. Actually, TFHE do both operations at once using an operation called \textit{blind rotation}, which is the core of the bootstrapping algorithm. 
 
-Introduced in \cite{EC:DucMic15}, the blind rotation takes advantage of the particular structure of the ring $\glweRing$. To explain this algorithm, we start by have a closer look to this ring.
+Introduced in \cite{EC:DucMic15}, the blind rotation takes advantage of the particular structure of the ring $\glweRing$. To explain this algorithm, we start by taking a closer look to this ring.
 
 
 
@@ -480,7 +483,7 @@ The goal here is to introduce blind rotation without the complexity induced by t
 \paragraph{Constructing a rounding function}
 How can we use this property to construct a rounding function ? Suppose we have a plaintext space $\plaintextRing$ and a ciphertext space $\lweRing$. Let $\vec c$ be  a $\LWE$ ciphertext, and $\mu = \phi(\vec c) = m + e$ its noisy phase produced by the linear step of the decryption algorithm. We want to round $\mu$ to the closest plaintext in $\plaintextRing$ to retrieve the message $m$.
 
-To do so, we are going to use a specifically tailored polynomial, called the \textit{accumulator polynomial} $\acc$. This polynomial is made of contiguous ``windows'' of size $\frac N p$ in which every coefficients are equal to each others. Coefficients of the window of index 0 have value 0, and so on. These windows are centered on the $p$ coefficients corresponding to the noiseless encodings of the plaintexts values in $\Z_N$. We illustrate such an accumulator on Figure \ref{fig:illustration_accumulator} (in the ``Rounding version'').
+To do so, we are going to use a specifically tailored polynomial, called the \textit{accumulator polynomial} $\acc$. This polynomial is made of contiguous ``windows'' of size $\frac N p$ in which every coefficient is equal to each others. Coefficients of the window of index 0 have value 0, for index 1 the value is 1, and so on. These windows are centered on the $p$ coefficients corresponding to the noiseless encodings of the plaintexts values in $\Z_N$. We illustrate such an accumulator on Figure \ref{fig:illustration_accumulator} (in the ``Rounding version'').
 
 
 
@@ -495,9 +498,9 @@ Our rounding procedure takes three steps:
 If the noise $\abs{\tilde e}$ in $\tilde \mu$ is smaller than half the width of a window (here $\frac{N}{2p}$), we properly get $v_{\tilde \mu} = m$. 
 
 \paragraph{Making it programmable:}
-This rounding using polynomials is the core idea of the bootstrapping algorithm. But actually, the killer feature of TFHE is that you can transform this rounding operation into a look-up table evaluation ! This is why TFHE's bootstrapping is called \textit{programmable}.
+This rounding using polynomials is the core idea of the bootstrapping algorithm. But actually, the killer feature of TFHE is that you can transform this rounding operation into a look-up table evaluation! This is why TFHE's bootstrapping is called \textit{programmable}.
 
-It is simply done by replacing the coefficients of the accumulator by the evaluations of a function $f:\plaintextRing \mapsto \plaintextRing$. So, the algorithm outputs $f(i)$ instead of $i$ ! This is illustrated on Figure \ref{fig:illustration_accumulator} (in the ``Programmable version'').
+It is simply done by replacing the coefficients of the accumulator by the evaluations of a function $f:\plaintextRing \mapsto \plaintextRing$. So, the algorithm outputs $f(i)$ instead of $i$! This is illustrated on Figure \ref{fig:illustration_accumulator} (in the ``Programmable version'').
 
 
 \begin{figure}
@@ -537,12 +540,12 @@ The server requires a \textit{bootstrapping key}, that we denote by $\BSK$, defi
 	\BSK = \left \lbrace \GGSW_{\glweSecretKey}(s_i) \right \rbrace_{0 \le i < n}
 \]
 
-where $\glweSecretKey$ is a $\GLWE$ secret key, of shape $(k, N)$.
+where $\glweSecretKey$ is a $\GLWE$ secret key, of dimension $k$ and degree $N$.
 
 \bigskip
 TFHE's bootstrapping algorithm can be broken down into three steps: \ModSwitch, \texttt{BlindRota\-te} and \SampleExtract.
 
-\paragraph{\ModSwitch:} The coefficients of $\vec c$ lives in $\lweRing$, but the polynomial of the $\GLWE$ ring are of degree $N$. Recall from last section that we would like the exponent of the monomial used in \BlindRotate to live in $\Z_{2N}$ (because $X$ has order $2N$ in $\glweRing$).
+\paragraph{\ModSwitch} The coefficients of $\vec c$ live in $\lweRing$, but the polynomials of the $\GLWE$ ring have degree $N$. Recall from last section that we would like the exponent of the monomial used in \BlindRotate to live in $\Z_{2N}$ (because $X$ has order $2N$ in $\glweRing$).
 
 The simplest case would be to choose directly $q = 2N$. However it does not work in practice: by enforcing such a constraint, it is impossible to construct a $\LWE$ instance which is secure and that enable fast arithmetic. So we need to switch the modulus of $\vec c$ to produce a new vector $\vec{\tilde c}$ living in the right space. This is simply done by computing:
 
@@ -554,20 +557,20 @@ The simplest case would be to choose directly $q = 2N$. However it does not work
 This operation adds some extra noise in the ciphertext, that is called \textit{drift} in the literature. \cite{joye_drift} provides an in-depth study of the behaviour of this noise, as well as alternative strategies to mitigate it.
 
 
-\paragraph{\BlindRotate:}
+\paragraph{\BlindRotate}
 
 In the previous paragraph, we introduced the rationale behind blind rotation. We use a polynomial called accumulator that we rotate using a multiplication by $X^{-\tilde \mu}$, where $\tilde \mu$ is the (noisy) phase resized in $\Z_{2N}$.
 
 For now, we do not specify the actual formula of the accumulator. Several possibilities exist and depend of which countermeasure against the negacyclicity problem is chosen. We elaborate further on the construction of this polynomial in Chapter \ref{chap:negacyclicity}.
 
 
-After $\ModSwitch$, the coefficients of $\vec{\tilde{c}}$ lives in the right space $\Z_{2N}$. It remains to compute the product $X^{-\tilde \mu} \cdot \acc$ homomorphically. This operation can be carried out by \textit{a chain of $\CMUX$}.
+After $\ModSwitch$, the coefficients of $\vec{\tilde{c}}$ live in the right space $\Z_{2N}$. It remains to compute the product $X^{-\tilde \mu} \cdot \acc$ homomorphically. This operation can be carried out by \textit{a chain of $\CMUX$}.
 
 
 This idea comes naturally if we rewrite the expression of the monomial $X^{-\tilde \mu}$ as:
 
 \[
-	X^{-\tilde \mu} = X^{\tilde b - \innerProduct{\vec{\tilde a}}{\vec s}} =  X^{-\tilde b} \cdot \prod_{i=0}^{n-1} X^{\tilde a_i \cdot s_i} = X^{-\tilde b} \cdot \prod_{i=0}^{n-1} \begin{cases}
+	X^{-\tilde \mu} = X^{- \left ( \tilde b - \innerProduct{\vec{\tilde a}}{\vec s} \right ) } =  X^{-\tilde b} \cdot \prod_{i=0}^{n-1} X^{\tilde a_i \cdot s_i} = X^{-\tilde b} \cdot \prod_{i=0}^{n-1} \begin{cases}
 		X^{\tilde a_i} \text{ if } s_i = 1\\
 		1 \text{ if } s_i = 0
 	\end{cases}
@@ -597,7 +600,7 @@ This is done in two steps: the $\SampleExtract$ that we introduce in the followi
 Let $\vec C = \GLWE_{\glweSecretKey'}(M)$ be a ciphertext encrypting the polynomial $M = \sum_{i=0}^{N-1} m_i X^i$. The $\SampleExtract$ takes as input a $\GLWE$ ciphertext and an index $\alpha$, and output a ciphertext $\bar{\vec c} = \LWE_{\bar{\lweSecretKey'}}(m_\alpha)$ where $\bar \lweSecretKey'$ is a \textit{flattened} version of the $\GLWE$ one. 
 
 \begin{definition} (Flattened $\GLWE$ key)
-	Let $\glweSecretKey = \left ( S_0 = \sum_{j=0}^{N-1} s_{0, j} X^j, \dots,  S_{k-1} = \sum_{j=0}^{N-1} s_{k-1, j} X^j\right ) \in \glweRing^k$. The \textit{flattenened} version of this key is a $\LWE$ secret key:
+	Let $\glweSecretKey = \left ( S_0 = \sum_{j=0}^{N-1} s_{0, j} X^j, \dots,  S_{k-1} = \sum_{j=0}^{N-1} s_{k-1, j} X^j\right ) \in \glweRing^k$. The \textit{flattened} version of this key is a $\LWE$ secret key:
 	\[
 		\bar{\lweSecretKey} =  (\bar s_0, \dots, \bar s_{kN-1}) \in \lweRing^{kN}
 	\] 
@@ -612,7 +615,7 @@ $\SampleExtract$is actually as a simple rearrangement of the coefficients of the
 
 
 
-In the PBS, $\SampleExtract$ is run with $\alpha = 0$. After that, we now have a $\LWE$ ciphertext encrypting the right value but with noise smaller than in the input. However, the key of this ciphertext is the flattened version of $\glweSecretKey'$. To close the loop, we need to come back to the original key $\lweSecretKey$. This is done with a simple $\LWE$-to-$\LWE$ keyswitching.
+In the PBS, $\SampleExtract$ is run with $\alpha = 0$. After that, we have a $\LWE$ ciphertext encrypting the right value but with noise smaller than in the input. However, the key of this ciphertext is the flattened version of $\glweSecretKey'$. To close the loop, we need to come back to the original key $\lweSecretKey$. This is done with a simple $\LWE$-to-$\LWE$ keyswitching.
 
 
 
