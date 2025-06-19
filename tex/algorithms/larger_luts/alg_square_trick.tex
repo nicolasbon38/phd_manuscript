@@ -1,0 +1,35 @@
+
+\begin{algorithm}[hbt!]
+\caption{\texttt{EncryptedProduct} - Homomorphic evaluation of a ciphertext-ciphertext product}
+\label{alg:square_trick}
+\KwContext{
+	$\left \lbrace
+	\begin{aligned}
+    	&\F_p \text{: the field of embedding}\\
+    	&x_1, x_{2} \in \F_p: \text{the inputs of the product in the clear.}
+    \end{aligned}
+    \right.$
+}
+\KwIn{
+	$\left \lbrace
+	    \begin{aligned}
+	    	c_1, c_2: \text{: the ciphertexts encrypting the inputs $x_1$ and $x_2$}\\
+	    \end{aligned}
+	\right.$
+}
+\KwResult{$c'$: an encryption of $x_1 \cdot x_2$}
+
+\Comment{We compute the sum and the difference}
+$s_1 \gets \texttt{SumTFHE}(c_1, c_2)$ \\
+$s_2 \gets \texttt{SumTFHE}(c_1, \texttt{MulTFHE}(c_2, \modulo{-1}{p}))$\\
+
+\Comment{Evaluation of the squares (we precompute the minus sign in front of the second one)}
+$s'_1 \gets \texttt{PBS\_TFHE}(s_1, x \mapsto x^2 \cdot \modulo{4^{-1}}{p})$ \\
+$s'_2 \gets \texttt{PBS\_TFHE}(s_2, x \mapsto \modulo{-1}{p} \cdot x^2 \cdot \modulo{4^{-1}}{p})$ \\
+
+\Comment{Summing the square}
+$c_r \gets \texttt{SumTFHE}(s'_1, s'_2)$\\
+
+\Return{$c_r$}
+
+\end{algorithm}

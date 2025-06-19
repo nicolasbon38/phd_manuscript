@@ -13,14 +13,8 @@ a trick to implement \emph{silent} LFSRs.  This general structure can be
 easily adapted to other contexts, and we believe it will find
 applications beyond TFHE.
 
-Our initial cryptanalysis of \coolName{} provides a solid
-theoretical background for this type of stream ciphers.  We introduce
-arguments based on the minimum number of rounds needed to have a
-non-zero correlation between ciphertext and master key, an inherent
-property of the round function of the FSM which we consider to be of
-independent interest.  We expect that future work will explore in more
-details how this property is related to the design of the round
-function, and how to optimize it without increasing the cost of the
-cipher.
 
+One of the constraint of this design was that the cipher should work in a small plaintext space. This was because the bottleneck in terms of running time was the evaluation of the S-box. But what if we could extend the capabilities of TFHE and evaluates larger S-boxes, like in more conventional designs ?
+
+This is the point of the next chapter, where we propose a construction to accelerate the evaluation of larger LUT.
 

@@ -10,7 +10,7 @@ In Section \ref{sec:pbs}, we presented the algorithm of the PBS. But we left a q
 In this chapter, we formalize the negacyclicity problem. We then present the classical countermeasure (the strategy of the padding bit), and our technique of odd plaintext modulus, which is a foundational block for the following contributions presented in this thesis. We finish by going through several others works that propose different countermeasures.
 
 
-\section{Basics on negacyclicity}
+\section{Basics on Negacyclicity}
 
 \paragraph{What is negacyclicity ?}
 
@@ -66,7 +66,7 @@ We give an explicit formula for this accumulator in Definition \ref{def:negacycl
 This construction is merely theoretical. Indeed, in practical setting, restricting the functions to be evaluated by PBS only to negacyclic function greatly limits the capability of the scheme. In order to be able to evaluate \textit{any} function in the PBS, more sophisticated techniques are required. We introduce the first example of such technique in the next section.
 
 
-\section{The classical countermeasure: the bit of padding}
+\section{The Classical Countermeasure: the Bit of Padding}
 \label{sec:bit_of_padding}
 
 The first countermeasure, that already appeared in the original TFHE paper, is called the \textit{bit of padding}. As in the ideal case presented in the previous section, it works in an \textbf{even} plaintext space.
@@ -119,7 +119,7 @@ The drawbacks of the bit-of-padding padding makes very challenging the developme
 
 In this thesis, we focus on a method we introduced in \cite{TCHES:BonPoiRiv24}: \textit{the odd plaintext modulus}
 
-\section{Our contribution: the odd plaintext modulus}
+\section{Our Contribution: the Odd Plaintext Modulus}
 \label{sec:odd_modulus}
 
 Negacyclicity has a quite different effect depending of the parity of the plaintext modulus $p$. Recall that $\mu = m + e \in \Z_q$, with $e$ sampled from a small centered Gaussian. Because the error is small, $\mu$ does not take all the values of $\Z_q$ with the same probability: in particular, the densest parts in terms of probability over $\Z_q$ are the one close to the ``noiseless'' encodings of $m$, namely $\left \{ \rounding{\frac {k q}{p}} ~\middle |~ k \in \Z_p \right \}$. We illustrate this distribution on Figure \ref{fig:density_of_phase}. We call these sections of the torus the \emph{dense spots}.
@@ -257,7 +257,7 @@ With this technique, no bit of padding is required. Consequently, it allows to u
 
 
 
-\section{Other countermeasures avoiding the bit of padding}
+\section{Other Countermeasures Avoiding the Bit of Padding}
 \label{sec:soa_padding_bit}
 
 Because the classical bit-of-padding solution brings too many constraints on the evaluation of computational circuits, several alternative constructions have been proposed to homomorphiclaly evaluate LUT. To do so, many of these constructions adopt a similar strategy: they decompose the target function into a sequence of several PBS steps. 

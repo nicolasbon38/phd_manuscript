@@ -1,0 +1,34 @@
+%!TeX_ROOT=../thesis.tex
+
+\chapter{Introduction en Français}
+
+\paragraph{Cryptographie.} La \textit{cryptographie} est un domaine technique a l'interface entre l'informatique et les mathématiques appliquées. Elle étudie les techniques permettant de protéger l'information. Les techniques cryptographiques les plus classiques sont:
+\begin{itemize}
+	\item Le \textit{chiffrement}, qui transforme un message, un fichier ou plus généralement n'importe quel type de donnée en la ``brouillant'' pour la rendre illisible aux personnes non autorisées. Cette technique est notamment utilisée pour protéger la confidentialité des messages sur les applications de messageries instantanées telles que WhatsApp ou Signal.
+	\item L'\textit{authentification}, qui permet de vérifier l'identité de l'émetteur d'un message. Par exemple, elle assure qu’un utilisateur se connecte bien au serveur de sa banque et non à un serveur frauduleux contrôlé par un pirate.
+	\item Le \textit{contrôle d'intégrité}, qui permet de s'assurer qu'un message n'a pas été modifié ou corrompu pendant sa transmission. C'est notamment utile pour s'assurer qu'un logiciel téléchargé n'a pas été altéré afin d'y introduire une faille de sécurité.
+\end{itemize}
+
+
+A l'origine exclusivement réservée au domaine militaire, la cryptographie a été transformée en un enjeu de société majeur au XXIe siècle. Une grande partie des échanges se fait désormais en ligne, qu'il s'agisse de transactions bancaires, d'échanges commerciaux ou de simples messages à ses proches. De fait, rendre les systèmes de communications résistants face aux attaques d'acteurs malveillants est devenu  un enjeu stratégique central pour garantir la sécurité et les libertés individuelles des citoyens. Des exemples de tels attaquants sont les cybercriminels qui pratiquent l'usurpation d'identité pour monter des escroqueries, ou bien rançonnent des entreprises ou des services publics en bloquant leur infrastructure ou en retenant leurs données. Il s'agit aussi de gouvernements autoritaires pratiquant la surveillance de masse sur leur population, afin de neutraliser des opposants politiques ou opprimer des groupes minoritaires.
+
+Les travaux fondateurs de Claude Shannon sur la théorie de l'information montrent qu'\textit{il ne peut exister de chiffrement parfait}. Autrement dit, un système cryptographique \textit{théoriquement incassable} serait inutilisable dans le monde réel. Ainsi, la pratique de la cryptographie consiste à garantir un niveau de sécurité suffisant à un système, sans altérer sa fonctionnalité et ses performances.
+
+Pour ce faire, les cryptographes cherchent à déterminer la puissance de calcul nécessaire à un attaquant pour casser un système de sécurité, par exemple en déchiffrant un message secret dont il n'a pas la clé. L'exemple le plus basique d'attaque est l'attaque par force brute (\textit{brute force}), qui consiste à essayer toutes les clés possibles jusqu'à trouver la bonne. Il convient donc de choisir des clés suffisamment grandes pour que cette stratégie soit trop lente, ou trop coûteuse à mettre en oeuvre. Evidemment, les attaques contre les systèmes cryptographiques se sophistiquent d'années en années, donc les techniques cryptographiques doivent évoluer pour s'y adapter et toujours avoir un temps d'avance.
+
+
+
+\paragraph{Calculer sur des données chiffrées.}
+La cryptographie a connu un essor fulgurant au cours des vingt dernières années. Notamment, le trafic Internet, qui était en clair jusqu'alors, a été sécurisé par l'introduction du protocole HTTPS, qui permet de chiffrer et d'authentifier les échanges entre le client et le serveur.
+
+Cependant, il reste un cas d'usage où la cryptographie est impuissante et où les données sont encore mal protégées: le \textit{calcul délégué}. Cette (vague) dénomination englobe tout les cas d'usages dans lesquels un utilisateur envoie une donnée à un serveur, non pas pour qu'il en assure le transit à travers Internet, mais pour qu'il la traite et lui renvoie un résultat. On peut penser par exemple aux applications telle que Google Maps, dans lesquels l'utilisateur envoie sa position actuelle et sa destination au serveur, qui calcule alors un itinéraire qu'il renvoie sur le téléphone de  l'utilisateur. On peut également penser aux nouvelles applications d'Intelligences Artificielles génératives dans lesquelles l'entrée de l'utilisateur est traitée par un algorithme pour générer du texte, de la musique ou des images. Enfin, cela concerne tous les cas où des entreprises louent des serveurs externes pour effectuer des calculs lourds ou héberger des services.
+
+Le problème est qu'effectuer des calculs sur des données chiffrées est un immense défi technologique, qu'on a longtemps pensé impossible. Par conséquent, le serveur doit nécessairement déchiffrer les données pour pouvoir les traiter, ce qui rend ces dernières vulnérable à la moindre compromission du serveur par une attaque informatique.
+
+
+\paragraph{Cryptographie Homomorphe}
+La cryptographie homomorphe est la branche de la cryptographie qui s'attaque à ce problème. Son but est de développer des algorithmes de chiffrement permettant à un serveur d'effectuer des calculs directement sur les données chiffrées, sans nécessiter de déchiffrement préalable. Le serveur n'ayant à aucun moment accès aux données, il devient alors inutile pour un attaquant d'essayer de s'y introduire, car l'intégralité des données de valeur qu'il contient sont chiffrées et donc inutilisables.
+
+
+
+

@@ -1,0 +1,8 @@
+\section{Conclusion}
+
+In this chapter, we presented a first application of our technique of using an odd plaintext modulus: by embedding $\ell$ bits into a prime field, it becomes possible to unlock the full potential of homomorphic addition and ``pack'' several bits into a ciphertext. We can then retrieve the result of any Boolean function $f:\B^\ell \mapsto \B$ by a unique bootstrapping. This approach scales much better than the conventional technique of using a LUT of size $2^\ell$.
+
+We ended this chapter by presenting an homomorphic implementation of the AES scheme. Implementing the circuit of the S-box using our technique was by far the most challenging part of this design. This is not very surprising: this component has been designed to prevent cryptanalysis,  which indirectly makes the circuit representation of this function unsuitable for this kind of Boolean-oriented approaches.
+
+An interesting axis of improvement would be to use an \textit{arithmetic} representation of the values, so the S-box would simply be evaluated as a LUT. But by fully committing to arithmetic representation, the linear part of the scheme (so the \ShiftRows, \MixColumns and \AddRoundKey steps) becomes the new bottleneck, as we could not leverage the additive homomorphism of TFHE to evaluate XOR operations anymore. In the next chapter, we elaborate further on these ideas and construct a more efficient version of homomorphic AES by combining both Boolean and arithmetic representations. 
+
