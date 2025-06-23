@@ -1,14 +1,19 @@
 %!TEX root = ../thesis.tex
 
 \chapter{Introduction to Fully Homomorphic Encryption}
+\label{chap:fhe}
 
 
+\section{Motivation}
 
-\section{Motivation and Background}
+Cryptography has experienced a tremendous boom over the past decades. In particular, Internet traffic, which used to be transmitted in plaintext, was secured by the introduction of the HTTPS protocol, which encrypts and authenticates communications between client and server.
 
-\TODO{Ecrire la motivation et les use-cases}
+However, one use case remains where cryptography is still ineffective, and where data is still poorly protected: delegated computation. This (vague) term encompasses all scenarios where a user sends data to a server not merely to transmit it across the Internet, but to have it processed and to receive a result in return. One can think, for example, of applications like Google Maps, where the user sends their current location and destination to a server, which then computes a route and sends it back to the user’s phone. Another example is the new generative Artificial Intelligence applications, where the user’s input is processed by an algorithm to generate text, music, or images. Finally, this also applies to cases where companies rent external servers to perform heavy computations or to host services.
+
+The problem is that performing computations on encrypted data is a massive technological challenge, long thought to be impossible. As a result, the server must necessarily decrypt the data before processing it, which leaves the data vulnerable to any potential compromise of the server by a cyberattack.
 
 
+Homomorphic encryption (Fully Homomorphic Encryption, or FHE) is the branch of cryptography that tackles this issue. Its goal is to develop encryption algorithms that allow a server to perform computations directly on encrypted data, without the need to decrypt it first. This way, an attacker has no incentive to breach the server, as all valuable data it contains remains encrypted and therefore useless. Additionally, the service provider itself does not have access to the data, ensuring full confidentiality for the user.
 
 
 
@@ -52,7 +57,7 @@ In 2009, Craig Gentry publishes the breakthrough paper \textit{Fully Homomorphic
 
 Bootstrappability is the ability of a scheme to evaluate homomorphically its own decryption circuit. Gentry shows that if a scheme achieves bootstrappability, then it achieves fully homomorphic encryption. Building on this theoretical result, he constructs a lattice-based bootstrappable scheme and demonstrates the first ever example of fully homomorphic scheme. Since this foundational work, lattice-based constructions have remained the only serious candidate for fully homomorphic encryption. 
 
-Such homomorphic schemes work by injecting some small random noise in the plaintext data before encryption. Its role is to ensure security, relying on computational hardness assumptions such as Learning With Errors (LWE) (we explain it further in Section \ref{sec:hardness_assumptions}). Because the noise is small, it can be easily removed during decryption by a simple rounding operation. 
+Such homomorphic schemes work by injecting some small random noise in the plaintext data before encryption. Its role is to ensure security, relying on computational hardness assumptions such as Learning With Errors ($\LWE$) (we explain it further in Section \ref{sec:hardness_assumptions}). Because the noise is small, it can be easily removed during decryption by a simple rounding operation. 
 
 Gentry's original scheme offered homomorphic additions and multiplications. However, because the plaintext messages are noisy, these operations increase the noise in the ciphertexts. So, if too many operations are performed, the noise gets so large that it becomes preponderant and blows the meaningful information contained in the ciphertexts.
 

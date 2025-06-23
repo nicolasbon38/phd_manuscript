@@ -1,10 +1,14 @@
 %!TeX_ROOT=../thesis.tex
 
-\chapter{Introduction en Français}
+\chapter*{Introduction en Français}
+\addstarredchapter{Introduction en Français}
 
-\paragraph{Cryptographie.} La \textit{cryptographie} est un domaine technique a l'interface entre l'informatique et les mathématiques appliquées. Elle étudie les techniques permettant de protéger l'information. Les techniques cryptographiques les plus classiques sont:
+
+\section{Mise en Contexte}
+
+\paragraph{Cryptographie.} La \textit{cryptographie} est un domaine technique a l'interface entre l'informatique et les mathématiques appliquées. Elle étudie les méthodes permettant de protéger l'information. Les techniques cryptographiques les plus classiques sont:
 \begin{itemize}
-	\item Le \textit{chiffrement}, qui transforme un message, un fichier ou plus généralement n'importe quel type de donnée en la ``brouillant'' pour la rendre illisible aux personnes non autorisées. Cette technique est notamment utilisée pour protéger la confidentialité des messages sur les applications de messageries instantanées telles que WhatsApp ou Signal.
+	\item Le \textit{chiffrement}, qui transforme un message, un fichier ou plus généralement n'importe quel type de donnée en la ``brouillant''. Le seul moyen pour déchiffrer est de posséder la \textit{clé} du chiffrement. La donnée est donc illisible par les personnes non autorisées, . Cette technique est notamment utilisée pour protéger la confidentialité des messages sur les applications de messageries instantanées telles que WhatsApp ou Signal.
 	\item L'\textit{authentification}, qui permet de vérifier l'identité de l'émetteur d'un message. Par exemple, elle assure qu’un utilisateur se connecte bien au serveur de sa banque et non à un serveur frauduleux contrôlé par un pirate.
 	\item Le \textit{contrôle d'intégrité}, qui permet de s'assurer qu'un message n'a pas été modifié ou corrompu pendant sa transmission. C'est notamment utile pour s'assurer qu'un logiciel téléchargé n'a pas été altéré afin d'y introduire une faille de sécurité.
 \end{itemize}
@@ -12,23 +16,104 @@
 
 A l'origine exclusivement réservée au domaine militaire, la cryptographie a été transformée en un enjeu de société majeur au XXIe siècle. Une grande partie des échanges se fait désormais en ligne, qu'il s'agisse de transactions bancaires, d'échanges commerciaux ou de simples messages à ses proches. De fait, rendre les systèmes de communications résistants face aux attaques d'acteurs malveillants est devenu  un enjeu stratégique central pour garantir la sécurité et les libertés individuelles des citoyens. Des exemples de tels attaquants sont les cybercriminels qui pratiquent l'usurpation d'identité pour monter des escroqueries, ou bien rançonnent des entreprises ou des services publics en bloquant leur infrastructure ou en retenant leurs données. Il s'agit aussi de gouvernements autoritaires pratiquant la surveillance de masse sur leur population, afin de neutraliser des opposants politiques ou opprimer des groupes minoritaires.
 
-Les travaux fondateurs de Claude Shannon sur la théorie de l'information montrent qu'\textit{il ne peut exister de chiffrement parfait}. Autrement dit, un système cryptographique \textit{théoriquement incassable} serait inutilisable dans le monde réel. Ainsi, la pratique de la cryptographie consiste à garantir un niveau de sécurité suffisant à un système, sans altérer sa fonctionnalité et ses performances.
+Les travaux fondateurs de Claude Shannon sur la théorie de l'information montrent qu'\textit{il ne peut exister de chiffrement parfait}. Autrement dit, un système cryptographique \textit{théoriquement incassable} serait inutilisable dans le monde réel. Ainsi, la pratique de la cryptographie consiste à garantir un niveau de sécurité suffisant à un système, sans altérer sa fonctionnalité ni ses performances.
 
 Pour ce faire, les cryptographes cherchent à déterminer la puissance de calcul nécessaire à un attaquant pour casser un système de sécurité, par exemple en déchiffrant un message secret dont il n'a pas la clé. L'exemple le plus basique d'attaque est l'attaque par force brute (\textit{brute force}), qui consiste à essayer toutes les clés possibles jusqu'à trouver la bonne. Il convient donc de choisir des clés suffisamment grandes pour que cette stratégie soit trop lente, ou trop coûteuse à mettre en oeuvre. Evidemment, les attaques contre les systèmes cryptographiques se sophistiquent d'années en années, donc les techniques cryptographiques doivent évoluer pour s'y adapter et toujours avoir un temps d'avance.
 
 
 
 \paragraph{Calculer sur des données chiffrées.}
-La cryptographie a connu un essor fulgurant au cours des vingt dernières années. Notamment, le trafic Internet, qui était en clair jusqu'alors, a été sécurisé par l'introduction du protocole HTTPS, qui permet de chiffrer et d'authentifier les échanges entre le client et le serveur.
+La cryptographie a connu un essor fulgurant au cours des dernières décennies. Notamment, le trafic Internet, qui était en clair jusqu'alors, a été sécurisé par l'introduction du protocole HTTPS, qui permet de chiffrer et d'authentifier les échanges entre le client et le serveur.
 
-Cependant, il reste un cas d'usage où la cryptographie est impuissante et où les données sont encore mal protégées: le \textit{calcul délégué}. Cette (vague) dénomination englobe tout les cas d'usages dans lesquels un utilisateur envoie une donnée à un serveur, non pas pour qu'il en assure le transit à travers Internet, mais pour qu'il la traite et lui renvoie un résultat. On peut penser par exemple aux applications telle que Google Maps, dans lesquels l'utilisateur envoie sa position actuelle et sa destination au serveur, qui calcule alors un itinéraire qu'il renvoie sur le téléphone de  l'utilisateur. On peut également penser aux nouvelles applications d'Intelligences Artificielles génératives dans lesquelles l'entrée de l'utilisateur est traitée par un algorithme pour générer du texte, de la musique ou des images. Enfin, cela concerne tous les cas où des entreprises louent des serveurs externes pour effectuer des calculs lourds ou héberger des services.
-
+Cependant, il reste un cas d'usage où la cryptographie demeure impuissante, et dans lequel les données sont encore mal protégées: le \textit{calcul délégué}. Cette (vague) dénomination englobe tout les cas d'usages dans lesquels un utilisateur envoie une donnée à un serveur, non pas pour qu'il en assure le transit à travers Internet, mais pour qu'il la traite et lui renvoie un résultat. On peut penser par exemple aux applications telle que Google Maps, dans lesquelles l'utilisateur envoie sa position actuelle et sa destination au serveur, qui calcule alors un itinéraire qu'il renvoie sur le téléphone de  l'utilisateur. On peut également penser aux nouvelles applications d'Intelligences Artificielles génératives dans lesquelles l'entrée de l'utilisateur est traitée par un algorithme pour générer du texte, de la musique ou des images. Enfin, cela concerne tous les cas où des entreprises louent des serveurs externes pour effectuer des calculs lourds ou héberger des services.
+ Sebastian Vettel[S] [score hidden] an hour ago 
 Le problème est qu'effectuer des calculs sur des données chiffrées est un immense défi technologique, qu'on a longtemps pensé impossible. Par conséquent, le serveur doit nécessairement déchiffrer les données pour pouvoir les traiter, ce qui rend ces dernières vulnérable à la moindre compromission du serveur par une attaque informatique.
 
 
-\paragraph{Cryptographie Homomorphe}
-La cryptographie homomorphe est la branche de la cryptographie qui s'attaque à ce problème. Son but est de développer des algorithmes de chiffrement permettant à un serveur d'effectuer des calculs directement sur les données chiffrées, sans nécessiter de déchiffrement préalable. Le serveur n'ayant à aucun moment accès aux données, il devient alors inutile pour un attaquant d'essayer de s'y introduire, car l'intégralité des données de valeur qu'il contient sont chiffrées et donc inutilisables.
+\paragraph{Cryptographie Homomorphe.}
+La cryptographie homomorphe (\textit{Fully Homomorphic Encryption} en anglais, souvent abrégé en FHE) est la branche de la cryptographie qui s'attaque à ce problème. Son but est de développer des algorithmes de chiffrement permettant à un serveur d'effectuer des calculs directement sur les données chiffrées, sans nécessiter de déchiffrement préalable. Il devient alors inutile pour un attaquant d'essayer de s'y introduire, car l'intégralité des données de valeur qu'il contient sont chiffrées et donc inutilisables.De plus, le fournisseur du service n'a lui-même pas accès aux données, ce qui assure une confidentialité totale vis-à-vis de l'utilisateur.
+
+Cette idée apparaît dans un article de recherche pour la première fois en 1978, mais il faut attendre 2009 pour que la première construction viable d'un algorithme de chiffrement homomorphe apparaisse dans un article de recherche intitulé \textit{Fully Homomorphic Encryption from Ideal Lattices} par Craig Gentry \cite{STOC:Gentry09}. Ce travail a surtout une valeur théorique, car l'algorithme de Gentry demande tellement de ressources pour être calculé qu'il est impossible de l'utiliser dans le monde réel.
+
+Cet article a initié un veritable essor du domaine dans la communauté scientifique, et les progrès ont été extrèmement rapides. Les algorithmes actuels commencent à être utilisable en pratique, et certains projets concrets d'aapplications homomorphes commencent à voir le jour.
+
+Le challenge actuel est donc d'améliorer les performances du chiffrement homomorphe. Pour cela, les cryptographes doivent s'attaquer à deux problématiques principales:
+
+\begin{itemize}
+	\item \textit{La quantité de calcul nécessaire:} Effectuer un calcul dans le domaine homomorphe (c'est-à-dire directement sur les chiffrés) nécessite beaucoup plus d'opérations que lorsqu'on l'effectue en clair. Par conséquent, une application fonctionnant homomorphiquement est beaucoup plus lente et plus coûteuse en énergie que si on l'exécute de façon classique (de 3 à 5 ordres de grandeur en fonction de la nature des calculs). 
+	\item \textit{Le bruit:} La sécurité des schémas de chiffrement homomorphes reposent sur la théorie des réseaux euclidiens. Concrètement, cela signifie que lorsqu'on chiffre les données on leur ajoute une petite perturbation aléatoire qu'on appelle le \textit{bruit}. Comme ce bruit est très faible, il ne pose pas de problème lors du déchiffrement car il est facile de se débarasser de cette imprécision en arrondissant simplement les valeurs. Par contre, lorsqu'on effectue des calculs homomorphes entre plusieurs valeurs chiffrées, leurs bruits s'additionnent ce qui fait croître l'imprécision. Par conséquent, le nombre d'opérations homomorphes qu'il est possible d'effectuer est limité, car un bruit trop élevé deviendrait prépondérant par rapport à l'information contenue dans les messages, rendant le déchiffrement impossible. On a donc un ``quota'' de quantité de calculs disponible  au terme duquel il faut nécessairement s'arrêter.
+\end{itemize}
 
 
+\paragraph{Bootstrapping.}
+Dans son article fondateur de 2009, Craig Gentry introduit une notion fondatrice appelée \textit{bootstrapping}\footnote{on dirait \textit{réamorçage} en français}, qui résout complètement le second problème. Il s'agit d'une opération qui permet au serveur de réduire le bruit d'un chiffré de manière homomorphe, sans violer la confidentialité des données ! Donc si un schéma de chiffrement possède une opération de bootstrapping (on dit qu'il est \textit{bootstrappable}), cela signifie qu'il n'a pas de limitations sur la quantité de calcul qu'il est possible de faire sur les données chiffrées. En effet, il suffit d'appliquer un bootstrapping à chaque fois que la quantité de bruit dans les chiffrés devient trop grande, et de continuer les calculs avec le chiffré bootstrappé !
+
+
+Pour comprendre comment cela fonctionne, rappelez vous que lorsque l'utilisateur déchiffre le résultat, il élimine le bruit avec une opération d'arrondi. Donc, si il est possible de calculer homomorphiquement la fonction de déchiffrement du schéma, alors il est possible de retirer le bruit sans que le serveur aie besoin de déchiffrer ! 
+
+Concrètement, disons que le serveur possède un message chiffré $\vec c_1$ qui correspond au message clair (bruité) $m + e_1$, chiffré avec la clé secrète $\vec s_1$. Ici $m$ et $e_1$ représentent respectivement le message clair et le bruit. Supposons que $\vec c_1$ soit le résultat d’opérations homomorphes, donc le bruit $e_1$ est élevé. Si nous voulons continuer à calculer, il faut réduire le bruit par un processus de bootstrapping.
+Pour cela, le client doit fournir au serveur une clé de bootstrapping $\BSK$. Pour la créer, le client peut considérer la clé secrète $\vec s_1$ comme un message et la chiffrer sous une autre clé secrète $\vec s_2$ pour produire $\BSK = \texttt{Enc}_{\vec s_2}(\vec s_1)$, où \texttt{Enc} désigne la fonction de chiffrement.
+
+La propriété fondamentale découverte par Gentry est que si le serveur calcule homomorphiquement le déchiffrement de $\vec c_1$ en utilisant la clé $\BSK$, il obtient un chiffré $\vec c_2$ du même message sous la clé secrète $\vec s_2$. Mais comme le déchiffrement élimine le bruit, $e_1$ disparaît et le message chiffré est à nouveau « frais » !
+En réalité, tout le bruit n’est pas supprimé (ce qui ne serait pas souhaitable, car toute la sécurité du chiffrement repose sur la présence de bruit dans les chiffrés). Comme il y a du bruit dans $\BSK$, le résultat $\vec c_2$ contient un nouveau bruit $e_2$. Mais si l'algorithme est bien conçu, il est possible d’avoir $e_2 \ll e_1$, ce qui permet de gagner de la marge pour d’autres calculs.
+
+
+Le bootstrapping n'est cependant pas une solution miracle. En effet, c'est une opération extrèmement coûteuse pour la totalité des schémas de chiffrement homomorphe. Donc en résolvant le second problème (celui du bruit qui limite la quantité de calcul), nous avons en fait aggravé le premier (la lenteur du FHE) ! L'un des axes de recherches principaux dans la communauté scientifique est donc de créer des schémas de chiffrement homomorphe avec un bootstrapping le plus efficace possible. 
+
+
+
+\paragraph{Le schéma TFHE}
+L'un des schémas homomorphes les plus prometteurs se nomme TFHE \cite{JC:CGGI20} (pour \textit{Fully Homomorphic Encryption over the Torus}). Comme tous les autres schémas, il permet d'effectuer des opérations linéaires, c'est-à-dire l'addition de deux chiffrés et la multiplication d'un chiffré par une constante. Ces opérations linéaires sont quasiment gratuites en terme de quantité de calcul, donc sont extrèmement rapides. Par contre, elles augmentent le bruit dans les chiffrés, et le serveur ne peut donc pas en effectuer un nombre illimité. Fort heureusement, TFHE possède une opération de bootstrapping relativement efficace par rapport aux standards du FHE, et donc les chiffrés peuvent être régulièrement rafraîchi sans tuer les performances. 
+La particularité du bootstrapping de TFHE est qu'il est \textit{programmable}. Cela signifie qu'en plus de réduire le niveau de bruit, le bootstrapping permet d'évaluer n'importe quelle fonction sur le chiffré, sans aucun surcoût ni en terme de calculs ni en terme de bruit ! Cette fonctionnalité représente une avancée majeure dans le domaine, car cela permet de rentabiliser le temps passé dans les opérations de bootstrapping.
+
+Cependant, TFHE a deux défauts de taille par rapport aux autres schémas de l'état de l'art. D'abord, il ne permet de manipuler des données de faible précision, de l'ordre de quelques bits. Par conséquent, si on veut travailler avec des entiers, cela nécessite de découper les valeurs en petites ``tranches'' de quelques bits et de manipuler ces sous-blocs. Cela rend la conception de programmes homomorphes bien plus complexe que dans le domaine des clairs. C'est la raison pour laquelle le développement de systèmes de compilation automatique de programmes homomorphes est devenu un domaine de recherche actif ces dernières années.
+
+Le second problème est que TFHE n'est pas intrinsèquement parallélisable, contrairement à d'autres chiffrements prometteurs de l'état de l'art tels que CKKS \cite{AC:CKKS17} qui permettent d'encoder plusieurs valeurs dans un même chiffré et d'effectuer des calculs en parallèle sur chacun d'eux. Si ces schémas montrent des meilleurs timings amortis, leur latence est beaucoup plus grande.
+
+
+Malgré ces faiblesses, TFHE reste très étudié dans la littérature scientifique et constitue l'un des principaux espoirs pour l'adoption massive du chiffrement homomorphe. Pendant cette thèse, nous nous sommes concentrés sur ce schéma et avons développé des algorithmes permettant d'accélérer les calculs homomorphes dans certains cas d'usages. Nous présentons un résumé de nos travaux dans la prochaine section.
+
+
+
+
+\section{Résumé de la thèse et des contributions scientifiques}
+
+La thèse commence par une introduction (Chapitre \ref{chap:fhe}) présentant le chiffrement totalement homomorphe, incluant quelques considérations historiques et présentant un état de l’art. Puis, le chapitre \ref{chap:spec_tfhe} introduit en détail le cryptosystème TFHE, en présentant tous ses composants internes ainsi que leur fonctionnement. En particulier, son opération de bootstrapping, qui constitue le coeur de ses capacités homomorphes, est présenté en détail.
+
+
+Dans le chapitre \ref{chap:negacyclicity}, nous présentons l'une des problématiques fondamentales de TFHE: \textit{le problème de négacyclicité}. Il s'agit de l’un des principaux éceuils lors de l'utilisation de TFHE en pratique,  car il limite les performances des opérations homomorphes de TFHE et complexifie énormément la conception de programmes homomorphes. Nous donnons une présentation formelle du problème ainsi qu’un aperçu de l’état de l’art des solutions existantes dans la littérature pour le résoudre. Puis, nous introduisons une nouvelle méthode consistant à utiliser un espace de plaintext d'ordre \textit{impair}, ce qui résout ce problème de négacyclicité tout en activant de nouvelles fonctionnalités pour TFHE. Cette construction constitue la base sur laquelle reposent les contributions du reste de cette thèse.
+
+
+Le chapitre \ref{chap:p_encodings} présente une méthode pour accélérer l’évaluation de fonctions booléennes arbitraires en TFHE. La technique de base de l'article fondateur de TFHE est d'effectuer un bootstrapping par porte logique dans le circuit de la fonction. Le problème est que cette stratégie passe très mal à l'échelle quand on veut travailler avec des fonctions plus complexes ou avec plus d'entrées. Pour résoudre ce problème, nous avons développé un nouveau type d'encodage, appelé \textit{$p$-encodages}, qui plongent les bits dans un espace plus grand. Grâce à cela, il devient possible de compresser plusieurs bits dans le même chiffré en les sommant, puis d'évaluer l'intégralité de la fonction en ne calculant qu'un seul bootstrapping. Nous développons des algorithmes permettant de trouver les $p$-encodages adaptés à une fonction donnée. Dans le cas où le circuit serait tout de même trop grand, nous présentons également un algorithme pour découper le circuit en sous-blocs évaluables avec notre méthode. Pour tester notre construction, nous l'appliquons à quelques primitives cryptographiques pour les implémenter en homomorphe, et démontrons un gain de performance significatif par rapport à l’état de l’art.
+Ce travail a donné lieu à la publication:
+
+\begin{center}
+	\fullcite{TCHES:BonPoiRiv24}
+\end{center}
+
+Le chapitre \ref{chap:hyppogriph} vie à améliorer l'implémentation homomorphe du standard AES du chapitre précédent. Pour ce faire, nous exploitons à la fois les représentations booléennes et arithmétiques et développons un cadre générique pour passer efficacement de l’une à l’autre. Cela nécessite de généraliser la méthode d’encodage du chapitre précédent au-delà du cas booléen vers le cas arithmétique, ainsi que d'adapter des opérateurs homomorphes avancés de l'état de l'art à cette logique d'encodage. Nous produisons ainsi l'implémentation d’AES la plus rapide de la littérature.
+Ce travail a donné lieu à la publication:
+
+\begin{center}
+	\fullcite{hippogryph}
+\end{center}
+
+Le principal cas d'usage visé par le chapitre \ref{chap:hyppogriph} est le transchiffrement, une technique cryptographique permettant de résoudre le problème d'expansion de chiffré. Concrètement, lorsque des données sont chiffrées homomorphiquement, elles prennent beaucoup plus d'espace en mémoire, et donc consomment plus de bande passante quand elles sont envoyées au serveur. Le transchiffrement résout ce problème: le client va plutôt envoyer les données chiffrées avec un algorithme de chiffrement symétrique classique, et le serveur va déchiffrer homomorphiquement ces données pour les récupérer dans le domaine homomorphe. LEs résultats expérimentaux montrent qu'utiliser un chiffrement standard tel que l'AES n'est pas très performant, au lieu de cela on préfèrerait utiliser un algorithme de chiffrement spécialement conçu pour s'évaluer rapidement dans le domain homomorphe. C'est ce que nous construisons dans le chapitre \ref{chap:transistor}: nous y présentons notre constribution à la conception de \texttt{Transistor}, un chiffrement à flot s'évaluant très efficacement avec TFHE.  Nous en donnons la spécification et expliquons le raisonnement motivant ses choix de conception, notamment l'utilisation du modulo impair. La majeure partie de ce chapitre est consacrée à l’analyse des bonnes performances de \texttt{Transistor} dans le domaine homomorphe.
+Ce travail a donné lieu à une publication dans
+
+\begin{center}
+	\fullcite{transistor}
+\end{center}
+
+La version publiée ci-dessus a beaucoup plus de contenu, notamment une analyse approfondie de la sécurité du schéma.
+
+
+L'une des limitations principales de TFHE est que l'opération de bootstrapping programmable devient très lente à mesure qu'on traite des messages de plus en plus grands. Ainsi, évaluer des tables de correspondances (\textit{Look-Up Tables}) de taille supérieure à 8 bits est impossible en pratique.  Dans le chapitre \ref{chap:larger_lut}, nous nous attaquons à ce problème et étendons les capacités du bootstrapping de TFHE au-delà de 8 bits grâce à une méthode accélérant l’évaluation homomorphe de ces grandes \textit{Look-Up Tables}. En nous appuyant à nouveau sur notre technique d'encodage, nous avons conçu un algorithme de décomposition des LUT permettant d'utiliser le bootstrapping sur des plus petits messages. 
+\TODO{Détailler quand le chapitre sera écrit}
+
+
+
+Enfin, le chapitre \ref{chap:parameters} va au-delà du cadre de notre méthode d'encodage dans des espaces impairs et introduit \toolName, un outil destiné à aider les concepteurs de programmes homomorphes à dimensionner des jeux de paramètres garantissant les trois propriétés centrales : la sécurité, la correction des calculs et l’efficacité. La force de \toolName réside dans sa flexibilité permettant de l'étendre facilement à des nouveaux opérateurs homomorphes. De plus, son algorithme d'optimisation estime le temps de calcul grâce à un modèle de coût dépendant de la machine sur laquelle le programme tourne, permettant d'adapter les jeux de paramètres à différents contextes d'utilisation.
+\TODO{Détailler quand ce sera écrit}
 
 

@@ -40,41 +40,46 @@
 \mtcsettitle{minitoc}{Chapter content}
 
 
-%% Hyperref
-\RequirePackage[backref=page]{hyperref}
 
-\hypersetup{
-  %backref=page,% add links into...
-  %pagebackref=true,%... references
-  %hyperindex=true, % add links in index
-  colorlinks=true, % add colors to links
-  breaklinks=true, % break line in long links
-  urlcolor= maincolor, % hyperlink color
-  linkcolor= maincolor, % external link color
-  %pdfpagelabels=true,
-  plainpages=false,% use i, ii, iii... page numbers in pdf readers
-  %bookmarks=true, %
-  %pdfa = true,
-  citecolor=secondarycolor
-}
 
+	\RequirePackage{nameref}  
+	 \RequirePackage[
+	   backend=biber,
+	   refsegment=chapter,
+	   url=false,
+	   backref=true,
+	   %sorting=none,
+	   %autocite=plain,
+	   %style=numeric-comp %% use numeric-comp instead of just numeric in order to have compact mutiple citations, ie [1-4] instead of [1,2,3,4]
+	   style=authoryear,
+     citestyle=authoryear
+	 ]{biblatex}
+	
+	
+	
+	
+	%% Hyperref
+	\RequirePackage{hyperref}
+	
+	%
+	\hypersetup{
+		%backref=page,% add links into...
+		%pagebackref=true,%... references
+		%hyperindex=true, % add links in index
+		colorlinks=true, % add colors to links
+		breaklinks=true, % break line in long links
+		urlcolor= maincolor, % hyperlink color
+		linkcolor= maincolor, % external link color
+		%pdfpagelabels=true,
+		plainpages=false,% use i, ii, iii... page numbers in pdf readers
+		%bookmarks=true, %
+		%pdfa = true,
+		citecolor=secondarycolor
+	}
 
 \makeatletter
 \renewcommand{\@chapapp}{Chapter}
 \makeatother
-
-\RequirePackage{nameref}  
-% \RequirePackage[
-%   backend=biber,
-%   refsegment=chapter,
-%   url=false,
-%   backref=true,
-%   %sorting=none,
-%   %autocite=plain,
-%   %style=numeric-comp %% use numeric-comp instead of just numeric in order to have compact mutiple citations, ie [1-4] instead of [1,2,3,4]
-%   citestyle=alphabetic,
-%   bibstyle=alphabetic
-% ]{biblatex}
 
 %% http://tex.stackexchange.com/questions/69139/refsegment-in-biblatex-broken-since-update-to-tl2012
 %% \defbibheading{subbibliography}{\section*{References for  Chapter~\ref{refsegment:\therefsegment}: \nameref{refsegment:\therefsegment}} }

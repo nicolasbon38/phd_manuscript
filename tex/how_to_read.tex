@@ -1,41 +1,42 @@
 %!TeX_ROOT=../thesis.tex
 
-\paragraph{How to read this thesis ?}
-\TODO{Aussi introduire l'intro en Français}
+\chapter*{How to read this thesis ?}
+\addstarredchapter{How to read this thesis ?}
 
+The thesis begins by a brief section written in French, that introduces the topic and provides a summary of the contributions of this thesis.
 
-Chapter \ref{chap:fhe} provides an introduction on the topic of Fully Homomorphic Encryption, including some historical considerations and a presents a state of the art.
+Chapter \ref{chap:fhe} is an introduction presenting Fully Homomorphic Encryption (FHE), including some historical background and a review of the state of the art. Then, Chapter \ref{chap:spec_tfhe} introduces the TFHE cryptosystem in detail, presenting all its internal components and their functioning. In particular, its bootstrapping operation, which lies at the heart of its homomorphic capabilities, is described in depth.
 
-Chapter \ref{chap:tfhe} introduces TFHE, the cryptosystem on which this thesis focusses. It presents its inner workings, as well as the challenges of implementations. The \textit{Programmable Bootstrapping}, which is at core of TFHE's homomorphic capabilities, is presented in detail.
+In Chapter \ref{chap:negacyclicity}, we address one of TFHE’s fundamental issues: the negacyclicity problem. This is one of the main hurdles when using TFHE in practice, as it limits the performance of homomorphic operations and greatly complicates the design of homomorphic programs. We provide a formal presentation of the problem as well as an overview of the existing solutions found in the literature. We then introduce a new approach using a plaintext space of odd order, which resolves the negacyclicity issue while also enabling new functionalities for TFHE. This construction forms the foundation on which the rest of this thesis builds.
 
-Chapter \ref{chap:negacyclicity_and_oddness} presents the negacyclicity problem, one of the main issue constraining the use of TFHE in practice. We give a formal presentation of the problem, as well as an overview of the state of the art of the solutions present in the literature. We introduce a new method called the \textit{odd plainext modulus}, which solves the negacycliity problem while enabling new features of TFHE. This construction is the building block upon which the contribuitions of the rest of this thesis are built.
+Chapter \ref{chap:p_encodings} presents a method to accelerate the evaluation of arbitrary Boolean functions in TFHE. The core technique of TFHE’s original paper performs one bootstrapping per logic gate in the function’s circuit. The problem is that this approach does not scale well when working with more complex functions or more inputs. To overcome this, we developed a new type of encoding, called $p$-encodings, which embed bits into a larger space. This allows multiple bits to be compressed into the same ciphertext by summing them, enabling evaluation of the entire function through a single bootstrapping. We develop algorithms to find suitable $p$-encodings for a given function. If the circuit is still too large, we also present an algorithm to decompose it into sub-blocks that can be processed using our method. To test this construction, we apply it to several cryptographic primitives and demonstrate significant performance improvements compared to the state of the art.
 
-Chapter \ref{chap:p_encodings} presents a method to accelerate the evaluation of arbitrary Boolean functions in TFHE. It relies on so-called $p$-encodings embedding the bits into a prime field to better leverage TFHE's homomorphic operations. We apply our method to some cryptographic primitives and demonstrates a significant gain of performances with respect to the state of the art. 
-This work has led to a publication in 
-\TODO{Ici copier le bout de biblio}.
+This work resulted in the publication:
 
+\begin{center}
+\fullcite{TCHES:BonPoiRiv24}
+\end{center}
 
-Chapter \ref{chap:hippogryph} extends this result further by generalizing the encoding method beyond the Boolean case to the arithmetic one. In this work, we attempted at constructing a fast homomorphic implementation of the Advanced Encryption Standard (AES) cipher. To achieve that, we leverage both Boolean and arithmetic representations and develop a generic framework to efficiently switch from one to another. We successfully exhibit the fastest implementation of AES of the literature.
-This work has led to a publication in 
-\TODO{Ici copier le bout de biblio}.
+Chapter \ref{chap:hyppogriph} aims to improve the homomorphic implementation of the AES standard from the previous chapter. To do so, we exploit both Boolean and arithmetic representations and develop a general framework for efficiently switching between the two. This requires generalizing the encoding method from the previous chapter beyond the Boolean case to the arithmetic case, and adapting advanced homomorphic operators from the literature to this encoding strategy. This leads to the fastest AES implementation in the literature.
 
+This work resulted in the publication:
 
-Chapter \ref{chap:transistor} presents \texttt{Transistor}, a TFHE-friendly steam cipher. We give its specification and explain the rationale behind the design choices. The largest part of this chapter is dedicated to analyze the good performances of \texttt{Transistor} in the homomorphic domain. 
-This work has led to a publication in 
-\TODO{Ici copier le bout de biblio}.
-The aforementioned published version includes much more material, including an in-depth security analysis of the cipher.
+\begin{center}
+\fullcite{hippogryph}
+\end{center}
 
+The main target use case of Chapter \ref{chap:hyppogriph} is transciphering, a cryptographic technique that solves the problem of ciphertext expansion. When data is encrypted homomorphically, it occupies much more memory space and thus consumes more bandwidth when sent to a server. Transciphering addresses this issue: instead, the client encrypts the data using a conventional symmetric cipher, and the server homomorphically decrypts the data to bring it into the homomorphic domain. Experimental results show that using a standard cipher like AES is not very efficient; instead, one would prefer a cipher specifically designed to be efficiently evaluable under homomorphic encryption. This is exactly what we construct in Chapter \ref{chap:transistor}: we present our contribution to the design of \texttt{Transistor}, a stream cipher that is highly efficient under TFHE. We provide its specification and explain the rationale behind its design choices, including the use of an odd modulus. Most of the chapter is dedicated to analyzing the strong performance of \texttt{Transistor} in the homomorphic domain.
 
-Chapter \ref{chap:larger_lut} presents a method to accelerate the homomoprhic evaluation of large look-up tables, extending the capabilities of the original Programmable Bootstrapping ot the TFHE cryptosystem.
-\TODO{Détailler quand le chapitre sera écrit}
+This work was published in:
 
+\begin{center}
+\fullcite{transistor}
+\end{center}
 
-Finally, Chapter \ref{chap:parameters} goes beyond the scope of the ``odd plaintext modulus'' framework and introduces \toolName, a tool designed to help FHE practitioners to create parameter sets ensuring the three central properties: security, correctness of the computations and efficiency.
-\TODO{Détailler quand ce sera écrit}
+The published version above includes significantly more content, including an in-depth security analysis of the scheme.
 
+One of TFHE’s main limitations is that programmable bootstrapping becomes very slow as the size of the message increases. As a result, evaluating Look-Up Tables (LUTs) larger than 8 bits is impractical. In Chapter \ref{chap:larger_lut}, we tackle this issue by extending TFHE’s bootstrapping capabilities beyond 8 bits through a method that accelerates homomorphic evaluation of large LUTs. Once again leveraging our encoding technique, we design a LUT decomposition algorithm that enables bootstrapping to be applied on smaller messages.
+\TODO{Details will be added once the chapter is written}
 
-
-
-
-
- 
+Finally, Chapter \ref{chap:parameters} goes beyond the scope of our encoding method in odd spaces and introduces \toolName, a tool designed to help homomorphic program designers choose parameter sets that ensure the three central properties: security, correctness of computation, and efficiency. The strength of \toolName lies in its flexibility, allowing easy extension to new homomorphic operators. Furthermore, its optimization algorithm estimates runtime using a cost model that depends on the machine executing the program, allowing parameter sets to be tailored to various usage contexts.
+\TODO{Details will be added once written}
