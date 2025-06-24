@@ -144,7 +144,7 @@ Table \ref{tab:parameters} shows the parameters used for our experiments, all en
 \scalebox{1}{
 	\begin{tabular}{|c||*{12}{>{\centering\arraybackslash}p{0.8cm}|}}
 		\hline
-		$p_{\text{err}}$ & $q$ & $n_{\text{short}}$ & $k$ & $N$ & $\sigma_{\text{short}}$ & $\sigma_{\text{long}}$ & $B_{BR}$ & $\ell_{\text{BR}}$ & $B_{KS}$ & $\ell_{\text{KS}}$ & $\lambda_{\text{short}}$ & $\lambda_{\text{long}}$\\
+		$p_{\text{err}}$ & $q$ & $n_{\text{short}}$ & $k$ & $N$ & $\sigma_{\text{short}}$ & $\sigma_{\text{long}}$ & $\baseDecompPBS$ & $\levelDecompPBS$ & $\baseDecompKS$ & $\levelDecompKS$ & $\lambda_{\text{short}}$ & $\lambda_{\text{long}}$\\
 		\hline
 		$2^{-40}$ & $2^{64}$ & 788 & 2 & 1024 & $2^{47}$ & $2^{14}$ & $2^{23}$ & 1 & $2^4$ & 3 & 131.8 & 128.9\\
 		\hline
@@ -173,7 +173,7 @@ As $|\mathcal W| \leq |\mathcal K|$, we can check that we always have $\sigma^2_
 
 \subsection{Performances} \label{sec:performances}
 
-We provide hereafter some benchmarks of our implementation of \coolName for two sets of parameters tailored for two different error probabilities. We first consider $\perr = 2^{-40}$, which is a common choice in the literature to benchmark homomorphic implementations. Our results for this error probability allow a fair comparison with the state of the art. While such an error probability theoretically allows transciphering to be error-free with a large amount of data with good probability, some recent works have shown that non-negligible error probabilities could be exploited by an adversary in some contexts~\cite{EPRINT:CSBB24,EPRINT:CCPSS24}. Thus, we also provide another set of parameters and associated benchmark for $\perr =  2^{-128}$.
+We provide hereafter some benchmarks of our implementation of \coolName for two sets of parameters tailored for two different error probabilities. We first consider $\perr = 2^{-40}$, which is a common choice in the literature to benchmark homomorphic implementations. Our results for this error probability allow a fair comparison with the state of the art. While such an error probability theoretically allows transciphering to be error-free with a large amount of data with good probability, some recent works have shown that non-negligible error probabilities could be exploited by an adversary in some contexts~\cite{C:CSBB24,CCS:CCPSS24}. Thus, we also provide another set of parameters and associated benchmark for $\perr =  2^{-128}$.
 
 Our implementation relies on our customized version of \texttt{tfhe-rs}~\cite{tfhe-rs} which has been adapted to support odd $p$ (size of the plaintext space), that we described in Section \ref{sec:library}. The experiments were carried on a processor 12th Gen Intel(R) Core(TM) i5-1245U with 4.4 GHz. Table \ref{tab:perfs} summarizes the obtained timings for the two sets of parameters. The throughput is computed assuming that $\log_2(17)$ bits are encoded on one element of $\F_{17}$. Encoding 4 bits on each element would scale the throughput by a factor $4/\log_2(17) \approx 0.98$.
 
@@ -201,7 +201,7 @@ Without taking into account the server key\ifeprint(whose sizes are shown in Tab
 
 
 
-By applying the ``free truncation optimization" introduced in Section \ref{sec:truncature}, we can reduce the volume of the encrypted symmetric key by a factor~0.7. This is particularly useful when transciphering a small volume of data (the volume of the encrypted key being preponderant). For example, to transcipher 1 KB of data, using this technique decreases the volume from 1.78~KB to 1.54~KB. 
+By applying the ``free truncation optimization" introduced in Section \ref{sec:key_wrapping}, we can reduce the volume of the encrypted symmetric key by a factor~0.7. This is particularly useful when transciphering a small volume of data (the volume of the encrypted key being preponderant). For example, to transcipher 1 KB of data, using this technique decreases the volume from 1.78~KB to 1.54~KB. 
 
 In Table \ref{tab:server_key_size} we provide the sizes for the server keys, namely the \emph{key-switching key} ($\KSK$) and the \emph{bootstrapping key} ($\BSK$) while using the ciphertext compression technique described in Section~\ref{sec:key_wrapping}. Those keys are only generated and communicated to the server once (during some user enrollment step).
 

@@ -111,11 +111,11 @@ using the bijection $g$, which reverses the decomposition:
 
 This process is repeated iteratively, using the next ciphertext at each step, until a single LWE ciphertext encrypting $f(m_0, \dots, m_{d-1})$ is obtained.  
 
-\TODO{Refaire ma propre figure}
+
 \begin{figure}
     \centering
-%    \includegraphics[width=0.8\textwidth]{figures/tree_method.pdf}
-    \caption{Illustration of the tree-based method on messages  $m_1 = 1, m_2=2$ in the space  $\mathbb{Z}_4$. The corresponding ciphertexts are $\vec c_1 \in \mathrm{}(m_1)$ and $\vec c_2 \in \mathrm{LWE}(m_2)$. We apply the addition in $\mathbb{Z}_4$ via programmable bootstrapping. Red arrows indicate bootstrappings. (Figure inspired by \cite{DBLP:conf/wahc/TramaCBS23}.)}
+    \treePBSFigure
+    \caption{Illustration of the tree-based method on messages  $m_1 = 1, m_2=2$ in the space  $\mathbb{Z}_4$. The corresponding ciphertexts are $\vec c_1 \in \LWE(m_1)$ and $\vec c_2 \in \LWE(m_2)$. We apply the addition in $\mathbb{Z}_4$ via programmable bootstrapping. Red arrows indicate bootstrappings. (Figure inspired by \cite{DBLP:conf/wahc/TramaCBS23}.)}
     \label{fig:my_label}
 \end{figure}
 

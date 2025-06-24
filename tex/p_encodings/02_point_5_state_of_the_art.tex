@@ -18,7 +18,7 @@ While both techniques seems straightforward, there are not a viable solution in 
 The algorithm of TFHE's programmable bootstrapping takes only one ciphertext in input, so one may think that it can be programmed only with univariate functions. However, there is an easy workaround allowing to evaluate multivariate functions.
 To evaluate a $\ell$-bits LUT, you pick $p = 2^\ell$ for the plaintext modulus. Each input bit is encoded in the LSB of one value in $\Z_{2^\ell}$, and encrypted in a separate ciphertext. Now, to evaluate the function $f$, the $i$-th input is shifted into the $i$-th least significant bit by a multiplication by $2^i$. They are then all summed together to encode the value $b_{\ell-1}b_{\ell-2}\dots b_1b_0$ and the LUT can be processed by a bootstrapping on $\ell$ bits.
 
-\TODO{Faire une figure illustrative}
+\TODO{Faire une figure illustrative (si j'ai le temps)}
 
 This approach does not scale well when the number of inputs $\ell$ increases. Indeed, working in a larger plaintext space slows terribly the PBS algorithm. On the other hand, using a circuit representation ensures a constant time for the bootstrapping algorithm no matter the number of inputs. 
 

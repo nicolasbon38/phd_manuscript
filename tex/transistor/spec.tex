@@ -14,7 +14,7 @@ Its overall structure is presented in Section~\ref{sec:description-structure}, i
 \label{sec:usage}
 
 \coolName{} is a stream cipher that generates a keystream consisting of elements from \( \mainField = \mathbb{F}_{17} \), referred to as {\em digits}.  It is intended for transciphering, i.e., for the type of protocol we summarized in Section \ref{sec:transciphering}.
-More precisely, a 128-bit master key and an IV are used to initialize the internal state of \coolName{} using  a PRF (namely, {\tt SHAKE}~\cite{add:SHA3}), as suggested in~\cite{FSE:BerGil07}. This initialization  is only performed on the client side, and in particular is not evaluated homomorphically, meaning that its cost is negligible. On the other hand, it ensures for example that related IVs cannot be exploited. The entire resulting internal state is then encrypted using TFHE and sent alongside the ciphertext. This ciphertext is obtained by casting the plaintext message to a string of digits of $\mainField$, which is added digit by digit to the keystream produced by \coolName{} using the group law of $\mainField$.
+More precisely, a 128-bit master key and an IV are used to initialize the internal state of \coolName{} using  a PRF (namely, {\tt SHAKE}~\cite{sha-3}), as suggested in~\cite{FSE:BerGil07}. This initialization  is only performed on the client side, and in particular is not evaluated homomorphically, meaning that its cost is negligible. On the other hand, it ensures for example that related IVs cannot be exploited. The entire resulting internal state is then encrypted using TFHE and sent alongside the ciphertext. This ciphertext is obtained by casting the plaintext message to a string of digits of $\mainField$, which is added digit by digit to the keystream produced by \coolName{} using the group law of $\mainField$.
 
 
 
@@ -37,7 +37,7 @@ have the following components:
 
 
 
-The FSM state is initialized to all zeros, and each LFSR is initialized using digits derived from the 128-bit master key and IV using SHAKE~\cite{add:SHA3}. 
+The FSM state is initialized to all zeros, and each LFSR is initialized using digits derived from the 128-bit master key and IV using SHAKE~\cite{sha-3}. 
 
 
 \paragraph{Security Claim.} \coolName{} is a stream cipher providing 128 bits of security, meaning any attack should require at least $2^{128}$ elementary operations, assuming no more than $2^{31}$ digits (about 1~GB) are generated with each IV.  We allow up to $2^{128}$ digits in total per key, corresponding to the multi-initial-state setting.
@@ -79,7 +79,7 @@ so that $\thesbox(0) = 1$, $\thesbox(1) = 12$, and so on. It has the following p
     & + 11 x^{9} + 13 x^{10} + 12 x^{11} + 13 x^{12} + 15 x^{14} + x^{15}~.
   \end{split}
 \end{equation*}
-It was chosen by enumerating all APN permutations of $\mathbb{F}_{17}$, i.e., all permutations $A$ such that the equation $A(x+a)=A(x)+b$ has at most 2 solutions $x$ for all $a \neq 0$ and all $b$. Then, we selected $\thesbox$ among those that offer a good balance between minimizing the number of pairs $(a,b)$ for which the previous equation has exactly two solutions, and minimizing the maximum modulus of the Walsh spectrum (see Definition~\ref{def:fourier}).
+It was chosen by enumerating all APN permutations of $\mathbb{F}_{17}$, i.e., all permutations $A$ such that the equation $A(x+a)=A(x)+b$ has at most 2 solutions $x$ for all $a \neq 0$ and all $b$. Then, we selected $\thesbox$ among those that offer a good balance between minimizing the number of pairs $(a,b)$ for which the previous equation has exactly two solutions, and minimizing the maximum modulus of the Walsh spectrum (see the full article \cite{transistor}).
 
 
 \paragraph{Linear Layer ($\mixC$).} We opted for a $4 \times 4$ Maximum Distance Separable (MDS) matrix to ensure optimal diffusion. The matrix we chose is 

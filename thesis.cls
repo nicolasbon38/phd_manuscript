@@ -42,18 +42,18 @@
 
 
 
-	\RequirePackage{nameref}  
-	 \RequirePackage[
+\RequirePackage{nameref}  
+\RequirePackage[
 	   backend=biber,
 	   refsegment=chapter,
-	   url=false,
+	   url=true,
 	   backref=true,
 	   %sorting=none,
 	   %autocite=plain,
 	   %style=numeric-comp %% use numeric-comp instead of just numeric in order to have compact mutiple citations, ie [1-4] instead of [1,2,3,4]
-	   style=authoryear,
-     citestyle=authoryear
-	 ]{biblatex}
+	   style=alphabetic,
+     citestyle=alphabetic
+ ]{biblatex}
 	
 	
 	

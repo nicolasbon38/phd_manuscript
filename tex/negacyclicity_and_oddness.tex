@@ -16,10 +16,10 @@ In this chapter, we formalize the negacyclicity problem. We then present the cla
 
 Let $v(X)$ be a polynomial of the ring $\glweRing$, such that $v(X) = \sum_{k=0}^{N-1} v_k X^k$. Recall how a multiplication by $X$  in this ring ``rotates'' the coefficients of the polynomial: \[X \cdot v(X) = - v_{N - 1} + v_0 \cdot X \dots + v_{N - 2} X^{N - 1}~.\]
 
-In TFHE's blind rotation, the polynomial multiplication in the blind rotation is actually done by $X^{-\Tilde{\mu}}$, which lives in $\{0, \dots, 2N - 1\}$. This leads to two problems:
+In TFHE's blind rotation, the polynomial multiplication is done by the monomial $X^{-\Tilde{\mu}}$, with $\Tilde{\mu} \in \left \lbrace 0, \dots, 2N - 1 \right \rbrace$. This leads to two problems:
 
 \begin{itemize}
-	\item A coefficient $v_j$ can be brought in first place by two different rotations: the one induced by the polynomial multiplication by $X^{\modulo{-j}{2N}}$ and the one by $X^{[-j + N]_{2N}}$.
+	\item A coefficient $v_j$ can be brought in first place by two different rotations: the one induced by the polynomial multiplication by $X^{\modulo{-j}{2N}}$ and the one by $X^{[-j + N]_{2N}}$. It means that two different messages produce the same output.
 	\item Each time a coefficient goes last to first, it gets negated (because $X^N = -1$ in the ring). So actually, the multiplication by $X^{[-j]_{2N}}$ yields correctly $v_j$, but the one by $X^{[-j + N]_{2N}}$ yields $-v_j$.
 \end{itemize}
 
@@ -27,7 +27,7 @@ In TFHE's blind rotation, the polynomial multiplication in the blind rotation is
 As the actual value of $\tilde{\mu}$ is encrypted, this is not possible to predict beforehand whether this undesirable minus sign will appear or not. So a countermeasure needs to be implemented into the scheme to neutralize the negacyclicity problem. The most frequent strategy is to develop encodings for the LUT $f$ in the accumulator specifically tailored to handle this issue.
 
 
-\paragraph{The ideal case}
+\paragraph{The ``natural'' case}
 
 Some functions interact naturally very well with the blind rotation algorithm: these are called the \textit{negacyclic functions} and they are presented in Definition \ref{def:negacyclic_function}.
 
@@ -63,7 +63,7 @@ We give an explicit formula for this accumulator in Definition \ref{def:negacycl
 
 
 
-This construction is merely theoretical. Indeed, in practical setting, restricting the functions to be evaluated by PBS only to negacyclic function greatly limits the capability of the scheme. In order to be able to evaluate \textit{any} function in the PBS, more sophisticated techniques are required. We introduce the first example of such technique in the next section.
+Unfortunately, this construction is merely theoretical. Indeed, in practical setting, restricting the functions to be evaluated by PBS only to negacyclic function greatly limits the capability of the scheme. In order to be able to evaluate \textit{any} function in the PBS, more sophisticated techniques are required. We introduce the first example of such technique in the next section.
 
 
 \section{The Classical Countermeasure: the Bit of Padding}
@@ -77,7 +77,6 @@ The advantage of this method is that it relaxes the negacyclicity constraint and
 
 To avoid this, when evaluating an homomorphic circuit, the program needs to keep track of the maximal value that each homomorphic operation can yield and make sure that it will never propagate a carry into the MSB. This often leads to extra bootstrapping to control the growth of the message and eliminate the overflows. 
 
-In Chapter \ref{chap:p_encodings}, we will demonstrate how this method makes the evaluation of Boolean circuit very inefficient, and we propose a new method that improves it.
 
 In the following, we give the definition of the accumulator $\acc$ in this ``bit-of-padding'' case:
 
@@ -115,7 +114,25 @@ An example of such an accumulator is shown on Figure \ref{fig:negacyclic_accumul
 
 
 
-The drawbacks of the bit-of-padding padding makes very challenging the development of homomorphic applications, because it prevents to use the linear operations freely. One should keep track of the maximal value contained in a ciphertext to avoid an overflow that would fill the padding bit. Some constructions have been developed to avoid this drawback, we present them in Section \ref{sec:soa_padding_bit}.
+The drawbacks of the bit-of-padding padding makes very challenging the development of homomorphic applications, because it prevents to use the linear operations freely. One should keep track of the maximal value contained in a ciphertext to avoid an overflow that would fill the padding bit. In Chapter \ref{chap:p_encodings}, we will demonstrate how this method makes the evaluation of Boolean circuit very inefficient, and we propose a new method that improves it.
+
+Some constructions have been developed to avoid these drawbacks, we present them in Section \ref{sec:soa_padding_bit}.
+
+
+
+\section{Other Countermeasures Avoiding the Bit of Padding}
+\label{sec:soa_padding_bit}
+
+Because the classical bit-of-padding solution brings too many constraints on the evaluation of computational circuits, several alternative constructions have been proposed to homomorphiclaly evaluate LUT. To do so, many of these constructions adopt a similar strategy: they decompose the target function into a sequence of several PBS steps. 
+
+A notable line of work, including \cite{EPRINT:YXSCZ21}, \cite{AC:LiuMicPol22}, and \cite{TCHES:KluSch23}, employs a two-step PBS strategy. In these approaches, the first PBS evaluates a quantity  encrypting the bit indicating whether the message lies in the positive or negative half of the torus. This effectively extracts the ``sign'' of the message. The second PBS then evaluates the actual function of interest regardless of the effects of negacyclicity, producing a result that may be flipped in sign. The ambiguity introduced by this flip is corrected using the result of the first PBS. While the specific techniques used to perform this correction vary across works, the overall architecture remains the same: use the first PBS to identify the torus half, and use this information to rectify the sign of the second PBS output.
+
+Another interesting approach is presented in \cite{AFRICACRYPT:CBSZ23}, where the target function is expressed as a sum of functions sharing a particular structure: so-called \textit{pseudo-odd} and a \textit{pseudo-even} function. These two properties are special cases of negacyclic functions, so they allow an evaluation with a PBS without suffering from the negacyclicity issue. Although this decomposition may require more than two PBS calls, an important advantage of the method is that the evaluations can be carried out in parallel. This contrasts with the previously mentioned approaches, which are intrinsically sequential due to the dependency between the two PBS stages.
+
+A completely different line of work is explored in \cite{AC:CLOT21}, which introduces the “Without-Padding PBS” (WoP-PBS) construction. A more refined version of this technique is presented in \cite{JC:BBBCLO23}, and we describe it here. The method begins by evaluating a scaled sign function (that is inherently negacyclic) using a standard PBS. Following this, the individual bits of the message are extracted and converted into $\GGSW$ ciphertexts (see Definitions \ref{def:ggsw} and \ref{def:ggsw2}) using a procedure known as \textit{circuit bootstrapping}. These ciphertexts are then used as selectors in a graph of $\CMUX$ operations (Definition \ref{def:cmux}) to select an appropriate accumulator based on the high-order bits of the message. Finally, a traditional PBS is used to rotate the selected accumulator according to the remaining lower-order bits.
+
+Although this technique is slower for small plaintext sizes, it scales particularly well with increasing input sizes. Notably, it enables the homomorphic evaluation of LUTs with larger plaintext sizes beyond what is feasible with classical PBS techniques, up to approximately 20 input bits.
+
 
 In this thesis, we focus on a method we introduced in \cite{TCHES:BonPoiRiv24}: \textit{the odd plaintext modulus}
 
@@ -257,21 +274,9 @@ With this technique, no bit of padding is required. Consequently, it allows to u
 
 
 
-\section{Other Countermeasures Avoiding the Bit of Padding}
-\label{sec:soa_padding_bit}
 
-Because the classical bit-of-padding solution brings too many constraints on the evaluation of computational circuits, several alternative constructions have been proposed to homomorphiclaly evaluate LUT. To do so, many of these constructions adopt a similar strategy: they decompose the target function into a sequence of several PBS steps. 
+\section{Conclusion}
 
-A notable line of work, including \cite{EPRINT:YXSCZ21}, \cite{AC:LiuMicPol22}, and \cite{TCHES:KluSch23}, employs a two-step PBS strategy. In these approaches, the first PBS evaluates a quantity  encrypting the bit indicating whether the message lies in the positive or negative half of the torus. This effectively extracts the ``sign'' of the message. The second PBS then evaluates the actual function of interest regardless of the effects of negacyclicity, producing a result that may be flipped in sign. The ambiguity introduced by this flip is corrected using the result of the first PBS. While the specific techniques used to perform this correction vary across works, the overall architecture remains the same: use the first PBS to identify the torus half, and use this information to rectify the sign of the second PBS output.
+Our idea of employing odd plaintext moduli that we developed in Section \ref{sec:odd_modulus} do not have any computational overhead with respect to the classical bit-of-padding technique of Section \ref{sec:bit_of_padding}, while removing all the constraints the latter put on the homomorphic compilation. This is not the case of the other methods of the state of the art that we summed up in Section \ref{sec:soa_padding_bit}, which all increase the amount of computation 
 
-Another interesting approach is presented in \cite{AFRICACRYPT:CBSZ23}, where the target function is expressed as a sum of functions sharing a particular structure: so-called \textit{pseudo-odd} and a \textit{pseudo-even} function. These two properties are special cases of negacyclic functions, so they allow an evaluation with a PBS without suffering from the negacyclicity issue. Although this decomposition may require more than two PBS calls, an important advantage of the method is that the evaluations can be carried out in parallel. This contrasts with the previously mentioned approaches, which are intrinsically sequential due to the dependency between the two PBS stages.
-
-A completely different line of work is explored in \cite{AC:CLOT21}, which introduces the “Without-Padding PBS” (WoP-PBS) construction. A more refined version of this technique is presented in \cite{JC:BBBCLO23}, and we describe it here. The method begins by evaluating a scaled sign function (that is inherently negacyclic) using a standard PBS. Following this, the individual bits of the message are extracted and converted into $\GGSW$ ciphertexts (see Definitions \ref{def:ggsw} and \ref{def:ggsw2}) using a procedure known as \textit{circuit bootstrapping}. These ciphertexts are then used as selectors in a graph of $\CMUX$ operations (Definition \ref{def:cmux}) to select an appropriate accumulator based on the high-order bits of the message. Finally, a traditional PBS is used to rotate the selected accumulator according to the remaining lower-order bits.
-
-Although this technique is slower for small plaintext sizes, it scales particularly well with increasing input sizes. Notably, it enables the homomorphic evaluation of LUTs with larger plaintext sizes beyond what is feasible with classical PBS techniques, up to approximately 20 input bits.
-
-
-Our idea of employing odd plaintext moduli that we developed in Section \ref{sec:odd_modulus} do not have any computational overhead with respect to the classical bit-of-padding (contrary to the other approaches we presented in this section), while removing all the constraints the latter put on the homomorphic compilation. However, working with an odd modulus may seem unhandy: data types in programming are usually defined on a power-of-two modulus for example.
-
-Chapter \ref{chap:p_encodings}, \ref{chap:hyppogriph}, \ref{chap:transistor} and \ref{chap:larger_lut} are examples of applications enabled by this feature of odd plaintext modulus.
-
+However, working with an odd modulus may seem unhandy: data types in programming are usually defined on a power-of-two modulus for example. But we show in the following chapters (Chapter \ref{chap:p_encodings}, \ref{chap:hyppogriph}, \ref{chap:transistor} and \ref{chap:larger_lut}) that this introduces new applications and homomorphic capabilities to TFHE.

@@ -32,7 +32,7 @@ Figure \ref{fig:classical_usage_fhe} demonstrates a procedure of private outsour
 \begin{figure}
 	\centering
 	\include{img/blocks_from_slides/simple_fhe.tex}
-	\caption{An illustration of a protocol of outsourced computation using FHE}
+	\caption{An illustration of a protocol of outsourced computation using FHE. Hatching denotes that the homomorphized version is run.}
 	\label{fig:classical_usage_fhe}
 \end{figure}
 
@@ -77,7 +77,7 @@ Gentry's original scheme was merely theoretical, because the homomorphic operati
 \begin{figure}
 	\centering
 	\include{img/blocks_from_slides/bootstrappable_schema.tex}
-	\caption{High-level overview of the bootstrapping principle.}
+	\caption{High-level overview of the bootstrapping principle. Hatching denotes the fact that the operation is ran homomorphically. The gauges denotes indicative noise levels for the ciphertexts.}
 	\label{fig:bootstrapping_principle}
 \end{figure}
 
@@ -94,10 +94,10 @@ After a decade of research, homomorphic schemes have evolved to stabilize around
 \paragraph{CKKS:} CKKS has quite opposite features than TFHE. It relies on a \textit{approximate} paradigm fo the computations, so is quite appropriate for floating-point computations. Moreover, it supports SIMD (Same Instruction Multiple Data) within its ciphertexts, so it allows for heavy parallelization. While its bootstrapping is quite heavy and appeared later in the literature \cite{EC:CHKKS18}, a lot of advancements happened in the last few years making it closer to practical \cite{EC:CheChiSon19, RSA:HanKi20, AC:KPKKM22}.
 
 
-We should also mention BFV/BGV \cite{C:Brakersky12, bgv, EPRINT:FanVer12}, that share most of the properties of CKKS. However these constructions do not work with approximate floating-point computation, but rather with exact computations over large integer rings.
+We should also mention BFV/BGV \cite{C:Brakerski12, bgv, EPRINT:FanVer12}, that share most of the properties of CKKS. However these constructions do not work with approximate floating-point computation, but rather with exact computations over large integer rings.
 
 
-Several libraries implement these schemes, facilitating their adoption. For TFHE, we can mention tfhe-rs \cite{tfhe-rs}  and TFHEpp \cite{TFHEpp}. For CKKS, we can mention HEAAN \cite{heean} and Lattigo \cite{lattigo}. Finally, OpenFHE \cite{openfhe} is an attempt at constructing a universal library that supports all the schemes and allows conversions.
+Several libraries implement these schemes, facilitating their adoption. For TFHE, we can mention tfhe-rs \cite{tfhe-rs}  and TFHEpp \cite{TFHEpp}. For CKKS, we can mention HEAAN \cite{heaan} and Lattigo \cite{lattigo}. Finally, OpenFHE \cite{OpenFHE} is an attempt at constructing a universal library that supports all the schemes and allows conversions.
 
 
 These libraries target users familiar with FHE, and offer quite low-level API. One of the issue slowing down the massive adoption of FHE is the difficulty of developing concrete applications from the cryptographic primitives. A layer of compilation is thus required from ``plaintext'' programming to homomorphic code. Such projects of homomorphic compiler include Concrete \cite{Concrete} and heir \cite{HEIR}.

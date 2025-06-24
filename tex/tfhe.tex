@@ -608,7 +608,7 @@ Let $\vec C = \GLWE_{\glweSecretKey'}(M)$ be a ciphertext encrypting the polynom
 	such that $\bar s_{iN + j} = s_{i, j}$ for $0 \le i < k$ and $0 \le j < N$.
 \end{definition}
 
-$\SampleExtract$is actually as a simple rearrangement of the coefficients of the ciphertext: its computational cost is negligible and it does not add any noise in the ciphertexts.
+$\SampleExtract$ is actually as a simple rearrangement of the coefficients of the ciphertext: its computational cost is negligible and it does not add any noise in the ciphertexts.
 
 
 \input{tex/algorithms/alg_sample_extract.tex}
@@ -644,7 +644,7 @@ One key aspect of TFHE is \textit{the degradation of the speed of the bootstrapp
 \begin{figure}
 	\centering
 	\includegraphics[width=0.8\linewidth]{img/to_harmonize/timings_pbs_precisions.png}
-	\caption{TODO: remove the legend "CJP21". Maybe redraw it to have a taller figure}
+	\caption{Timings of the PBS with respect to $\log_2(p)$, where $p$ is the plaintext modulus}
 	\label{fig:PBS_perfs}
 \end{figure}
 
@@ -652,7 +652,7 @@ One key aspect of TFHE is \textit{the degradation of the speed of the bootstrapp
 
 Intuitively, the reason is simple. When one wants to use a greater $p$, the torus must be sliced into more parts, that are thus smaller. When we switch the modulus to $2N$ in the bootstrapping, the ``windows'' of the accumulator polynomial gets smaller, so the bound on the noise to ensure correct bootstrapping must be smaller. To keep some room to enable the homomorphic capabilities of TFHE, one has to pick a greater value for the degree $N$. As this must be a power of two, it quickly reach values where the polynomial operations gets very slow.
 
-Usually, PBS is not used for plaintext modulus greater than 8 bits. Some constructions exist in the literature to extend the capabilities of this algorithm to larger plaintext spaces, notably the WoP-PBS of \cite{AC:CLOT21}. In this thesis, we propose our own in Chapter \ref{chap:larger_lut}.
+Usually, PBS is not used for plaintext modulus greater than 8 bits. Some constructions exist in the literature to extend the capabilities of this algorithm to larger plaintext spaces, notably the tree bootstrapping of \cite{TCHES:GuiBorAra21} and the WoP-PBS of \cite{AC:CLOT21}. In this thesis, we propose our own in Chapter \ref{chap:larger_lut}.
 
 
 
