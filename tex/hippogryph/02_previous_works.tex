@@ -128,7 +128,7 @@ Finally, the ``full-LUT'' approach facilitates efficient computation of the S-bo
 
 
 
-\section{Generalization of $p$-encodings to Arithmetic Case}
+\section{Generalization of $p$-encodings to the Arithmetic Case}
 \label{sec:generalization_p_encodings}
 
 In Chapter \ref{chap:p_encodings} of this thesis, we introduced the notion of $p$-encodings and used it in Section \ref{sec:p_encodings_aes} to evaluate AES homomorphically. In this method, data was encrypted bit per bit and only Boolean operations were performed. It leveraged the fact that, in the plaintext space $\Z_2$, the \texttt{SumTFHE} operation actually performs a XOR. Thus, the linear operations \MixColumns and \AddRoundKey could be efficiently performed with minimal cost, using only the homomorphic sum of TFHE. To be able to evaluate $\SubBytes$ under Boolean representation, we used $p$-encodings to evaluate the circuits of \SubBytes with a minimal number of bootstrappings. While this has brought some improvements, evaluating the LUT of AES as a Boolean circuit is still suboptimal, and in this chapter we attempt at doing it using arithmetic representation.
