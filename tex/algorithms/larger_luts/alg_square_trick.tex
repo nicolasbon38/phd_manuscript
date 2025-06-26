@@ -13,22 +13,22 @@
 \KwIn{
 	$\left \lbrace
 	    \begin{aligned}
-	    	c_1, c_2: \text{: the ciphertexts encrypting the inputs $x_1$ and $x_2$}\\
+	    	\vec c_1, \vec c_2 \text{: the ciphertexts encrypting the inputs $x_1$ and $x_2$}\\
 	    \end{aligned}
 	\right.$
 }
-\KwResult{$c'$: an encryption of $x_1 \cdot x_2$}
+\KwResult{$\vec c'$: an encryption of $x_1 \cdot x_2$}
 
 \Comment{We compute the sum and the difference}
-$s_1 \gets \texttt{SumTFHE}(c_1, c_2)$ \\
-$s_2 \gets \texttt{SumTFHE}(c_1, \texttt{MulTFHE}(c_2, \modulo{-1}{p}))$\\
+$\vec s_1 \gets \texttt{SumTFHE}(\vec c_1, \vec c_2)$ \\
+$\vec s_2 \gets \texttt{SumTFHE}(\vec c_1, \texttt{MulTFHE}(\vec c_2, \modulo{-1}{p}))$\\
 
 \Comment{Evaluation of the squares (we precompute the minus sign in front of the second one)}
-$s'_1 \gets \texttt{PBS\_TFHE}(s_1, x \mapsto x^2 \cdot \modulo{4^{-1}}{p})$ \\
-$s'_2 \gets \texttt{PBS\_TFHE}(s_2, x \mapsto \modulo{-1}{p} \cdot x^2 \cdot \modulo{4^{-1}}{p})$ \\
+$\vec s'_1 \gets \texttt{PBS\_TFHE}(\vec s_1, x \mapsto x^2 \cdot \modulo{4^{-1}}{p})$ \\
+$\vec s'_2 \gets \texttt{PBS\_TFHE}(\vec s_2, x \mapsto \modulo{-1}{p} \cdot x^2 \cdot \modulo{4^{-1}}{p})$ \\
 
 \Comment{Summing the square}
-$c_r \gets \texttt{SumTFHE}(s'_1, s'_2)$\\
+$\vec c_r \gets \texttt{SumTFHE}(\vec s'_1, \vec s'_2)$\\
 
 \Return{$c_r$}
 
