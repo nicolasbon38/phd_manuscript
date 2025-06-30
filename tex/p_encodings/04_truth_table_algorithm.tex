@@ -22,8 +22,7 @@ We introduce two lemmas that will be used to reduce the search space:
 Let us assume that the vector $\Encoding = (\Encoding_1, \dots, \Encoding_\ell)$ of Lemma \ref{lemma:reduction} is suitable for the function $f$. Then the sets $\mathcal{P}_0$ and $\mathcal{P}_1$ constructed like in Equation \ref{def:sets_p} are disjoint.
 Now, let us consider the vector of canonical $p$-encodings $\Encoding' = (\Encoding'_1, \dots, \Encoding'_\ell)$ respecting the property:
 $$
-\forall~b \ \in \B, \forall 
-~i \in \{0, \dots, \ell\}, \Encoding'_i(b) \subset \Encoding_i(b).
+\forall~b \ \in \B, \forall i \in \{1, \dots, \ell\}, \Encoding'_i(b) \subset \Encoding_i(b).
 $$
 As a consequence, if we build the sets $\mathcal{P'}_0$ and $\mathcal{P'}_1$ relative to the encodings $\Encoding'$, then we naturally get $\mathcal{P'}_0 \subset \mathcal{P}_0$ and $\mathcal{P'}_1 \subset \mathcal{P}_1$. So we get $\mathcal{P'}_0 \cap \mathcal{P'}_1 = \emptyset$, proving Lemma \ref{lemma:reduction}.
 \end{proof}
@@ -31,7 +30,7 @@ As a consequence, if we build the sets $\mathcal{P'}_0$ and $\mathcal{P'}_1$ rel
 
 \begin{lemma}[Reducibility to the singleton zero]
     Let $f: \B^\ell \longrightarrow \B$ and let $(\Encoding_1, \dots, \Encoding_\ell)$ be a vector of $p$-encodings suitable for $f$ and of the form: $\forall i \in \{1, \dots, \ell\}, \Encoding_i = \EncDef{\{x^{(i)}\}}{\{y^{(i)}\}}$
-    Then any vector of canonical $p$-encodings $(\Encoding'_1, \dots, \Encoding'_\ell)$ of the form: $\forall~i \in \{1, \dots, \ell\}, \Encoding'_i = \EncDefOne{y^{(i)} - x^{(i)}}$
+    Then any vector of canonical $p$-encodings $(\Encoding'_1, \dots, \Encoding'_\ell)$ of the form: $\forall i \in \{1, \dots, \ell\}, \Encoding'_i = \EncDefOne{y^{(i)} - x^{(i)}}$
     is suitable for the function $f$ as well.
     \label{lemma:enczero}
 \end{lemma}
@@ -79,12 +78,12 @@ As a consequence, if $p$ is prime (which we shall always choose in practice), an
 
 \subsection{Formalization of the Search Problem}
 
-According to the lemmas from Section \ref{sec:restriction}, we can reduce the problem of finding a vector of $p$-encodings $(\Encoding_1, \dots, \Encoding_l)$ such that $f(\Encoding_1, \dots, \Encoding_\ell)$ is valid to the problem of finding a vector $\vec{d} = (d_1, \dots, d_\ell)$ such that $d_1 = 1$, $\Encoding_i = \EncDefOne{d_i}$ and $f(\Encoding_1, \dots, \Encoding_\ell)$ is valid. In the following, we describe an algorithm to find such a vector $\vec d$.
+According to the lemmas from Section \ref{sec:restriction}, we can reduce the problem of finding a vector of $p$-encodings $(\Encoding_1, \dots, \Encoding_\ell)$ such that $f(\Encoding_1, \dots, \Encoding_\ell)$ is valid to the problem of finding a vector $\vec{d} = (d_1, \dots, d_\ell)$ such that $d_1 = 1$, $\Encoding_i = \EncDefOne{d_i}$ and $f(\Encoding_1, \dots, \Encoding_\ell)$ is valid. In the following, we describe an algorithm to find such a vector $\vec d$.
 
 
-We denote $V$ the matrix of elements of $\B$ of shape $2^\ell \times \ell$ gathering all the possible sequences of entries for the function $f$:
+We denote $\mat V$ the matrix of elements of $\B$ of shape $2^\ell \times \ell$ gathering all the possible sequences of entries for the function $f$:
 
-$$V = \left ( \begin{matrix}
+$$\mat V = \left ( \begin{matrix}
 0 & \dots & 0 & 0\\
 0 & \dots & 0 & 1\\
 0 & \dots & 1 & 0\\
@@ -93,25 +92,25 @@ $$V = \left ( \begin{matrix}
 \end{matrix}
 \right ) $$
 
-Also, we denote by $\Vec{b}$ the vector of all the outputs of the function $f$, sorted in same order as the rows of $V$. Thus, we have: $\forall~i \in \{1, \dots, 2^\ell\}, b_i = f(V_i)$
-for $V_i$ the $i$th row of $V$. Let us define the vector $\vec r$ as: $\Vec{r} = V \vec{d}$. To make $\vec d$ a solution of the problem, $\vec r$ has to verify the following property:
+Also, we denote by $\Vec{b}$ the vector of all the outputs of the function $f$, sorted in same order as the rows of $\mat V$. Thus, we have: $\forall i \in \{1, \dots, 2^\ell\}, b_i = f(\mat V_i)$
+for $\mat V_i$ the $i$-th row of $\mat V$. Let us define the vector $\vec r$ as: $\Vec{r} = \mat V \vec{d}$. To make $\vec d$ a solution of the problem, $\vec r$ has to verify the following property:
 \[
-\forall~i, j \in \{1, \dots, 2^\ell\}, f(V_i) \neq f(V_j) \implies r_i \neq r_j   
+\forall (i, j) \in \{1, \dots, 2^\ell\}, f(\mat V_i) \neq f(\mat V_j) \implies r_i \neq r_j   
 \]
-An alternative formulation is: we look for two disjoint subsets $\mathcal{P}_0$ and $\mathcal{P}_1$ of $\Z_p$, such that: $f(V_i) = b \Longleftrightarrow r_i \in \mathcal P_b$.
+An alternative formulation is: we look for two disjoint subsets $\mathcal{P}_0$ and $\mathcal{P}_1$ of $\Z_p$, such that: $f(\mat V_i) = b \Longleftrightarrow r_i \in \mathcal P_b$.
 
 The following section describes an algorithm finding a solution to this problem.
 
 \subsection{Algorithm}
 \label{sec:search_algorithm}
 
-We start by constructing two sets $\mathcal F$ and $\mathcal T$ such that: \[\mathcal F = \{V_i ~\vert~ b_i = 0\} \text{ and } \mathcal T = \{V_i ~\vert~ b_i = 1\}.\]
-Each line $V_i$ represents a linear combination of the $d_j$'s, that verifies:
-\[r_i = \sum_{j=0}^{\ell} V_{ij} \cdot d_j \mod p.\]
+We start by constructing two sets $\mathcal F$ and $\mathcal T$ such that: \[\mathcal F = \{\mat V_i ~\vert~ b_i = 0\} \text{ and } \mathcal T = \{\mat V_i ~\vert~ b_i = 1\}.\]
+Each line $\mat V_i$ represents a linear combination of the $d_j$'s, that verifies:
+\[r_i = \sum_{j=0}^{\ell} \mat V_{ij} \cdot d_j \mod p.\]
 The values $r_i$ produced by the elements of $\mathcal{F}$ must be different from the ones produced by $\mathcal{T}$. As a consequence, we can write:
-\[\forall~(V_i, V_j) \in \mathcal F \times \mathcal T, \sum_{k=0}^\ell V_{ik} \cdot d_k \neq \sum_{k=0}^\ell V_{jk} \cdot d_k,\] which is equivalent to writing:
-\[\forall~(V_i, V_j) \in \mathcal F \times \mathcal T, \sum_{k=0}^\ell (V_{ik} - V_{jk}) \cdot d_k \neq 0.\]
-So we can rewrite our constraints in the set $\mathcal C =  \{V_i - V_j ~\vert~ (V_i, V_j) \in \mathcal F \times \mathcal T\}.$ $\mathcal{C}$ contains vectors with coordinates in $\{0, 1, -1\}$ representing linear combinations that have to be non-zero. Note that if an element of the set $\mathcal{C}$ is the opposite of an other, it does not bring further constraint and can thus be safely discarded from the set.
+\[\forall~(\mat V_i, \mat V_j) \in \mathcal F \times \mathcal T, \sum_{k=0}^\ell \mat V_{ik} \cdot d_k \neq \sum_{k=0}^\ell \mat V_{jk} \cdot d_k,\] which is equivalent to writing:
+\[\forall~(\mat V_i, \mat V_j) \in \mathcal F \times \mathcal T, \sum_{k=0}^\ell (\mat V_{ik} - \mat V_{jk}) \cdot d_k \neq 0.\]
+So we can rewrite our constraints in the set $\mathcal C =  \{\mat V_i - \mat V_j ~\vert~ (\mat V_i, \mat V_j) \in \mathcal F \times \mathcal T\}.$ $\mathcal{C}$ contains vectors with coordinates in $\{0, 1, -1\}$ representing linear combinations that have to be non-zero. Note that if an element of the set $\mathcal{C}$ is the opposite of an other, it does not bring further constraint and can thus be safely discarded from the set.
 
 The use of a set in the implementation at this point of the algorithm allows to remove a lot of duplicate constraints and to simplify the next step. Then, the problem reduces to solving a ``linear system of inequalities'' in the ring $\Z_p$: 
 
@@ -125,11 +124,11 @@ c_i^{(j)} \in \{0, \pm 1\}
 $$
 
 
-After filtering the duplicates, we pack all the elements of $\mathcal{C}$ in $\ell$ matrices $\{C_i\}_{1 \le i \le \ell}$ (each row being a linear combination), where the matrix $C_i$ packs all the constraints involving only the $i$ first inputs (i.e. all the coefficients of column index greater than $i$ are zeros).
+After filtering the duplicates, we pack all the elements of $\mathcal{C}$ in $\ell$ matrices $\{\mat C_i\}_{1 \le i \le \ell}$ (each row being a linear combination), where the matrix $\mat C_i$ packs all the constraints involving only the $i$ first inputs (i.e. all the coefficients of column index greater than $i$ are zeros).
 
 
-We then perform a recursive search (Algorithm \ref{alg:add_element}), affecting at each step of depth $i$ a possible value $d_i$ for the $i$-th input. To do so, we call Algorithm \ref{alg:get_possible_values} to construct the set of all possible values complying with the constraints of the matrix $C_i$ and the previously set values for the preceding inputs. If we reach a dead-end, we backtrack by deleting the previous input and assigning it the next possible value. Algorithms \ref{alg:add_element} and \ref{alg:get_possible_values} formalize this idea: Algorithm \ref{alg:add_element} is a  basic recursive backtracking algorithm using calls to the set construction function (Algorithm \ref{alg:get_possible_values}) to get the possibilities for the next value of $\vec{d}$. The latter, when called at depth $j+1$, takes as input the 
-$j$ values already computed at higher depth for $\vec{d}$ and the matrix of constraints $C_{j+1}$. Each line of $C_{j+1}$ creates a (potentially duplicate) forbidden value for $d_{j+1}$, these values are all computed and the complement of this set in $\Z_p$ is returned by the algorithm (i.e. the set for possible values for $d_{j+1}$ at this point of the search).
+We then perform a recursive search (Algorithm \ref{alg:add_element}), affecting at each step of depth $i$ a possible value $d_i$ for the $i$-th input. To do so, we call Algorithm \ref{alg:get_possible_values} to construct the set of all possible values complying with the constraints of the matrix $\mat C_i$ and the previously set values for the preceding inputs. If we reach a dead-end, we backtrack by deleting the previous input and assigning it the next possible value. Algorithms \ref{alg:add_element} and \ref{alg:get_possible_values} formalize this idea: Algorithm \ref{alg:add_element} is a  basic recursive backtracking algorithm using calls to the set construction function (Algorithm \ref{alg:get_possible_values}) to get the possibilities for the next value of $\vec{d}$. The latter, when called at depth $j+1$, takes as input the 
+$j$ values already computed at higher depth for $\vec{d}$ and the matrix of constraints $\mat C_{j+1}$. Each line of $\mat C_{j+1}$ creates a (potentially duplicate) forbidden value for $d_{j+1}$, these values are all computed and the complement of this set in $\Z_p$ is returned by the algorithm (i.e. the set for possible values for $d_{j+1}$ at this point of the search).
 
 \begin{theorem}
      Running Algorithm \ref{alg:add_element} with increasing values of $p$ ensures that the first solution $\vec d$ found is optimal for the function $f$, i.e. the solution works and its associated $p$ is the smallest as possible.   

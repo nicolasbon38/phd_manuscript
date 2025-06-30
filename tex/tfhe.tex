@@ -5,7 +5,7 @@
 
 The previous chapter presented insights on Fully Homomorphic Encryption in general, but this thesis will exclusively cover the TFHE scheme.
 
-Presented in \cite{JC:CGGI20, these_chillotti} as an evolution of the FHEW scheme \cite{EC:DucMic15}, TFHE quickly gained traction to become one of the most promising scheme to attain performances good enough to be  used in real-world scenarios. 
+Introduced in \cite{AC:CGGI16, AC:CGGI17} as an evolution of the FHEW scheme \cite{EC:DucMic15}, TFHE quickly gained traction to become one of the most promising scheme to attain performances good enough to be  used in real-world scenarios. It has been enriched with more features later: and more complete versions of this work have been published in \cite{JC:CGGI20, these_chillotti}.
 
 At the core of TFHE lies a powerful \textit{Programmable Bootstrapping} operation (PBS). As we presented in Section \ref{sec:gentry_bootstrapping}, it allows to manage the noise in the ciphertexts during the computation, allowing to achieve Fully Homomorphic Encryption. In TFHE, this bootstrapping operation goes a step further: it enables the evaluation of arbitrary functions directly on the refreshed ciphertexts, with no computational or noise overhead.
 
@@ -40,7 +40,7 @@ In 2005, Regev laid the foundations for an important part of modern lattice-base
 
 Regev proved that the search and decisional problems are reducible to each other and their average case is as hard as worst-case lattice problems.
 
-The hardness of this problem depends on the parameters $q$, $n$, $\chi_s$ and $\chi_e$, and so does the security of the schemes built upon it. There is not yet in the literature simple guidelines to construct secure instances of the problem. Common practice in the field is to derive an approximate concrete security level $\lambda$ for a given parameter set with a tool named \texttt{lattice-estimator} \cite{lattice-estimator}. Users can input concrete values and distributions for the parameters, and the tool evaluates the security of the underlying $\LWE$ instance by running simulations of attacks of the literature.
+The hardness of this problem depends on the parameters $q$, $n$, $\chi_s$ and $\chi_e$, and so does the security of the schemes built upon it. Common practice in the field is to derive an approximate concrete security level $\lambda$ for a given parameter set with a tool named \texttt{lattice-estimator} \cite{lattice-estimator}. Users can input concrete values and distributions for the parameters, and the tool evaluates the security of the underlying $\LWE$ instance by running simulations of attacks of the literature. 
 
 In Definition \ref{def:LWE}, we did not specify the shapes of the distributions $\chi_s$ and $\chi_e$ (beyond the fact they yields small values). Several distributions are possible: a discrete Gaussian with a small variance, a uniform distribution restricted on a small interval, or a binomial. Some versions with sparse secrets also exist. The choice of the right distribution depends of the considered use-case, each possibilities offering different trade-offs in matter of security and efficiency \cite{AFRICACRYPT:BGPW16, DBLP:conf/ccs/CurtisP19, EPRINT:BGPT19, EPRINT:SLZS24}.
 
@@ -52,10 +52,10 @@ Most implementations of TFHE select a uniform distribution on $\{0, 1\}$ for the
 \paragraph{Extension to the Polynomials.}
 
 
-Looking for more efficient solutions, $\LWE$ problem has been declined in a \textit{ring variant} named $\RLWE$ in \cite{rlwe}. A generalized version over rings named $\GLWE$, first formalized in \cite{EPRINT:BraGenVai11} and used by TFHE, is presented below. It is very similar to the $\LWE$ one, but deals with polynomial values instead of integers:
+Looking for more efficient solutions, $\LWE$ problem has been declined in a \textit{ring variant} named $\RLWE$ in \cite{EC:LyuPeiReg10, AC:SSTX09}. A generalized version over rings named $\GLWE$, first formalized in \cite{EPRINT:BraGenVai11} and used by TFHE, is presented below. It is very similar to the $\LWE$ one, but deals with polynomial values instead of integers:
 
 \begin{definition}
-	(Generalized Learning with Errors) Let $q$, $k$ and $N$ three integers, respectively called \textit{modulus}, \textit{dimension} and \textit{degree}. We consider the polynomial ring $\glweRingFull$, that we denote in short $\glweRing$. Let $\chi_S$ and $\chi_E$ be distributions over the small values of $\glweRing$, (that is to say, polynomials with small coefficients). We consider a secret vector $\glweSecretKey$, sampled as $\glweSecretKey = (S_0, \dots, S_{k-1}) \drawfrom \chi_S^k$. The $\GLWE$ distribution $\mathcal{D}_{q, k, N, \chi_S, \chi_E}^{\GLWE}(\glweSecretKey)$ is defined as:
+	(Generalized Learning with Errors) Let $q$ and $k$ two integers, and $N$ a power of two, respectively called \textit{modulus}, \textit{dimension} and \textit{degree}. We consider the polynomial ring $\glweRingFull$, that we denote in short $\glweRing$. Let $\chi_S$ and $\chi_E$ be distributions over the small values of $\glweRing$, (that is to say, polynomials with small coefficients). We consider a secret vector $\glweSecretKey$, sampled as $\glweSecretKey = (S_0, \dots, S_{k-1}) \drawfrom \chi_S^k$. The $\GLWE$ distribution $\mathcal{D}_{q, k, N, \chi_S, \chi_E}^{\GLWE}(\glweSecretKey)$ is defined as:
 	
 	\[
 	\mathcal{D}_{q, k, N, \chi_S, \chi_E}^{\GLWE}(\glweSecretKey) = \left \{ (\vec A, B) \;\middle|\; \vec A = (A_0, \dots, A_{k-1}) \drawfrom \unif{\glweRing}^k, E \drawfrom \chi_E, B = \innerProduct{\vec A}{\vec S} + E \right \}
@@ -67,7 +67,7 @@ Looking for more efficient solutions, $\LWE$ problem has been declined in a \tex
 	\mathcal{D}^{(\textsf{random})} = \left \{(\vec A, R) \;\middle|\; \vec A \drawfrom \unif{\glweRing}^k, R \drawfrom \unif{\glweRing} \right\}
 	\]
 	
-	The \emph{search} version of the problem is to recover $\lweSecretKey$ from samples of $\mathcal{D}_{q, k , N, \chi_S, \chi_E}^{\GLWE}(\glweSecretKey)$. 
+	The \emph{search} version of the problem is to recover $\glweSecretKey$ from samples of $\mathcal{D}_{q, k , N, \chi_S, \chi_E}^{\GLWE}(\glweSecretKey)$. 
 	\label{def:GLWE}
 \end{definition}
 
@@ -95,7 +95,7 @@ The torus $\T = \R / \Z$ corresponds to the reals modulo 1. Algebraically, this 
 
 
 
-Recall the $\LWE$ assumption (Definition \ref{def:LWE}). If we rescale the elements of $\lweRing$ by dividing them by $q$, we get torus elements. We can then redefine seamlessly the $\LWE$ problem over the torus. Extensive details about this transformation can be found in \cite{these_chillotti}.
+Recall the $\LWE$ assumption (Definition \ref{def:LWE}). If we rescale the elements of $\lweRing$ by dividing them by $q$, we get elements of the discretized torus. We can then redefine seamlessly the $\LWE$ problem over the torus. Extensive details about this transformation can be found in \cite{these_chillotti}.
 
 
 This brings two advantages:

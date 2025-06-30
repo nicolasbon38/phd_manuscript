@@ -52,7 +52,9 @@
 	   %autocite=plain,
 	   %style=numeric-comp %% use numeric-comp instead of just numeric in order to have compact mutiple citations, ie [1-4] instead of [1,2,3,4]
 	   style=alphabetic,
-     citestyle=alphabetic
+     citestyle=alphabetic,
+          maxnames=99,
+     minnames=99
  ]{biblatex}
 	
 	
