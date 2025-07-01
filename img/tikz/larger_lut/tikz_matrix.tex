@@ -1,0 +1,116 @@
+% Args:
+% #1 = width
+% #2 = height
+% #3 = fill color
+% #4 = center label (text inside)
+% #5 = horizontal label (optional)
+% #6 = vertical label (optional)
+% #7 = x position
+% #8 = y position
+% #9 = node name
+\newcommand{\drawBox}[9]{%
+	% Create the named node
+	\node[draw, minimum width=#1cm, minimum height=#2cm, fill=#3, opacity=0.3,
+	anchor=south west, inner sep=0pt, name=#9] at (#7, #8) {\phantom{\rule{#1cm}{#2cm}}};
+	
+	% Center label
+	\node at ($ (#9.south west)!0.5!(#9.north east) $) {\textbf{#4}};
+	
+	% Optional horizontal bracket
+	\ifx&#5&%
+	\else
+	\draw[decorate,decoration={brace,mirror,amplitude=8pt}]
+	(#9.south west) -- (#9.south east)
+	node[midway,below,yshift=-6pt] {\( #5 \)};
+	\fi
+	
+	% Optional vertical bracket
+	\ifx&#6&%
+	\else
+	\draw[decorate,decoration={brace,amplitude=8pt}]
+	(#9.south west) -- (#9.north west)
+	node[midway,left,xshift=-6pt] {\( #6 \)};
+	\fi
+}
+
+
+
+
+\newcommand{\testMatrix}{
+
+	\begin{tikzpicture}
+		\drawBox{1}{4}{gray!30}{$\mat I$}{n}{s^n}{0}{0}{matrixIdentity}
+		\drawBox{2}{4}{green!30}{$\mat B$}{\ell}{}{1}{0}{matrixBase}
+		\drawBox{1.5}{4}{red!30}{$\mat V^{(0)}$}{t_0}{}{3}{0}{matrixChainInner}
+		\drawBox{1.5}{4}{red!30}{$\mat V^{(0)}$}{t_0}{}{6.5}{0}{matrixChainOuter}
+		
+		\node[draw, minimum width=1cm, minimum height=1cm]  (chainV0)
+			at ($ (matrixChainOuter.north) + (-1.5, 2) $) {\(\Phi_{n+\ell, t_0}\)};
+		
+		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (chainV0.south) -- (matrixChainOuter.north);	
+		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (chainV0.south) -- (matrixChainInner.north);	
+		
+		\node[draw, minimum width=1cm, minimum height=1cm]  (chainBase)
+		at ($ (matrixBase.north) + (0, 2) $) {\(\Phi_{n, \ell}\)};
+		
+		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (chainBase.south) -- (matrixBase.north);
+		
+		
+		\draw[blue, dashed, line width=2pt] (0,0) rectangle ++(4.5,4);
+		\node at ($ (matrixBase.north) + (-2, 0.5) $) {\(\textcolor{blue}{\mat U^{(0)}}\)};	
+		\node at ($ (matrixChainOuter.west) + (-1, 0) $) {\( \slyusar \)};
+	
+		\node at ($ (matrixChainOuter.east) + (1, 0) $) {\( = \)};
+		
+		\drawBox{4.5}{4}{red!30}{$\mat A^{(0)}$}{t_0(n + \ell + t_0)}{}{10}{0}{matrixA}
+		
+		
+		%%%second floor
+		\drawBox{0.75}{4}{orange!30}{$\vec y^{(0)}$}{1}{s^n}{13}{-6}{matrixY0}
+		
+		\node[draw, minimum width=2cm, minimum height=2cm]  (gaussElimination)
+			at ($ (matrixY0.west) + (-4, 0) $) {\texttt{GaussElimination}};
+		
+		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (matrixY0.west) -- (gaussElimination);		
+		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (matrixA) -- (gaussElimination);		
+		
+		\drawBox{0.75}{4}{orange!30}{$\boldsymbol \beta^{(0)}$}{1}{t_0(n+l+t_0)}{5}{-8}{matrixBeta}
+		
+		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (gaussElimination) -- (matrixBeta);		
+		
+		\node[draw, minimum width=2cm, minimum height=2cm]  (ComputeProducts)
+			at ($ (matrixBeta.west) + (-4, 1.5) $) {\texttt{ComputeProducts}};
+			
+		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (matrixA) -- (ComputeProducts);		
+		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (matrixBeta) -- (ComputeProducts);
+		
+		
+		
+		%%%third floor
+		\drawBox{1}{4}{gray!30}{$\mat I$}{n}{s^n}{0}{-14}{matrixIdentity2}
+		\drawBox{2}{4}{green!30}{$\mat B$}{\ell}{}{1}{-14}{matrixBase2}
+		\drawBox{1.5}{4}{red!30}{$\mat V^{(0)}$}{t_0}{}{3}{-14}{matrixChainInner2}
+		\drawBox{1.5}{4}{yellow!30}{$\mat \rho^{(0)}$}{t_0}{}{4.5}{-14}{matrixRho}
+		\drawBox{1}{4}{red!30}{$\mat V^{(1)}$}{t_1}{}{6}{-14}{matrixChainInnerBis}
+		
+		\node[draw, minimum width=1cm, minimum height=1cm]  (chainV1)
+			at ($ (matrixChainInnerBis.north) + (1.5, 1) $) {\(\Phi_{n+\ell+t_0, t_1}\)};
+			
+		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (chainV1) -- (matrixChainInnerBis.north);		
+
+			
+		
+		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (ComputeProducts) -- (matrixRho.north);		
+		
+		\node at ($ (matrixChainInnerBis.east) + (1, 0) $) {\( \slyusar \)};
+		
+		\drawBox{1}{4}{red!30}{$\mat V^{(1)}$}{t_1}{}{9}{-14}{matrixChainOuterBis}
+		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (chainV1) -- (matrixChainOuterBis.north);
+		
+		\node at ($ (matrixChainOuterBis.east) + (1, 0) $) {\( = \)};
+		
+		\drawBox{4.5}{4}{red!30}{$\mat A^{(1)}$}{t_1(n + \ell + t_1)}{}{12}{-14}{matrixABis}
+
+	\end{tikzpicture}
+
+}

@@ -27,7 +27,7 @@
 \usepackage{xstring}
 \usepackage[rgb]{xcolor}
 \usepackage{xparse} % for double default arguments in macros
-\usetikzlibrary{arrows.meta, positioning, fit, calc, patterns, patterns.meta, matrix}
+\usetikzlibrary{arrows.meta, positioning, fit, calc, patterns, patterns.meta, matrix, decorations.pathreplacing}
 
 \usepackage{enumitem}
 \usepackage[algo2e]{algorithm2e} % for algorithms
@@ -44,7 +44,7 @@
 \usepackage{mathtools}	% for \vcentcolon
 \usepackage{stmaryrd} % Where \llbracket and \rrbracket are defined
 \usepackage{csquotes} 	% to silence warning
-
+\usepackage{xparse} % for NewDocumentCommand	
 
 	
 % --------------------------------------
@@ -153,6 +153,7 @@
 \input{img/tikz/tikz_gauge.tex}
 \input{img/blocks_from_slides/tikz_macros.tex}
 \input{img/tikz/tikz_mvb_tree.tex}
+\input{img/tikz/larger_lut/tikz_matrix.tex}
 
 
 \input{tex/how_to_read}
