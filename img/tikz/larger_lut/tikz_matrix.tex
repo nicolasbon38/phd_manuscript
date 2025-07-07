@@ -46,12 +46,14 @@
 		
 		\node[draw, minimum width=1cm, minimum height=1cm]  (chainV0)
 			at ($ (matrixChainOuter.north) + (-1.5, 2) $) {\(\Phi_{n+\ell, t_0}\)};
+		\node at ($ (chainV0.west) + (-0.5, 0) $) {2.};
 		
 		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (chainV0.south) -- (matrixChainOuter.north);	
 		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (chainV0.south) -- (matrixChainInner.north);	
 		
 		\node[draw, minimum width=1cm, minimum height=1cm]  (chainBase)
 		at ($ (matrixBase.north) + (0, 2) $) {\(\Phi_{n, \ell}\)};
+		\node at ($ (chainBase.west) + (-0.5, 0) $) {1.};
 		
 		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (chainBase.south) -- (matrixBase.north);
 		
@@ -59,6 +61,7 @@
 		\draw[blue, dashed, line width=2pt] (0,0) rectangle ++(4.5,4);
 		\node at ($ (matrixBase.north) + (-2, 0.5) $) {\(\textcolor{blue}{\mat U^{(0)}}\)};	
 		\node at ($ (matrixChainOuter.west) + (-1, 0) $) {\( \slyusar \)};
+		\node at ($ (matrixChainOuter.west) + (-1, -0.5) $) {3.};
 	
 		\node at ($ (matrixChainOuter.east) + (1, 0) $) {\( = \)};
 		
@@ -66,22 +69,30 @@
 		
 		
 		%%%second floor
-		\drawBox{0.75}{4}{orange!30}{$\vec y^{(0)}$}{1}{s^n}{13}{-6}{matrixY0}
+		\drawBox{0.75}{4}{orange!30}{$\vec y^{(0)}$}{1}{}{13}{-6}{matrixY0}
+		\draw[decorate,decoration={brace,amplitude=8pt}]
+		(matrixY0.north east) -- (matrixY0.south east)
+		node[midway,right,xshift=6pt] {\( s^n \)};
 		
 		\node[draw, minimum width=2cm, minimum height=2cm]  (gaussElimination)
-			at ($ (matrixY0.west) + (-4, 0) $) {\texttt{GaussElimination}};
+			at ($ (matrixY0.west) + (-4, 0) $) {\texttt{GaussElimination}}		;
+		\node at ($ (gaussElimination.north west) + (-0.25, 0.25) $) {4.};
 		
 		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (matrixY0.west) -- (gaussElimination);		
 		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (matrixA) -- (gaussElimination);		
 		
-		\drawBox{0.75}{4}{orange!30}{$\boldsymbol \beta^{(0)}$}{1}{t_0(n+l+t_0)}{5}{-8}{matrixBeta}
+		\drawBox{0.75}{4}{orange!30}{$\boldsymbol \beta^{(0)}$}{1}{}{5}{-8}{matrixBeta}
+		\draw[decorate,decoration={brace,amplitude=8pt}]
+		(matrixBeta.north east) -- (matrixBeta.south east)
+		node[midway,right,xshift=6pt] {\( t_0(n + \ell + t_0) \)};
 		
 		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (gaussElimination) -- (matrixBeta);		
 		
 		\node[draw, minimum width=2cm, minimum height=2cm]  (ComputeProducts)
 			at ($ (matrixBeta.west) + (-4, 1.5) $) {\texttt{ComputeProducts}};
+		\node at ($ (ComputeProducts.north west) + (-0.25, 0.25) $) {5.};
 			
-		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (matrixA) -- (ComputeProducts);		
+		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (matrixA.south west) -- (ComputeProducts);		
 		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (matrixBeta) -- (ComputeProducts);
 		
 		
@@ -95,6 +106,8 @@
 		
 		\node[draw, minimum width=1cm, minimum height=1cm]  (chainV1)
 			at ($ (matrixChainInnerBis.north) + (1.5, 1) $) {\(\Phi_{n+\ell+t_0, t_1}\)};
+			
+		\node at ($ (chainV1.west) + (-0.5, 0) $) {6.};
 			
 		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (chainV1) -- (matrixChainInnerBis.north);		
 
@@ -110,6 +123,9 @@
 		\node at ($ (matrixChainOuterBis.east) + (1, 0) $) {\( = \)};
 		
 		\drawBox{4.5}{4}{red!30}{$\mat A^{(1)}$}{t_1(n + \ell + t_1)}{}{12}{-14}{matrixABis}
+		
+		\draw[blue, dashed, line width=2pt] (0,-14) rectangle ++(7,4);
+		\node at ($ (matrixBase2.north) + (-2, 0.5) $) {\(\textcolor{blue}{\mat U^{(1)}}\)};	
 
 	\end{tikzpicture}
 

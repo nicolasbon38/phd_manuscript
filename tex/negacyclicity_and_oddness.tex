@@ -27,7 +27,7 @@ In TFHE's blind rotation, the polynomial multiplication is done by the monomial 
 As the actual value of $\tilde{\mu}$ is encrypted, this is not possible to predict beforehand whether this undesirable minus sign will appear or not. So a countermeasure needs to be implemented into the scheme to neutralize the negacyclicity problem. The most frequent strategy is to develop encodings for the LUT $f$ in the accumulator specifically tailored to handle this issue.
 
 
-\paragraph{The ``natural'' case}
+\paragraph{The ``natural'' case.}
 
 Some functions interact naturally very well with the blind rotation algorithm: these are called the \textit{negacyclic functions} and they are presented in Definition \ref{def:negacyclic_function}.
 
@@ -55,7 +55,7 @@ We give an explicit formula for this accumulator in Definition \ref{def:negacycl
 		\acc^{\textsf{negacyclic}} = X^{\frac{-2N}{2p}} \cdot \sum_{j=0}^{2N / p - 1} X^j \cdot \sum_{i=0}^{p/2 - 1} f(i) X^{i \frac{2N}{p}} \mod (X^N + 1)
 	\]
 	
-	is a valid accumulator for the blind rotation.
+\noindent is a valid accumulator for the blind rotation. It means that running the $\BlindRotate$ algorithm with this accumulator yields the right value.
 	
 	\paragraph{Remark on the encoding:}
 	$f(i)$ is an element of the plaintext space $\Z_p$. In the context of this definition, we refer to its encoding into the ciphertext space $\Z_q$ (according to the procedure of Section \ref{sec:encryption}). That is to say, we actually put $\rounding{\frac{f(i) \cdot q}{p}}$ in the coefficients of the polynomial.
@@ -86,7 +86,7 @@ In the following, we give the definition of the accumulator $\acc$ in this ``bit
 		\acc^{\textsf{bit-of-padding}} = X^{\frac{-N}{2p}} \cdot \sum_{j=0}^{N / p - 1} X^j \cdot \sum_{i=0}^{p - 1} f(i) X^{i \frac{N}{p}} \mod (X^N + 1)
 	\]
 	
-	is a valid accumulator for the blind rotation.
+\noindent is a valid accumulator for the blind rotation.
 	\paragraph{Remark on the encoding:}
 	Contrary to the purely negacyclic case of Definition \ref{def:negacyclic_accumulator}, $f(i)$ is not encoded in the Most Significant Bits of the polynomial's coefficient. Instead, the MSB is reserved and fixed to zero to maintain the encoded value in the first half of the torus. That is to say, we actually put $\rounding{\frac{f(i) \cdot q}{2 \cdot p}}$ in the coefficients of the polynomial.
 \end{definition}
@@ -114,9 +114,9 @@ An example of such an accumulator is shown on Figure \ref{fig:negacyclic_accumul
 
 
 
-The drawbacks of the bit-of-padding padding makes very challenging the development of homomorphic applications, because it prevents to use the linear operations freely. One should keep track of the maximal value contained in a ciphertext to avoid an overflow that would fill the padding bit. In Chapter \ref{chap:p_encodings}, we will demonstrate how this method makes the evaluation of Boolean circuit very inefficient, and we propose a new method that improves it.
+The drawback of the bit-of-padding padding makes very challenging the development of homomorphic applications, because it prevents to use the linear operations freely. One should keep track of the maximal value contained in a ciphertext to avoid an overflow that would fill the padding bit. In Chapter \ref{chap:p_encodings}, we will demonstrate how this method makes the evaluation of Boolean circuit very inefficient, and we propose a new method that improves it.
 
-Some constructions have been developed to avoid these drawbacks, we present them in Section \ref{sec:soa_padding_bit}.
+Other constructions have been developed to avoid these drawbacks, we present them in Section \ref{sec:soa_padding_bit}.
 
 
 
@@ -131,10 +131,10 @@ Another interesting approach is presented in \cite{AFRICACRYPT:CBSZ23}, where th
 
 A completely different line of work is explored in \cite{AC:CLOT21}, which introduces the “Without-Padding PBS” (WoP-PBS) construction. A more refined version of this technique is presented in \cite{JC:BBBCLO23}, and we describe it here. The method begins by evaluating a scaled sign function (that is inherently negacyclic) using a standard PBS. Following this, the individual bits of the message are extracted and converted into $\GGSW$ ciphertexts (see Definitions \ref{def:ggsw} and \ref{def:ggsw2}) using a procedure known as \textit{circuit bootstrapping}. These ciphertexts are then used as selectors in a graph of $\CMUX$ operations (Definition \ref{def:cmux}) to select an appropriate accumulator based on the high-order bits of the message. Finally, a traditional PBS is used to rotate the selected accumulator according to the remaining lower-order bits.
 
-Although this technique is slower for small plaintext sizes, it scales particularly well with increasing input sizes. Notably, it enables the homomorphic evaluation of LUTs with larger plaintext sizes beyond what is feasible with classical PBS techniques, up to approximately 20 input bits.
+Although this technique is slower for small plaintext sizes, it scales particularly well with an increasing plaintext sizes. Notably, it enables the homomorphic evaluation of LUTs with larger plaintext sizes beyond what is feasible with classical PBS techniques, up to approximately 20 input bits.
 
 
-In this thesis, we focus on a method we introduced in \cite{TCHES:BonPoiRiv24}: \textit{the odd plaintext modulus}
+In this thesis, we focus on a method we introduced in \cite{TCHES:BonPoiRiv24}: \textit{the odd plaintext modulus}.
 
 \section{Our Contribution: the Odd Plaintext Modulus}
 \label{sec:odd_modulus}
@@ -185,7 +185,7 @@ This is where the parity of $p$ plays a part: if $p$ is even, then $\modulo{
 	}
 	{p}
 }
-{2N}$ is a dense spot as well. So collisions happens with high probability.  On the other hand, let us consider an odd value for $p$. Then, $\modulo{
+{2N}$ is a dense spot as well. So collisions happen with high probability.  On the other hand, let us consider an odd value for $p$. Then, $\modulo{
 	\frac{
 		(-k + \frac p 2 ) \cdot 2N
 	}
@@ -200,7 +200,7 @@ This is where the parity of $p$ plays a part: if $p$ is even, then $\modulo{
 		(-k + \frac {p+1} {2} ) \cdot 2N
 	}
 	{p}
-}{2N}$. As a consequence, collision never occurs. Figure \ref{fig:torus_p_even_vs_odd} illustrates this phenomenon.
+}{2N}$. As a consequence, collisions never occur. Figure \ref{fig:torus_p_even_vs_odd} illustrates this phenomenon.
 
 
 \begin{figure}
@@ -224,7 +224,7 @@ This is where the parity of $p$ plays a part: if $p$ is even, then $\modulo{
 So, by selecting odd values for the plaintext modulus, the negacyclicity problem is naturally neutralized.
 
 
-We present in Definition \ref{def:odd_accumulator} the formula for the accumulator in this case. Note that because $N$ is a power of two and $p$ an odd value, some rounding is required in the quotient $\frac N p$, but we omit it to keep notations lighter, (or )equivalently, the division operator is assumed to include rounding).
+We present in Definition \ref{def:odd_accumulator} the formula for the accumulator in this case. Note that because $N$ is a power of two and $p$ an odd value, some rounding is required in the quotient $\frac N p$, but we omit it to keep notations lighter, (or equivalently, the division operator is assumed to include rounding).
 
 \begin{definition}(Odd-case Accumulator)
 	\label{def:odd_accumulator}
