@@ -27,12 +27,12 @@
 
 
 % Problems / Ciphertexts
-\newcommand{\LWE}{\textsf{\glsentryshort{LWE}}}
+\newcommand{\LWE}{\textsf{\gls{LWE}}}
 \newcommand{\TrivialLWE}{\textsf{TrivialLWE}}
-\newcommand{\RLWE}{\textsf{\glsentryshort{RLWE}}}
-\newcommand{\GLWE}{\textsf{\glsentryshort{GLWE}}}
+\newcommand{\RLWE}{\textsf{\gls{RLWE}}}
+\newcommand{\GLWE}{\textsf{\gls{GLWE}}}
 \newcommand{\TrivialGLWE}{\textsf{TrivialGLWE}}
-\newcommand{\GGSW}{\textsf{\glsentryshort{GGSW}}}
+\newcommand{\GGSW}{\textsf{\gls{GGSW}}}
 
 % Classical Mathematical Operations
 \newcommand{\rounding}[1]{\left \lfloor #1 \right \rceil}
@@ -42,26 +42,26 @@
 \newcommand{\abs}[1]{\left \lvert #1 \right \rvert}
 \newcommand{\norm}[1]{\lVert #1 \rVert}
 
-% TFHE-specific notations
+% \gls{TFHE}-specific notations
 \newcommand{\lweSigma}{\sigma_{\LWE}}
 \newcommand{\glweSigma}{\sigma_{\GLWE}}
 \newcommand{\baseDecomp}{\mathfrak{B}}
 \newcommand{\levelDecomp}{\ell}
-\newcommand{\baseDecompPBS}{\mathfrak{B}_{\textsf{PBS}}}
-\newcommand{\levelDecompPBS}{\ell_{\textsf{PBS}}}
+\newcommand{\baseDecompPBS}{\mathfrak{B}_{\textsf{\gls{PBS}}}}
+\newcommand{\levelDecompPBS}{\ell_{\textsf{\gls{PBS}}}}
 \newcommand{\baseDecompKS}{\mathfrak{B}_{\textsf{KS}}}
 \newcommand{\levelDecompKS}{\ell_{\textsf{KS}}}
 
 \newcommand{\lweSecretKey}{\vec s}
 \newcommand{\glweSecretKey}{\vec S}
 
-\newcommand{\BSK}{\textsf{\glsentryshort{BSK}}} 
-\newcommand{\KSK}{\textsf{\glsentryshort{KSK}}}
+\newcommand{\BSK}{\textsf{\gls{BSK}}} 
+\newcommand{\KSK}{\textsf{\gls{KSK}}}
 % TODO : trouver une otation plus jolie pour BSK
 \newcommand{\acc}{\textsf{acc}(X)}
 
 
-%TFHE homomorphic operations
+%\gls{TFHE} homomorphic operations
 
 \newcommand{\sumTFHE}[2]{\texttt{SumTFHE}(#1, #2)}
 \newcommand{\sumTFHETernary}[3]{\texttt{SumTFHE}(#1, #2, #3)}
@@ -81,7 +81,7 @@
 \newcommand{\decomp}[3]{\textbf{\textsf{dec}}^{(#1, #2)}(#3)}
 
 
-% TFHE-related spaces\\
+% \gls{TFHE}-related spaces\\
 \newcommand{\plaintextTorus}{\mathbb{T}_p}
 \newcommand{\plaintextRing}{\mathbb{Z}_p}
 \newcommand{\plaintextTorusPoly}{\mathbb{T}_p[X] / (X^N + 1)}
@@ -137,7 +137,7 @@
 }
 
 
-% AES Cipher Step Macros
+% \gls{AES} Cipher Step Macros
 \newcommand{\SubBytes}{\texttt{SubBytes}}
 \newcommand{\ShiftRows}{\texttt{ShiftRows}}
 \newcommand{\MixColumns}{\texttt{MixColumns}}

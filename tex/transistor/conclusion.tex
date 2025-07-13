@@ -2,19 +2,19 @@
 \label{sec:conclusion}
 
 
-\coolName{} is a new stream cipher design tailored to TFHE
+\coolName{} is a new stream cipher design tailored to \gls{TFHE}
 transciphering, that significantly outperforms the state-of-the-art of
-TFHE-friendly stream ciphers.  After analyzing the constraints of the
-TFHE setting in the context of a symmetric cipher, we designed
+\gls{TFHE}-friendly stream ciphers.  After analyzing the constraints of the
+\gls{TFHE} setting in the context of a symmetric cipher, we designed
 \coolName{} by combining an LFSR-based key schedule, an LFSR-based
-whitening, and a non-linear FSM with an AES-like structure.  We report
-implementation results of \coolName{} using state-of-the-art TFHE, using
+whitening, and a non-linear FSM with an \gls{AES}-like structure.  We report
+implementation results of \coolName{} using state-of-the-art \gls{TFHE}, using
 a trick to implement \emph{silent} LFSRs.  This general structure can be
 easily adapted to other contexts, and we believe it will find
-applications beyond TFHE.
+applications beyond \gls{TFHE}.
 
 
-One of the constraint of this design was that the cipher should work in a small plaintext space. This was because the bottleneck in terms of running time was the evaluation of the S-box. But what if we could extend the capabilities of TFHE and evaluates larger S-boxes, like in more conventional designs ?
+One of the constraint of this design was that the cipher should work in a small plaintext space. This was because the bottleneck in terms of running time was the evaluation of the S-box. But what if we could extend the capabilities of \gls{TFHE} and evaluates larger S-boxes, like in more conventional designs ?
 
-This is the point of the next chapter, where we propose a construction to accelerate the evaluation of larger LUT.
+This is the point of the next chapter, where we propose a construction to accelerate the evaluation of larger \gls{LUT}.
 

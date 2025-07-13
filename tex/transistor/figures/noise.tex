@@ -20,15 +20,15 @@
       
       \draw (4.5, 3.5) node[inner sep=0pt](varW){$\sigma_\whitening^2$} ;
       \node at ($(varW.north) + (0, 1)$) {\scalebox{0.5}{\verticalgauge{30}}};
-      \draw (7, \yPseudoKS) node[inner sep=0pt](varPBS){$\sigma_{\text{PBS}}^2$} ;
+      \draw (7, \yPseudoKS) node[inner sep=0pt](varPBS){$\sigma_{\text{\gls{PBS}}}^2$} ;
        \node at ($(varPBS.south) + (0, -1)$) {\scalebox{0.5}{\verticalgauge{50}}};
-      \draw (9.7,\yPseudoKS) node[inner sep=0pt](varSR){$\sigma_{\text{PBS}}^2$} ;
+      \draw (9.7,\yPseudoKS) node[inner sep=0pt](varSR){$\sigma_{\text{\gls{PBS}}}^2$} ;
       \node at ($(varSR.south) + (0, -1)$) {\scalebox{0.5}{\verticalgauge{50}}};
       \draw (8, 2 * \yPseudoKS - 1) node[inner sep=0pt](varMC){$\sigma^2_\mixC$} ;
       \node at ($(varMC.south) + (0, -1)$) {\scalebox{0.5}{\verticalgauge{70}}};
       \draw (4.35, \yPseudoKS + 1.5) node(sum) {$\sigma_\pseudoKS^2+\sigma^2_\mixC$};
       \node at ($(sum.south) + (0, 2)$) {\scalebox{0.5}{\verticalgauge{70}}};
-      \draw (9, 3.5) node[inner sep=0pt](varout){$\sigma^2_{\text{out}}  = \sigma_\whitening^2 + \sigma_{\text{PBS}}^2$} ;
+      \draw (9, 3.5) node[inner sep=0pt](varout){$\sigma^2_{\text{out}}  = \sigma_\whitening^2 + \sigma_{\text{\gls{PBS}}}^2$} ;
       \node at ($(varout.north) + (0, 1)$) {\scalebox{0.5}{\verticalgauge{50}}};
 
       \draw[->] (2, \yPseudoKS + 0.5) -- (addm) ;

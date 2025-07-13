@@ -1,5 +1,5 @@
-pdflatex thesis.tex
+pdflatex -interaction=nonstopmode thesis.tex
 biber thesis
 makeglossaries thesis
-pdflatex thesis.tex
-pdflatex thesis.tex
+pdflatex -interaction=nonstopmode thesis.tex
+pdflatex -interaction=nonstopmode thesis.tex

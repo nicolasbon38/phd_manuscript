@@ -59,16 +59,16 @@
 
 
 % define the nodes
-\newcommand{\keygenfhe}[1]{\node[draw=\fhecolor, rectangle, very thick, minimum size = \sizenode cm] at (#1)(keygen) {$\textsf{KeyGen}_{\textsf{FHE}}$};}
+\newcommand{\keygenfhe}[1]{\node[draw=\fhecolor, rectangle, very thick, minimum size = \sizenode cm] at (#1)(keygen) {$\textsf{KeyGen}_{\textsf{\gls{FHE}}}$};}
 
 \newcommand{\encsym}[1]{\operatorwithimage{\symcolor}{enc_sym}{#1}{$\textsf{Enc}_{\textsf{Sym}}$}{red_key.png}}
-\newcommand{\encfhe}[1]{\operatorwithimage{\fhecolor}{enc_fhe}{#1}{$\textsf{Enc}_{\textsf{FHE}}$}{green_key.png}}
-\newcommand{\decfhe}[1]{\operatorwithimage{\fhecolor}{dec_fhe}{#1}{$\textsf{Dec}_{\textsf{FHE}}$}{green_key.png}}
+\newcommand{\encfhe}[1]{\operatorwithimage{\fhecolor}{enc_fhe}{#1}{$\textsf{Enc}_{\textsf{\gls{FHE}}}$}{green_key.png}}
+\newcommand{\decfhe}[1]{\operatorwithimage{\fhecolor}{dec_fhe}{#1}{$\textsf{Dec}_{\textsf{\gls{FHE}}}$}{green_key.png}}
 
 \newcommand{\fheneuralnetwork}[1]{\homomorphicoperator{\fhecolor}{fhe_neural_network}{#1}{
 	\includegraphics[width=\sizenode cm]{img/blocks_from_slides/assets/neural_network.png}
 }}
-\newcommand{\transciphering}[1]{\homomorphicoperator{\fhecolor}{transciphering}{#1}{$\textsf{Dec}_{\textsf{Sym}}^{(\textsf{FHE})}$}}
+\newcommand{\transciphering}[1]{\homomorphicoperator{\fhecolor}{transciphering}{#1}{$\textsf{Dec}_{\textsf{Sym}}^{(\textsf{\gls{FHE}})}$}}
 
 
 
@@ -79,5 +79,5 @@
 ¨
 
 \newcommand{\bootstrappingkey}[1]{\encryptedvalue{green_key.png}{\fhecolorbis}{#1}{bootstrapping_key}}
-\newcommand{\bootstrapping}[1]{\homomorphicoperator{\fhecolorbis}{bootstrapping}{#1}{$\textsf{Dec}_{\textsf{FHE}}$}}
+\newcommand{\bootstrapping}[1]{\homomorphicoperator{\fhecolorbis}{bootstrapping}{#1}{$\textsf{Dec}_{\textsf{\gls{FHE}}}$}}
 \newcommand{\fhedatabis}[1]{\encryptedvalue{data.png}{\fhecolorbis}{#1}{data_fhe_bis}}

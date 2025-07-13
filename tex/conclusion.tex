@@ -4,36 +4,36 @@
 
 Fully Homomorphic Encryption is believed to be on the verge of practical usability. But still some challenges are remaining so it can be used in our day-to-day life.
 
-The purpose of this thesis was to adress some concrete obstacles that hinder the practical deployment of FHE. In this concluding section, we list the main challenges and relate them to the contributions presented throughout this manuscript.
+The purpose of this thesis was to adress some concrete obstacles that hinder the practical deployment of \gls{FHE}. In this concluding section, we list the main challenges and relate them to the contributions presented throughout this manuscript.
 
-\paragraph{On Efficiency}
+\paragraph{On Efficiency.}
 
-FHE still incurs an significant computational overhead compared to traditional, unencrypted computation. While the FHE schemes themselves have been seen much improvement in the last years, an orthogonal direction is to design new algorithms tailored for specific use-cases. In Chapter \ref{chap:p_encodings}, we developed a framework to accelerate the evaluation of Boolean functions. At the opposite end of the spectrum, Chapter \ref{chap:larger_lut} focus on accelerating the evaluation of LUT in larger plaintext spaces than those originally supported by TFHE. Chapter \ref{chap:hyppogriph} further demonstrated how Boolean and arithmetic representations offer complementary advantages, and how efficient conversion mechanisms  between the two can enhance performance within homomorphic circuits. 
+\gls{FHE} still incurs an significant computational overhead compared to traditional, unencrypted computation. While the \gls{FHE} schemes themselves have been seen much improvement in the last years, an orthogonal direction is to design new algorithms tailored for specific use-cases. In Chapter \ref{chap:p_encodings}, we developed a framework to accelerate the evaluation of Boolean functions. At the opposite end of the spectrum, Chapter \ref{chap:larger_lut} focus on accelerating the evaluation of \gls{LUT} in larger plaintext spaces than those originally supported by \gls{TFHE}. Chapter \ref{chap:hyppogriph} further demonstrated how Boolean and arithmetic representations offer complementary advantages, and how efficient conversion mechanisms  between the two can enhance performance within homomorphic circuits. 
 
 Another way of improving performances lies in selecting appropriate parameters for the scheme. We propose such a procedure of parameter selection, which takes into account the computational circuit to evaluate as well as the environment of execution.
 
 
 
 
-\paragraph{On Data Expansion and Transciphering}
+\paragraph{On Data Expansion and Transciphering.}
 
 
-Data expansion is another well-known bottleneck in FHE. While the literature has long proposed transciphering as a promising solution, it necessitates homomorphic evaluation of the decryption function of a symmetric cipher. In Chapter \ref{chap:hyppogriph}, we have shown how far we could push to evaluate efficiently the AES cipher using TFHE. However, it is clear that standard ciphers such as AES cannot compete against schemes specifically designed with the transciphering use-case in mind. In Chapter \ref{chap:transistor}, we present such a cipher and show how its design combines the properties required to ensure both cryptographic security and homomorphic efficiency. 
+Data expansion is another well-known bottleneck in \gls{FHE}. While the literature has long proposed transciphering as a promising solution, it necessitates homomorphic evaluation of the decryption function of a symmetric cipher. In Chapter \ref{chap:hyppogriph}, we have shown how far we could push to evaluate efficiently the \gls{AES} cipher using \gls{TFHE}. However, it is clear that standard ciphers such as \gls{AES} cannot compete against schemes specifically designed with the transciphering use-case in mind. In Chapter \ref{chap:transistor}, we present such a cipher and show how its design combines the properties required to ensure both cryptographic security and homomorphic efficiency. 
 
 
 
 
-\paragraph{On Compilation and Development of Homomorphic Computations}
+\paragraph{On Compilation and Development of Homomorphic Computations.}
 %
 
-Developing homomorphic applications remains a tedious task, equiring deep understanding of both cryptography and the internal workings of specific FHE schemes. It is clear that an adoption of FHE at scale will require an automated compilation toolchain that will abstract away cryptography complexity from non-expert programmers.
+Developing homomorphic applications remains a tedious task, equiring deep understanding of both cryptography and the internal workings of specific \gls{FHE} schemes. It is clear that an adoption of \gls{FHE} at scale will require an automated compilation toolchain that will abstract away cryptography complexity from non-expert programmers.
 
 In Chapter \ref{chap:p_encodings}, we proposed algorithm that automatically compiles Boolean functions into optimized sequences of homomorphic operations. We did a similar thing in the case of large LUTs in Chapter \ref{chap:larger_lut}, where those LUTs are compiled into a more tractable algorithm, composed of smaller ones. Finally, our parameter selection framework presented in \ref{chap:parameters} further contribute to this effort
 
 
 \bigskip
 
-The road is probably still long until FHE becomes an ubiquitous technology. But the pace scientific progress in this field is accelerting rapidly. So it is reasonable to believe (and hope) that such a technological revolution will happen in a not-so-distant future.
+The road is probably still long until \gls{FHE} becomes an ubiquitous technology. But the pace scientific progress in this field is accelerting rapidly. So it is reasonable to believe (and hope) that such a technological revolution will happen in a not-so-distant future.
 
 
 

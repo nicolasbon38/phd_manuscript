@@ -14,7 +14,7 @@ Its overall structure is presented in Section~\ref{sec:description-structure}, i
 \label{sec:usage}
 
 \coolName{} is a stream cipher that generates a keystream consisting of elements from \( \mainField = \mathbb{F}_{17} \), referred to as {\em digits}.  It is intended for transciphering, i.e., for the type of protocol we summarized in Section \ref{sec:transciphering}.
-More precisely, a 128-bit master key and an IV are used to initialize the internal state of \coolName{} using  a PRF (namely, {\tt SHAKE}~\cite{sha-3}), as suggested in~\cite{FSE:BerGil07}. This initialization  is only performed on the client side, and in particular is not evaluated homomorphically, meaning that its cost is negligible. On the other hand, it ensures for example that related IVs cannot be exploited. The entire resulting internal state is then encrypted using TFHE and sent alongside the ciphertext. This ciphertext is obtained by casting the plaintext message to a string of digits of $\mainField$, which is added digit by digit to the keystream produced by \coolName{} using the group law of $\mainField$.
+More precisely, a 128-bit master key and an IV are used to initialize the internal state of \coolName{} using  a PRF (namely, {\tt SHAKE}~\cite{sha-3}), as suggested in~\cite{FSE:BerGil07}. This initialization  is only performed on the client side, and in particular is not evaluated homomorphically, meaning that its cost is negligible. On the other hand, it ensures for example that related IVs cannot be exploited. The entire resulting internal state is then encrypted using \gls{TFHE} and sent alongside the ciphertext. This ciphertext is obtained by casting the plaintext message to a string of digits of $\mainField$, which is added digit by digit to the keystream produced by \coolName{} using the group law of $\mainField$.
 
 
 
@@ -49,7 +49,7 @@ The FSM state is initialized to all zeros, and each LFSR is initialized using di
 \subsection{Detailed Description}
 \label{sec:sepc-details}
 
-Obviously taking inspiration from the AES, the state of the FSM is organized into a two-dimensional array of size $4\times 4$, where each entry corresponds to a digit in $\F_p$. With this representation, the successive operations applied to the state can be defined as follows.
+Obviously taking inspiration from the \gls{AES}, the state of the FSM is organized into a two-dimensional array of size $4\times 4$, where each entry corresponds to a digit in $\F_p$. With this representation, the successive operations applied to the state can be defined as follows.
 
 \begin{description}
 \item[$\subWords~(\subW)$] is an S-box layer: the permutation $\thesbox$ is applied on each digit.

@@ -1,43 +1,43 @@
-The last example of application of the previous chapter was to evaluate homomorphically the AES cipher.  But why would one want to perform such a computation in the first place?
+The last example of application of the previous chapter was to evaluate homomorphically the \gls{AES} cipher.  But why would one want to perform such a computation in the first place?
 
-There are two answers to this question. First,  AES is a particularly interesting benchmark, as an example of a nontrivial algorithm which has eluded ``practical'' FHE execution performances for years. This is part of the reason why it will most likely be selected by NIST as a flagship reference in its upcoming call on threshold (homomorphic) cryptography \cite{call_nist}. Since 2023, the algorithm has thus been the subject of a renewed attention from the FHE community and has served as a playground to test advanced operators\cite{DBLP:conf/wahc/TramaCBS23, ISC:WWLLL23, TCHES:BonPoiRiv24, TCHES:WLWLLW24}. AES is particularly interesting as a benchmark notably because of the tension between boolean- and byte-oriented operations within the algorithm.
-
-
-There is also a more down-to-earth reason: evaluating symmetric ciphers using FHE is the core of a cryptographic technique called \textit{transciphering}, which is a promising solution for solving the \textit{ciphertext expansion} problem of FHE. In this protocol, the client first encrypts its data using a symmetric encryption scheme and sends both the encrypted data and (once and for all) the FHE-encrypted symmetric key to the server. Leveraging its encrypted-domain computing capabilities, the server can then decrypt the encrypted data \emph{within the homomorphic domain}, ultimately producing homomorphic ciphertexts on which it can perform the requested calculations. With this trick, the amount of data uploaded by the client is drastically reduces, as symmetric ciphertexts are much lighter than homomorphic ones.
+There are two answers to this question. First,  \gls{AES} is a particularly interesting benchmark, as an example of a nontrivial algorithm which has eluded ``practical'' \gls{FHE} execution performances for years. This is part of the reason why it will most likely be selected by NIST as a flagship reference in its upcoming call on threshold (homomorphic) cryptography \cite{call_nist}. Since 2023, the algorithm has thus been the subject of a renewed attention from the \gls{FHE} community and has served as a playground to test advanced operators\cite{DBLP:conf/wahc/TramaCBS23, ISC:WWLLL23, TCHES:BonPoiRiv24, TCHES:WLWLLW24}. \gls{AES} is particularly interesting as a benchmark notably because of the tension between boolean- and byte-oriented operations within the algorithm.
 
 
-In this chapter, we introduce \hippo, the fastest homomorphic implementation of AES using TFHE at the time of writing. To construct it, we leveraged three main ideas:
+There is also a more down-to-earth reason: evaluating symmetric ciphers using \gls{FHE} is the core of a cryptographic technique called \textit{transciphering}, which is a promising solution for solving the \textit{ciphertext expansion} problem of \gls{FHE}. In this protocol, the client first encrypts its data using a symmetric encryption scheme and sends both the encrypted data and (once and for all) the \gls{FHE}-encrypted symmetric key to the server. Leveraging its encrypted-domain computing capabilities, the server can then decrypt the encrypted data \emph{within the homomorphic domain}, ultimately producing homomorphic ciphertexts on which it can perform the requested calculations. With this trick, the amount of data uploaded by the client is drastically reduces, as symmetric ciphertexts are much lighter than homomorphic ones.
+
+
+In this chapter, we introduce \hippo, the fastest homomorphic implementation of \gls{AES} using \gls{TFHE} at the time of writing. To construct it, we leveraged three main ideas:
 
 \begin{itemize}
 	\item[-] We generalized the $p$-encoding construction introduced in Chapter \ref{chap:p_encodings} to the arithmetic case.
-	\item[-] The LUT-oriented implementation of \cite{DBLP:conf/wahc/TramaCBS23} is very efficient to evaluate the large Sbox of AES, so we borrowed this idea as it was.
+	\item[-] The \gls{LUT}-oriented implementation of \cite{DBLP:conf/wahc/TramaCBS23} is very efficient to evaluate the large S-box of \gls{AES}, so we borrowed this idea as it was.
 	\item[-] We associated both previous techniques by developing a framework of conversion between Boolean and arithmetic representations.
 \end{itemize}
 
 
-The result of this work is doubly interesting: first, we manage to outperform the rest of the literature on homomorphic AES evaluation. Second, we develop a generic framework useful to resolve the recurring tension between Boolean and arithmetic representations within homomorphic circuits, which we believe is of independent interest.
+The result of this work is doubly interesting: first, we manage to outperform the rest of the literature on homomorphic \gls{AES} evaluation. Second, we develop a generic framework useful to resolve the recurring tension between Boolean and arithmetic representations within homomorphic circuits, which we believe is of independent interest.
 
 
-We start this chapter by introducing the notion of transciphering in Section \ref{sec:transciphering}, which will be a recurring theme in the rest of this manuscript. Then, after some preliminaries on the AES cipher (Section \ref{sec:preliminaries_aes}), we introduce in Section \ref{sec:previous-blocks} some advanced homomorphic operators from \cite{DBLP:conf/wahc/TramaCBS23} that will be useful in this work. We then generalize the $p$-encoding construction of Chapter \ref{chap:p_encodings} to the arithmetic case (Section \ref{sec:generalization_p_encodings}). Finally, Section~\ref{sec:hippogryph_our_work} introduces our new design and Section~\ref{sec:comparison} presents a detailed comparison with existing approaches, supported by relevant benchmarks.
+We start this chapter by introducing the notion of transciphering in Section \ref{sec:transciphering}, which will be a recurring theme in the rest of this manuscript. Then, after some preliminaries on the \gls{AES} cipher (Section \ref{sec:preliminaries_aes}), we introduce in Section \ref{sec:previous-blocks} some advanced homomorphic operators from \cite{DBLP:conf/wahc/TramaCBS23} that will be useful in this work. We then generalize the $p$-encoding construction of Chapter \ref{chap:p_encodings} to the arithmetic case (Section \ref{sec:generalization_p_encodings}). Finally, Section~\ref{sec:hippogryph_our_work} introduces our new design and Section~\ref{sec:comparison} presents a detailed comparison with existing approaches, supported by relevant benchmarks.
 
 
 \begin{table}[ht]
 	\centering
-	\caption{State-of-the-art \emph{single-core} homomorphic evaluation of AES. The table indicates both the original timings, in seconds, provided in the papers and, in brackets, the timings obtained on our single machine test bench (a 12th Gen Intel(R) Core(TM) i7-12700H CPU laptop).}
+	\caption{State-of-the-art \emph{single-core} homomorphic evaluation of \gls{AES}. The table indicates both the original timings, in seconds, provided in the papers and, in brackets, the timings obtained on our single machine test bench (a 12th Gen Intel(R) Core(TM) i7-12700H CPU laptop).}
 	\label{tab:soa}
 	\begin{tabular}{|>{\centering\arraybackslash}p{1.5cm}|>{\centering\arraybackslash}p{3.7cm}|>{\centering\arraybackslash}p{6cm}|>{\centering\arraybackslash}p{2.5cm}|}
 		\hline
 		\textbf{Year} & \textbf{Reference} & \textbf{Method} & \textbf{Timings} \\
 		\hline
-		\multirow{3}{*}{2023} & \cite{DBLP:conf/wahc/TramaCBS23} & Tree-Based Method (TBM) & 270 (270) s\\
+		\multirow{3}{*}{2023} & \cite{DBLP:conf/wahc/TramaCBS23} & Tree-Based Method (\gls{TBM}) & 270 (270) s\\
 		\cline{2-4}
 		& \cite{TCHES:BonPoiRiv24} (Chapter \ref{chap:p_encodings}) & $p$-encoding method & 135 (90) s\\
 		\cline{2-4}
-		& \cite{ISC:WWLLL23} & TFHE in ``LHE'' mode  & 86 (87) s\\
+		& \cite{ISC:WWLLL23} & \gls{TFHE} in ``LHE'' mode  & 86 (87) s\\
 		\hline
-		2024 & \cite{TCHES:WLWLLW24} & TFHE in ``LHE'' mode & 46 (60) s\\
+		2024 & \cite{TCHES:WLWLLW24} & \gls{TFHE} in ``LHE'' mode & 46 (60) s\\
 		\hline \hline
-		2025 & This work & Combined TBM/$p$-encodings & 32 s\\
+		2025 & This work & Combined \gls{TBM}/$p$-encodings & 32 s\\
 		\hline
 	\end{tabular}
 \end{table}

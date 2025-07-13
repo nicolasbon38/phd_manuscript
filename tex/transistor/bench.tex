@@ -5,11 +5,11 @@
 \label{sec:bench}
 
 
-This section focuses on the performances of transciphering with \coolName. We first address the wrapping of a (\coolName) symmetric key as a compact set of TFHE ciphertexts for which we additionally introduce a trade-off between bandwidth and computation. Next, we explain how to manage different data representations to be able to fit with the input format of the server application. We then provide a detailed description of the homomorphic evaluation of \coolName. We finally give some implementation benchmarks and comparison to the state of the art.
+This section focuses on the performances of transciphering with \coolName. We first address the wrapping of a (\coolName) symmetric key as a compact set of \gls{TFHE} ciphertexts for which we additionally introduce a trade-off between bandwidth and computation. Next, we explain how to manage different data representations to be able to fit with the input format of the server application. We then provide a detailed description of the homomorphic evaluation of \coolName. We finally give some implementation benchmarks and comparison to the state of the art.
 
-\subsection{Key Wrapping and Bandwidth in TFHE Transciphering} \label{sec:key_wrapping}
+\subsection{Key Wrapping and Bandwidth in \gls{TFHE} Transciphering} \label{sec:key_wrapping}
 
-Assume one wants to generate a fresh TFHE ciphertext vector $(c_1, \ldots, c_t)$ for a plaintext vector $(m_1, \ldots, m_t) \in \mathbb{Z}_p^t$, where $c_i = (a_{i,1}, \ldots, a_{i,n}, b_i)$, for every $i \in [1,t]$. Since the $a_{i,j}$'s are uniformly sampled at random over $\mathbb{Z}_q$, a folklore trick is to generate them pseudorandomly from a seed. We get the following compressed encryption procedure (where $\lambda$ denotes the security level in bits):
+Assume one wants to generate a fresh \gls{TFHE} ciphertext vector $(c_1, \ldots, c_t)$ for a plaintext vector $(m_1, \ldots, m_t) \in \mathbb{Z}_p^t$, where $c_i = (a_{i,1}, \ldots, a_{i,n}, b_i)$, for every $i \in [1,t]$. Since the $a_{i,j}$'s are uniformly sampled at random over $\mathbb{Z}_q$, a folklore trick is to generate them pseudorandomly from a seed. We get the following compressed encryption procedure (where $\lambda$ denotes the security level in bits):
   
 \begin{center}
 \noindent\framebox{
@@ -30,19 +30,19 @@ Assume one wants to generate a fresh TFHE ciphertext vector $(c_1, \ldots, c_t)$
 
 \smallskip
 
-Recovering standard TFHE ciphertexts $c_1$, \ldots, $c_t$ from the compressed form $(\mathsf{seed}, b_1, \ldots, b_t)$ is simply done by expanding the $a_{i,j}$'s from $\mathsf{seed}$. The size of the obtained compressed ciphertext vector is $\lambda + t \cdot \log_2(q)$ against $t \cdot (n+1) \cdot \log_2(q)$ for a standard TFHE encryption, meaning a compression by a factor about $(n+1)$. 
+Recovering standard \gls{TFHE} ciphertexts $c_1$, \ldots, $c_t$ from the compressed form $(\mathsf{seed}, b_1, \ldots, b_t)$ is simply done by expanding the $a_{i,j}$'s from $\mathsf{seed}$. The size of the obtained compressed ciphertext vector is $\lambda + t \cdot \log_2(q)$ against $t \cdot (n+1) \cdot \log_2(q)$ for a standard \gls{TFHE} encryption, meaning a compression by a factor about $(n+1)$. 
 
-This compressed TFHE encryption method can be applied directly to transmit homomorphically encrypted data from the user to the server. Alternatively, it can be combined with transciphering to encrypt a symmetric key. The resulting bandwidth requirements and the corresponding plaintext-to-ciphertext expansion factor are summarized in Table~\ref{tab:formulas_bandwidth}, where they are further compared with the naive (uncompressed) TFHE encryption. In particular, for \coolName, a wrapped key is of size $\lambda + (|\mathcal K| + |\mathcal W|) \cdot \log_2(q)$, (which in our case gives 784 bytes) for a security of $\lambda = 128$ bits (target security of \coolName), the standard choice of $q= 2^{64}$ (which we use in our implementation) and $|\mathcal K| + |\mathcal W| = 96$ per the specification of \coolName (see Section~\ref{sec:description}). This fixed cost is hence very quickly amortized while the amount of data to encrypt grows.
+This compressed \gls{TFHE} encryption method can be applied directly to transmit homomorphically encrypted data from the user to the server. Alternatively, it can be combined with transciphering to encrypt a symmetric key. The resulting bandwidth requirements and the corresponding plaintext-to-ciphertext expansion factor are summarized in Table~\ref{tab:formulas_bandwidth}, where they are further compared with the naive (uncompressed) \gls{TFHE} encryption. In particular, for \coolName, a wrapped key is of size $\lambda + (|\mathcal K| + |\mathcal W|) \cdot \log_2(q)$, (which in our case gives 784 bytes) for a security of $\lambda = 128$ bits (target security of \coolName), the standard choice of $q= 2^{64}$ (which we use in our implementation) and $|\mathcal K| + |\mathcal W| = 96$ per the specification of \coolName (see Section~\ref{sec:description}). This fixed cost is hence very quickly amortized while the amount of data to encrypt grows.
 Moreover, this approach can be applied to the server keys as well, which are actually encryptions of the secret key's bits. We took this optimization into account in our estimations of the server key sizes in Table \ref{tab:server_key_size}. 
 
 \paragraph{Compressing further.}
 
-We introduce hereafter a tweak to compress a TFHE encryption further than the folklore compression. By definition of the TFHE encryption process, the least significant bits of the body $b_i = \sum_{j=1}^n a_{i,j} \cdot s_j + \tilde{m}_i + e_i$ are randomized by the error $e_i$ and can hence be discarded without loss of information. We can thus tweak the above compressed encryption process by returning $(\mathsf{seed}, \mathrm{Tr}_\ell(b_1), \ldots, \mathrm{Tr}_\ell(b_t))$ where $\mathrm{Tr}_\ell(\cdot)$ denotes the truncation of the $\ell$ least significant bits. To decompress such ciphertexts, besides pseudorandomly generating the masks from the seed, one just needs to pad the truncated bodies with $\ell$ bits to $0$. By the randomness of the mask, the effect of this truncation plus $0$-padding is to add a uniform random error of $\ell$ bits to the body, namely an error of standard deviation: 
+We introduce hereafter a tweak to compress a \gls{TFHE} encryption further than the folklore compression. By definition of the \gls{TFHE} encryption process, the least significant bits of the body $b_i = \sum_{j=1}^n a_{i,j} \cdot s_j + \tilde{m}_i + e_i$ are randomized by the error $e_i$ and can hence be discarded without loss of information. We can thus tweak the above compressed encryption process by returning $(\mathsf{seed}, \mathrm{Tr}_\ell(b_1), \ldots, \mathrm{Tr}_\ell(b_t))$ where $\mathrm{Tr}_\ell(\cdot)$ denotes the truncation of the $\ell$ least significant bits. To decompress such ciphertexts, besides pseudorandomly generating the masks from the seed, one just needs to pad the truncated bodies with $\ell$ bits to $0$. By the randomness of the mask, the effect of this truncation plus $0$-padding is to add a uniform random error of $\ell$ bits to the body, namely an error of standard deviation: 
 $$\sigma_0^2  = \frac{(2^\ell - 1)^2}{12} \approx \frac{2^{2\ell}}{12} \approx 0.08 \cdot 2^{2\ell} ~.$$
 
 \noindent This optimization comes in two flavors:
 \begin{enumerate}
-	\item \emph{The ``free'' variant.} The number of truncated bits $\ell$ is selected to have a small impact on the noise distribution. For instance in \coolName, the noise of the fresh ciphertexts is summed with the noise coming from the FSM. Thus, we can compute $\ell$ to keep $\sigma^2_{\mathcal W} < \sigma^2_{\text{PBS}}$. Our experiments shows $\sigma^2_{\text{PBS}} = 2^{52}$, so running the numbers we find that we can truncate up to $\ell=19$ bits, allowing to reduce the volume of the TFHE ciphertexts to send by a factor $1 - \frac{19}{64} \approx 0.7$.
+	\item \emph{The ``free'' variant.} The number of truncated bits $\ell$ is selected to have a small impact on the noise distribution. For instance in \coolName, the noise of the fresh ciphertexts is summed with the noise coming from the FSM. Thus, we can compute $\ell$ to keep $\sigma^2_{\mathcal W} < \sigma^2_{\text{\gls{PBS}}}$. Our experiments shows $\sigma^2_{\text{\gls{PBS}}} = 2^{52}$, so running the numbers we find that we can truncate up to $\ell=19$ bits, allowing to reduce the volume of the \gls{TFHE} ciphertexts to send by a factor $1 - \frac{19}{64} \approx 0.7$.
 	
 	\smallskip
 	
@@ -82,17 +82,17 @@ This kind of compression has been more extensively studied in the concurrent wor
 \subsection{Transciphering vs. Data Representation}
 \label{sec:data_representation}
 
-Managing data representation is a common challenge when working with TFHE. Since this scheme is only efficient at very low precision, an abstraction layer is required to construct practical data types (e.g., 8-, 32-, or 64-bit integers) from smaller encrypted chunks. Common constructions include radix-based decompositions and Chinese Remainder Theorem (CRT) representations, leading to different efficiency trade-offs. Carry propagation in radix-based representations is notoriously slow due to the large number of required bootstrappings, while CRT representations impose constraints on feasible operations. These constructions have been studied in~\cite{JC:BBBCLO23}. 
+Managing data representation is a common challenge when working with \gls{TFHE}. Since this scheme is only efficient at very low precision, an abstraction layer is required to construct practical data types (e.g., 8-, 32-, or 64-bit integers) from smaller encrypted chunks. Common constructions include radix-based decompositions and Chinese Remainder Theorem (CRT) representations, leading to different efficiency trade-offs. Carry propagation in radix-based representations is notoriously slow due to the large number of required bootstrappings, while CRT representations impose constraints on feasible operations. These constructions have been studied in~\cite{JC:BBBCLO23}. 
 
-As a result, there is no universal representation that is optimal for all homomorphic operations. Thankfully, the representation of data in the transciphering algorithm can be chosen independently of that of the homomorphic application running on the server. If the representation in $\mathbb Z_p$ does not suit the application, the server can convert the ciphertexts to the desired representation before running the application. %Such a conversion can be either applied to the TFHE ciphertexts obtained by the server after transciphering, or directly on the keystream (in this case, the symmetric ciphertexts are encoded directly in the desired representation, and the encryption/decryption operation is performed in the corresponding space). In both cases, it simply requires a bootstrapping for each element of $\mathbb Z_p$. 
+As a result, there is no universal representation that is optimal for all homomorphic operations. Thankfully, the representation of data in the transciphering algorithm can be chosen independently of that of the homomorphic application running on the server. If the representation in $\mathbb Z_p$ does not suit the application, the server can convert the ciphertexts to the desired representation before running the application. %Such a conversion can be either applied to the \gls{TFHE} ciphertexts obtained by the server after transciphering, or directly on the keystream (in this case, the symmetric ciphertexts are encoded directly in the desired representation, and the encryption/decryption operation is performed in the corresponding space). In both cases, it simply requires a bootstrapping for each element of $\mathbb Z_p$. 
 We stress that this additional step of conversion would be necessary for any transciphering algorithm, as the data format desired in output of transciphering is completely application-dependent.
 
 	
-As a concrete example, assume that the data to be encrypted (i.e., the input to the homomorphic computation) consists of elements from $\mathbb{Z}_{16}$. The overall transciphering process unfolds as follows. On the client side, the plaintext is first embedded from $\mathbb{Z}_{16}$ into $\mathbb{Z}_{17}$ before being encrypted using \coolName. On the server side, the keystream is homomorphically generated and then used to homomorphically decrypt the ciphertext. This results in a TFHE encryption of the original plaintext, now embedded in $\mathbb{Z}_{17}$, meaning that the plaintext space for the TFHE encryption is $\mathbb{Z}_{17}$. A programmable bootstrapping (PBS) operation is then applied to switch the plaintext space from $\mathbb{Z}_{17}$ back to $\mathbb{Z}_{16}$.
+As a concrete example, assume that the data to be encrypted (i.e., the input to the homomorphic computation) consists of elements from $\mathbb{Z}_{16}$. The overall transciphering process unfolds as follows. On the client side, the plaintext is first embedded from $\mathbb{Z}_{16}$ into $\mathbb{Z}_{17}$ before being encrypted using \coolName. On the server side, the keystream is homomorphically generated and then used to homomorphically decrypt the ciphertext. This results in a \gls{TFHE} encryption of the original plaintext, now embedded in $\mathbb{Z}_{17}$, meaning that the plaintext space for the \gls{TFHE} encryption is $\mathbb{Z}_{17}$. A programmable bootstrapping (\gls{PBS}) operation is then applied to switch the plaintext space from $\mathbb{Z}_{17}$ back to $\mathbb{Z}_{16}$.
 
-In terms of computation, this process adds one PBS per $\mathbb{Z}_{16}$-element of the original plaintext, in addition to the four PBS per element required for keystream generation with \coolName. Moreover, embedding $\mathbb{Z}_{16}$ into $\mathbb{Z}_{17}$ increases the size of the encrypted data by a factor of $1 + 1/16 = 1.0625$.
+In terms of computation, this process adds one \gls{PBS} per $\mathbb{Z}_{16}$-element of the original plaintext, in addition to the four \gls{PBS} per element required for keystream generation with \coolName. Moreover, embedding $\mathbb{Z}_{16}$ into $\mathbb{Z}_{17}$ increases the size of the encrypted data by a factor of $1 + 1/16 = 1.0625$.
 
-This approach can be generalized to address other plaintext representations. In particular, for larger chunks of bits, the bootstrapping operation would allow to merge several elements of $\mathbb{Z}_{16}$ (embedded into $\mathbb{Z}_{17}$) into one element of $\mathbb{Z}_{2^\ell}$ with $\ell > 4$. On the other hand, one may split an element of $\mathbb{Z}_{16}$ (or its $\mathbb{Z}_{17}$ embedding) into 4 elements of $\mathbb{Z}_{2}$ using a PBS with multiple look-up tables (``PBSmanyLUT'') as proposed in~\cite{AC:CLOT21}.
+This approach can be generalized to address other plaintext representations. In particular, for larger chunks of bits, the bootstrapping operation would allow to merge several elements of $\mathbb{Z}_{16}$ (embedded into $\mathbb{Z}_{17}$) into one element of $\mathbb{Z}_{2^\ell}$ with $\ell > 4$. On the other hand, one may split an element of $\mathbb{Z}_{16}$ (or its $\mathbb{Z}_{17}$ embedding) into 4 elements of $\mathbb{Z}_{2}$ using a \gls{PBS} with multiple look-up tables (``PBSmanyLUT'') as proposed in~\cite{AC:CLOT21}.
 
 
 
@@ -111,7 +111,7 @@ We suggest the \emph{silent LFSR} approach for the homomorphic evaluation of LFS
 \input{tex/algorithms/transistor/silent_lsfr.tex}
 
 
-\paragraph{Homomorphic evaluation of} \coolName. The complete homomorphic evaluation of a round of on clock cycle of \coolName is depicted in Algorithm~\ref{alg:transistor}, using $\pseudoKS.\texttt{clock}$ and $\whitening.\texttt{clock}$ as subroutines (i.e., Algorithm~\ref{alg:lsfr} evaluated on the key schedule and whitening LFSRs). The most computation intensive part of the algorithm is by far the evaluation of the PBS in $\subWords$ which can be fully parallelized to reduce the latency.
+\paragraph{Homomorphic evaluation of} \coolName. The complete homomorphic evaluation of a round of on clock cycle of \coolName is depicted in Algorithm~\ref{alg:transistor}, using $\pseudoKS.\texttt{clock}$ and $\whitening.\texttt{clock}$ as subroutines (i.e., Algorithm~\ref{alg:lsfr} evaluated on the key schedule and whitening LFSRs). The most computation intensive part of the algorithm is by far the evaluation of the \gls{PBS} in $\subWords$ which can be fully parallelized to reduce the latency.
 
 
  \input{tex/algorithms/transistor/round.tex}
@@ -119,11 +119,11 @@ We suggest the \emph{silent LFSR} approach for the homomorphic evaluation of LFS
 
 
 
-\subsection{TFHE Parameters} 
+\subsection{\gls{TFHE} Parameters} 
 \label{sec:tfhe-parameters}
 
 
-We discuss hereafter the selection of the different TFHE parameters involved in the homomorphic implementation of \coolName. An extensive presentation of the TFHE parameters and their role within the scheme can be found in Section \ref{sec:about_problem}.
+We discuss hereafter the selection of the different \gls{TFHE} parameters involved in the homomorphic implementation of \coolName. An extensive presentation of the \gls{TFHE} parameters and their role within the scheme can be found in Section \ref{sec:about_problem}.
 
 Figure \ref{fig:structure_fhe} shows the ciphertext format at the different steps of the homomorphic evaluation of \coolName. It shows that the manipulated ciphertexts can be of three different types: LWE ciphertexts of dimension $n_{\text{short}}$, LWE ciphertexts of dimension $n_{\text{long}}$, or GLWE ciphertexts of dimension $k$ and polynomial degree $N$.
 	
@@ -131,15 +131,15 @@ Figure \ref{fig:structure_fhe} shows the ciphertext format at the different step
 \input{tex/transistor/figures/structure_fhe.tex}
 
 
-\paragraph{Optimization of the TFHE parameters.}
-To generate a set of parameters, we use the method developed in~\cite{JC:BBBCLO23}. Given the negligible noise contribution from the LFSRs, the FSM can be modeled using the \emph{atomic pattern} introduced in~\cite{JC:BBBCLO23} (specifically the instance referred to as $\mathcal{A}^{(\text{CJP21})}$), which is a pattern of homomorphic operators taking a set of ciphertexts in input, computing linear combinations of those ciphertexts and applying a programmable bootstrapping to each of them. The FSM round in \coolName which composes a multiplication by a constant matrix ($\mixColumns$), followed by a bootstrapping step ($\subWords$) is precisely an instance of such an atomic pattern. The framework proposed in~\cite{JC:BBBCLO23} generates parameters that guarantee a specified security level $\lambda$ for the LWE encryption and target error probability $p_{\text{err}}$, while optimizing the PBS to be as fast as possible. 
+\paragraph{Optimization of the \gls{TFHE} parameters.}
+To generate a set of parameters, we use the method developed in~\cite{JC:BBBCLO23}. Given the negligible noise contribution from the LFSRs, the FSM can be modeled using the \emph{atomic pattern} introduced in~\cite{JC:BBBCLO23} (specifically the instance referred to as $\mathcal{A}^{(\text{CJP21})}$), which is a pattern of homomorphic operators taking a set of ciphertexts in input, computing linear combinations of those ciphertexts and applying a programmable bootstrapping to each of them. The FSM round in \coolName which composes a multiplication by a constant matrix ($\mixColumns$), followed by a bootstrapping step ($\subWords$) is precisely an instance of such an atomic pattern. The framework proposed in~\cite{JC:BBBCLO23} generates parameters that guarantee a specified security level $\lambda$ for the LWE encryption and target error probability $p_{\text{err}}$, while optimizing the \gls{PBS} to be as fast as possible. 
 
-Table \ref{tab:parameters} shows the parameters used for our experiments, all ensuring 128 bits of security. The obtained security levels $\lambda_{\text{short}}$ et $\lambda_{\text{long}}$ have been estimated using the \texttt{lattice estimator}~\cite{lattice-estimator}.
+Table \ref{tab:transistor_parameters} shows the parameters used for our experiments, all ensuring 128 bits of security. The obtained security levels $\lambda_{\text{short}}$ et $\lambda_{\text{long}}$ have been estimated using the \texttt{lattice estimator}~\cite{lattice-estimator}.
 
 \begin{table}[t!]
 \centering
-\caption{TFHE Parameters used in our experiments}.
-\label{tab:parameters}
+\caption{\gls{TFHE} Parameters used in our experiments}.
+\label{tab:transistor_parameters}
 \renewcommand{\arraystretch}{1.3}  % Adjust row spacing
 \scalebox{1}{
 	\begin{tabular}{|c||*{12}{>{\centering\arraybackslash}p{0.8cm}|}}
@@ -157,18 +157,18 @@ Table \ref{tab:parameters} shows the parameters used for our experiments, all en
 
 
 \paragraph{Encryption security.} 
-The security level (in bits) of the LWE ciphertexts is a function of the modulus $q$, the dimension $n$ and the noise standard deviation $\sigma$. While no explicit formula exists for this function, the \emph{lattice estimator} tool allows to produce an estimation of this function by simulating the main attacks of the literature~\cite{lattice-estimator}, which we denote $\mathcal{O}$ (for \emph{security oracle}). The selected TFHE parameters are constrained to satisfy $\mathcal{O}(q,n,\sigma) \geq \lambda$ for both $(q,n,\sigma) = (q,n_{\text{short}},\sigma_{\text{short}})$ and $(q,n,\sigma) = (q,n_{\text{long}},\sigma_{\text{long}})$.
+The security level (in bits) of the LWE ciphertexts is a function of the modulus $q$, the dimension $n$ and the noise standard deviation $\sigma$. While no explicit formula exists for this function, the \emph{lattice estimator} tool allows to produce an estimation of this function by simulating the main attacks of the literature~\cite{lattice-estimator}, which we denote $\mathcal{O}$ (for \emph{security oracle}). The selected \gls{TFHE} parameters are constrained to satisfy $\mathcal{O}(q,n,\sigma) \geq \lambda$ for both $(q,n,\sigma) = (q,n_{\text{short}},\sigma_{\text{short}})$ and $(q,n,\sigma) = (q,n_{\text{long}},\sigma_{\text{long}})$.
 
 
 
-\paragraph{Correctness of the PBS.} To compute the error probability $p_{\text{err}}$, we have to evaluate the variances occurring inside the programmable bootstrapping of the $\subWords$ layer. This reasoning will be more detailed in Chapter \ref{chap:parameters} (with additional bits in Appendix \ref{sec:cjp_details}). Here, we provide a short reasoning sufficient for our purpose.
+\paragraph{Correctness of the \gls{PBS}.} To compute the error probability $p_{\text{err}}$, we have to evaluate the variances occurring inside the programmable bootstrapping of the $\subWords$ layer. This reasoning will be more detailed in Chapter \ref{chap:parameters} (with additional bits in Appendix \ref{sec:cjp_details}). Here, we provide a short reasoning sufficient for our purpose.
 
 
-In the following, we denote the maximum error probability of the bootstrapping by $p_{\text{err}} := 2^{-\kappa}$. We aim to choose parameters such that the PBS outputs a correct ciphertext with probability at least $1-p_{\text{err}}$. This translates to the following constraint:
+In the following, we denote the maximum error probability of the bootstrapping by $p_{\text{err}} := 2^{-\kappa}$. We aim to choose parameters such that the \gls{PBS} outputs a correct ciphertext with probability at least $1-p_{\text{err}}$. This translates to the following constraint:
 $$\sigma^2_{\text{in-}\textsf{BR}} \leq  C(\kappa) \cdot \left(\frac1{4p}\right)^2 ~~~\text{with}~~~C(\kappa) := \left(\frac{1}{\sqrt{2} \cdot \mathsf{erfc}^{-1}(2^{-\kappa})}\right)^2 ~.$$
-Under the Gaussian assumption, the noise in input of the \textsf{BlindRotate} is lower than $\mathsf{erfc}^{-1}(2^{-\kappa}) \cdot \sqrt{\sigma^2_{\text{in-}\textsf{BR}}}$ with probability $1-2^{-\kappa}$. The above constraint thus implies that, with probability $1-2^{-\kappa}$, the noise is lower than $1/{4p}$ which ensures the correctness of the PBS. 
+Under the Gaussian assumption, the noise in input of the \textsf{BlindRotate} is lower than $\mathsf{erfc}^{-1}(2^{-\kappa}) \cdot \sqrt{\sigma^2_{\text{in-}\textsf{BR}}}$ with probability $1-2^{-\kappa}$. The above constraint thus implies that, with probability $1-2^{-\kappa}$, the noise is lower than $1/{4p}$ which ensures the correctness of the \gls{PBS}. 
 
-As $|\mathcal W| \leq |\mathcal K|$, we can check that we always have $\sigma^2_{\text{out}} \leq \sigma^2_{\text{in-}\textsf{PBS}}$ which implies that the output is always bootstrappable with correctness probability at least $1-p_{\text{err}}$ in the subsequent bootstrapping.
+As $|\mathcal W| \leq |\mathcal K|$, we can check that we always have $\sigma^2_{\text{out}} \leq \sigma^2_{\text{in-}\textsf{\gls{PBS}}}$ which implies that the output is always bootstrappable with correctness probability at least $1-p_{\text{err}}$ in the subsequent bootstrapping.
 
 
 \subsection{Performances} \label{sec:performances}
@@ -184,7 +184,7 @@ Our implementation relies on our customized version of \texttt{tfhe-rs}~\cite{tf
 	\renewcommand{\arraystretch}{1.2}  % Adjust row spacing
 	\begin{tabular}{|c||*{3}{>{\centering\arraybackslash}p{3cm}|}}
 		\hline
-		~~$p_{\text{err}}$~~ & Time for one PBS & Latency (one round) & Throughput\\
+		~~$p_{\text{err}}$~~ & Time for one \gls{PBS} & Latency (one round) & Throughput\\
 		\hline
 		$2^{-40}$ & 11.9 ms & 195 ms & 83.84 bits/s\\
 		\hline
@@ -195,7 +195,7 @@ Our implementation relies on our customized version of \texttt{tfhe-rs}~\cite{tf
 
 
 
-Although our current implementation does not leverage the inherent parallelism of \coolName, it is important to note that it can be easily parallelized across 16 threads. Specifically, during the $\subWords$ steps, which dominate the overall runtime, the 16 PBS operations can be executed concurrently. This parallelization would result in nearly a 16-fold reduction in total execution time.
+Although our current implementation does not leverage the inherent parallelism of \coolName, it is important to note that it can be easily parallelized across 16 threads. Specifically, during the $\subWords$ steps, which dominate the overall runtime, the 16 \gls{PBS} operations can be executed concurrently. This parallelization would result in nearly a 16-fold reduction in total execution time.
 
 Without taking into account the server key\ifeprint(whose sizes are shown in Table \ref{tab:server_key_size})\fi, and using compressed encryption (Section \ref{sec:key_wrapping}),  transciphering 1 KB of plain data requires 1.78 KB of data to be sent, instead of 64 KB. For larger amounts of message, the volume of the encrypted symmetric key becomes negligible with respect to the message: for 1 MB of plain data, we use 1.0008 MB, and for 1 GB, this goes down to 1.000001 GB. The two sets of parameters yield the same bandwidth consumption, but not the same running time as shown in Table \ref{tab:perfs}.
 
@@ -231,8 +231,8 @@ In Table \ref{tab:server_key_size} we provide the sizes for the server keys, nam
 \subsection{Comparisons to the State of the Art}
 \label{sec:perfs_soa}	
 
-\subsubsection{Comparisons with other TFHE-friendly ciphers.} 
-%In Section \ref{sec:soa}, we provided an overview of the recent landscape of TFHE-friendly symmetric ciphers.
+\subsubsection{Comparisons with other \gls{TFHE}-friendly ciphers.} 
+%In Section \ref{sec:soa}, we provided an overview of the recent landscape of \gls{TFHE}-friendly symmetric ciphers.
 In what follows, we compare \coolName with several of the most competitive state-of-the-art schemes. Our results are summarized in Table~\ref{tab:comparisons_soa}.
 Although such comparisons must be interpreted with care — due to differences in libraries, hardware platforms, and bootstrapping error probabilities — they still offer valuable insights into the relative efficiency and trade-offs of these approaches.
 
@@ -244,13 +244,13 @@ In~\cite{DBLP:conf/wahc/BalenboisOS23}, \texttt{Trivium} and \texttt{Kreyvium} w
 Similarly, Deo et al. proposed~\cite{EPRINT:DJLCB24} a pseudorandom function whose security relies on the hardness of the LWR problem~\cite{EC:BanPeiRos12}. It enables a stream cipher–like transciphering scheme, where each pseudorandom element in $\mathbb{Z}_p$ (with $p=2^5$) is produced using a single bootstrapping. Their implementation reaches up to 881 bits/s on their hardware, surpassing \texttt{Transistor} in throughput. However, as with \texttt{Margrethe}, this efficiency comes at the cost of a significant increase in key size: their PRF requires 500 to 1000 elements encrypted in GGSW form, which is much larger than the 96 elements in LWE form for \coolName.
 
 
-The authors of \texttt{FRAST}~\cite{ToSC:CCHLOS24} implemented it with \texttt{tfhe-rs}, like \coolName. It targets 128-bit security with an error probability of $2^{-80}$. On the same platform, our instance of \coolName (with a tighter error bound of $2^{-128}$) achieves three times higher throughput, significantly lower latency, and does not require any setup phase—unlike \texttt{FRAST}, which involves a 25-second setup. In addition, \texttt{FRAST} requires substantially larger evaluation key material, due to its use of multiple derivatives of the PBS algorithm. Finally, no information is provided regarding the output noise level of the scheme.
+The authors of \texttt{FRAST}~\cite{ToSC:CCHLOS24} implemented it with \texttt{tfhe-rs}, like \coolName. It targets 128-bit security with an error probability of $2^{-80}$. On the same platform, our instance of \coolName (with a tighter error bound of $2^{-128}$) achieves three times higher throughput, significantly lower latency, and does not require any setup phase—unlike \texttt{FRAST}, which involves a 25-second setup. In addition, \texttt{FRAST} requires substantially larger evaluation key material, due to its use of multiple derivatives of the \gls{PBS} algorithm. Finally, no information is provided regarding the output noise level of the scheme.
 
 
 
 \begin{table}[t!]
 	\centering
-	\caption{Performance of state-of-the-art TFHE-friendly ciphers (single-threaded when applicable). Communication cost accounts for both the encrypted symmetric key and the evaluation keys. \label{tab:comparisons_soa}}
+	\caption{Performance of state-of-the-art \gls{TFHE}-friendly ciphers (single-threaded when applicable). Communication cost accounts for both the encrypted symmetric key and the evaluation keys. \label{tab:comparisons_soa}}
 	\resizebox{\textwidth}{!}{
 	\renewcommand{\arraystretch}{1.3}  % Adjust row spacing
     \begin{tabular}{|c|c|c|c|c|c|}
@@ -282,12 +282,12 @@ The authors of \texttt{FRAST}~\cite{ToSC:CCHLOS24} implemented it with \texttt{t
 
 
 \subsubsection{Comparisons with other homomorphic schemes.} 
-TFHE yields very different trade-offs between the various performance metrics (latency, throughput, bandwith consumption, ...), compared to other FHE schemes. In scenarios where throughput is a priority, TFHE—and by extension, \texttt{Transistor}—is generally not the most suitable choice. However, TFHE shines in use cases that require low-latency homomorphic computations and efficient evaluation of look-up tables (LUTs), thanks to its native support for fast programmable bootstrapping.
+\gls{TFHE} yields very different trade-offs between the various performance metrics (latency, throughput, bandwith consumption, ...), compared to other \gls{FHE} schemes. In scenarios where throughput is a priority, \gls{TFHE}—and by extension, \texttt{Transistor}—is generally not the most suitable choice. However, \gls{TFHE} shines in use cases that require low-latency homomorphic computations and efficient evaluation of look-up tables (LUTs), thanks to its native support for fast programmable bootstrapping.
 In the following, we provide a brief survey of some transciphering approaches built upon alternative homomorphic encryption schemes.
 
-For CKKS-based transciphering, we look at the AES evaluation using the so-called \texttt{XBOOT} optimization proposed in~\cite{EPRINT:NHYCKH25}. While the reported amortized throughput significantly outperforms that of \coolName, it comes at the cost of a much higher latency—153s and 236s using 64 threads, compared to 251ms for \coolName running on a single thread. We observe similar results for  BGV-based transciphering. In this case we instead consider the optimized evaluation of \texttt{RASTA}~\cite{C:DEGLLL18} presented in~\cite{EPRINT:NHYCKH25}. Using the same \texttt{XBOOT} optimization as the CKKS variant, it also yields high latencies: 303s, again with 64-thread parallelism. 
+For CKKS-based transciphering, we look at the \gls{AES} evaluation using the so-called \texttt{XBOOT} optimization proposed in~\cite{EPRINT:NHYCKH25}. While the reported amortized throughput significantly outperforms that of \coolName, it comes at the cost of a much higher latency—153s and 236s using 64 threads, compared to 251ms for \coolName running on a single thread. We observe similar results for  BGV-based transciphering. In this case we instead consider the optimized evaluation of \texttt{RASTA}~\cite{C:DEGLLL18} presented in~\cite{EPRINT:NHYCKH25}. Using the same \texttt{XBOOT} optimization as the CKKS variant, it also yields high latencies: 303s, again with 64-thread parallelism. 
 
 
-Lastly, \texttt{FINAL}~\cite{AC:BIPPS22} is another, more recent homomorphic encryption scheme based on NTRU. Its bootstrapping is approximately 30\% faster than TFHE’s, but it is not programmable, and therefore does not support LUT evaluation. The works~\cite{CiC:MeaParPer24,CCS:CDPP22} implement the stream cipher \texttt{Filip} using \texttt{FINAL}, relying on the Improved Filter Permutator paradigm, without LUTs' evaluation. The competitive performances of these implementations (resp. 159 bits/s and 381 bits/s) comes with a trade-off in key size: encrypting the symmetric key requires resp. 215 MB and 200 MB, versus 4.8 MB for \coolName~(uncompressed). This is mainly due to the size of the key register in \texttt{Filip} ($2^{14}$ bits), while \coolName~only requires the upload of 96 elements in~$\mathbb{Z}_{17}$ (around 400 bits).
+Lastly, \texttt{FINAL}~\cite{AC:BIPPS22} is another, more recent homomorphic encryption scheme based on NTRU. Its bootstrapping is approximately 30\% faster than \gls{TFHE}’s, but it is not programmable, and therefore does not support \gls{LUT} evaluation. The works~\cite{CiC:MeaParPer24,CCS:CDPP22} implement the stream cipher \texttt{Filip} using \texttt{FINAL}, relying on the Improved Filter Permutator paradigm, without LUTs' evaluation. The competitive performances of these implementations (resp. 159 bits/s and 381 bits/s) comes with a trade-off in key size: encrypting the symmetric key requires resp. 215 MB and 200 MB, versus 4.8 MB for \coolName~(uncompressed). This is mainly due to the size of the key register in \texttt{Filip} ($2^{14}$ bits), while \coolName~only requires the upload of 96 elements in~$\mathbb{Z}_{17}$ (around 400 bits).
 
 

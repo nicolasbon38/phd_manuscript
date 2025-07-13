@@ -139,7 +139,7 @@
 				at (\nibblewidth / 2, -2 * \nibblewidth / 5) {\Huge \textbf{Tree}};
 				
 				\node[rectangle, minimum width=3cm, minimum height=1.5cm, align=center] 
-				at (\nibblewidth / 2, -3 * \nibblewidth / 5) {\Huge \textbf{PBS}};
+				at (\nibblewidth / 2, -3 * \nibblewidth / 5) {\Huge \textbf{\gls{PBS}}};
 			}
 		}
 	}
@@ -158,14 +158,14 @@
 	}
 
 
-	% Define the "PBS" pic
+	% Define the "\gls{PBS}" pic
 	\tikzset{
 		pics/pbs/.style args={#1}{
 			code={		
 				\node[draw, minimum width=\nibbleheight cm, minimum height=\halfwidth cm, anchor=north west, fill=\operatorcolor, fill opacity=0.5] (#1) at (0,0) {};
 				
 				\node[rectangle, minimum width=1cm, minimum height=1.5cm, align=center, rotate=90] 
-				at (\nibbleheight / 2, -\nibblewidth / 4) {\huge \textbf{PBS}};
+				at (\nibbleheight / 2, -\nibblewidth / 4) {\huge \textbf{\gls{PBS}}};
 			}
 		}
 	}
@@ -319,7 +319,7 @@
 		pic {bit=rec_bit{\i + 4}};
 		
 		
-		% PBS layer
+		% \gls{PBS} layer
 		\path 
 		({\xrecomposer + \nibblespacing + \i * (\bitspacing + \bitsize)}, 
 		{\yrecomposer - \recomposerheight + \nibblespacing + \bitsize + \nibblewidth}) 

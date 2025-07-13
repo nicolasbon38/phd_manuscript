@@ -10,7 +10,6 @@ We propose a construction in which we embed Boolean values in $\Z_p$ for well-ch
 
 To represent Boolean values over $\Z_p$, we use a mapping function that we call a \emph{$p$-encoding}:
 
-\TODO{Regler le probleme de couloeur}
 \begin{definition}[$p$-encoding]
     A \emph{$p$-encoding} is a function $\Encoding: \B \mapsto 2^{\Z_p}$ that maps the Boolean space to a subset of the discretized torus. A $p$-encoding is \emph{valid} if and only if:
     \begin{equation}
@@ -21,7 +20,7 @@ To represent Boolean values over $\Z_p$, we use a mapping function that we call 
     \label{def:validity}
     \end{equation}
     We call this last property \emph{relaxed negacyclicity}.
-    \label{def:encoding}
+    \label{def:p_encodings_encoding}
 \end{definition}
 
 
@@ -31,7 +30,7 @@ To represent Boolean values over $\Z_p$, we use a mapping function that we call 
 	\begin{minipage}{0.45\textwidth}
 		\centering
 		\begin{tikzpicture}[scale=0.8]
-			\drawSingleRingGreenRed{15}{small}{true}{true}{9, 10}{0, 8, 11, 12, 14}
+			\drawSingleRingGreenRed{15}{small}{true}{9, 10}{0, 8, 11, 12, 14}
 		\end{tikzpicture}
 		\caption*{Example with $p=15$}
 	\end{minipage}
@@ -39,7 +38,7 @@ To represent Boolean values over $\Z_p$, we use a mapping function that we call 
 	\begin{minipage}{0.45\textwidth}
 		\centering
 		\begin{tikzpicture}[scale=0.8]
-			\drawSingleRingGreenRed{16}{small}{true}{true}{8, 12, 13}{0, 4, 9, 11}
+			\drawSingleRingGreenRed{16}{small}{true}{8, 12, 13}{0, 4, 9, 11}
 		\end{tikzpicture}
 		\caption*{Example with $p=16$}
 	\end{minipage}
@@ -48,7 +47,7 @@ To represent Boolean values over $\Z_p$, we use a mapping function that we call 
 \end{figure}
 
 
-In our approach when we need to encrypt a bit, we apply a $p$-encoding to embed it in $\Z_p$, then we encrypt the result using the classical setup of TFHE.  When new values are freshly encrypted or produced by a PBS, only one element of $ \Z_p$ is chosen for each bit. We call such an encoding a canonical $p$-encoding:
+In our approach when we need to encrypt a bit, we apply a $p$-encoding to embed it in $\Z_p$, then we encrypt the result using the classical setup of \gls{TFHE}.  When new values are freshly encrypted or produced by a \gls{PBS}, only one element of $ \Z_p$ is chosen for each bit. We call such an encoding a canonical $p$-encoding:
 
 \begin{definition}[Canonical Encoding]
     A $p$-encoding $\Encoding$ is said \emph{canonical} if and only if it is valid and $\left| \Encoding(0) \right| = \left| \Encoding(1) \right| = 1$
@@ -56,12 +55,12 @@ In our approach when we need to encrypt a bit, we apply a $p$-encoding to embed 
 \end{definition}
 
 
-Let $c$ be a ciphertext encoding a bit $b$ under a $p$-encoding $\Encoding$, where $\Encoding$ is an arbitrary valid encoding: its associated subsets can be any subset of $\Z_p$ as long as the validity requirements of (\ref{def:validity}) are fulfilled. One can transform the ciphertext $\vec c$ into another ciphertext $\vec{c'}$ encoded under any \emph{canonical} $p$-encoding, possibly under a different $p$, by simply performing a PBS.
+Let $c$ be a ciphertext encoding a bit $b$ under a $p$-encoding $\Encoding$, where $\Encoding$ is an arbitrary valid encoding: its associated subsets can be any subset of $\Z_p$ as long as the validity requirements of (\ref{def:validity}) are fulfilled. One can transform the ciphertext $\vec c$ into another ciphertext $\vec{c'}$ encoded under any \emph{canonical} $p$-encoding, possibly under a different $p$, by simply performing a \gls{PBS}.
 
 
 \begin{property} [Reduction to a canonical encoding]
     \label{prop:cast_valid_to_canonical}
-    Let $\Encoding$ be a valid $p$-encoding and $\Encoding'$ a canonical $p'$-encoding. We denote $\alpha' = \Encoding'(0)$ and $\beta' = \Encoding'(1)$. Let $\vec c$ be a ciphertext encrypting a bit $b$ under $\Encoding$. Then, one can produce a ciphertext $\vec c'$ encrypting the same bit $b$ under $\Encoding'$ by applying a PBS on $\vec c$. This PBS performs the function :
+    Let $\Encoding$ be a valid $p$-encoding and $\Encoding'$ a canonical $p'$-encoding. We denote $\alpha' = \Encoding'(0)$ and $\beta' = \Encoding'(1)$. Let $\vec c$ be a ciphertext encrypting a bit $b$ under $\Encoding$. Then, one can produce a ciphertext $\vec c'$ encrypting the same bit $b$ under $\Encoding'$ by applying a \gls{PBS} on $\vec c$. This \gls{PBS} performs the function :
     \[
         \begin{aligned}
             \texttt{Cast}_{\Encoding \mapsto \Encoding'}~:~& \Z_p \mapsto \Z_{p'}\\
@@ -77,7 +76,7 @@ Let $c$ be a ciphertext encoding a bit $b$ under a $p$-encoding $\Encoding$, whe
 
 
 
-Our goal is to represent the Boolean function we want to evaluate with a sum of $p$-encodings (we define what we mean by ``sum of $p$-encoding'' in Section \ref{sec:p_encodings_new_strategy}).  When sums are carried out on ciphertexts (and so homomorphically on the underlying $p$-encodings), the sets $\Encoding(0)$ and $\Encoding(1)$ of the $p$-encodings may move, grow, shrink, but they should never overlap as it would result in a loss of information. As we removed the need for a bit of padding, we do not need to track a potential overflow of data (informally we say that ciphertexts are free to ``loop around the torus''). After the sum, the encoding of the result can be reset to a canonical one with a PBS to allow further computation. Or, if the homomorphic computation is over, the result can be recovered by decrypting the ciphertext and checking in which partition the decrypted value lies.
+Our goal is to represent the Boolean function we want to evaluate with a sum of $p$-encodings (we define what we mean by ``sum of $p$-encoding'' in Section \ref{sec:p_encodings_new_strategy}).  When sums are carried out on ciphertexts (and so homomorphically on the underlying $p$-encodings), the sets $\Encoding(0)$ and $\Encoding(1)$ of the $p$-encodings may move, grow, shrink, but they should never overlap as it would result in a loss of information. As we removed the need for a bit of padding, we do not need to track a potential overflow of data (informally we say that ciphertexts are free to ``loop around the torus''). After the sum, the encoding of the result can be reset to a canonical one with a \gls{PBS} to allow further computation. Or, if the homomorphic computation is over, the result can be recovered by decrypting the ciphertext and checking in which partition the decrypted value lies.
 
 
 The next subsection explains in further details the process of evaluating Boolean functions on with $p$-encodings.
@@ -166,7 +165,7 @@ To wrap up, here is our proposed framework to evaluate a Boolean function $f: \B
 \item For a Boolean function $f$ to be evaluated on $b_1, \dots, b_\ell$, compute homomorphically the sum of the ciphertexts $\vec c = \vec{c}_1 + \dots + \vec{c}_\ell$. This yields an encryption of $b = f(b_1, \dots, b_\ell)$, encoded with a valid $p$-encoding $\Encoding_{sum} = f(\Encoding_1, \dots, \Encoding_\ell)$.
 \item \begin{enumerate}
     \item If the result is directly required by the client, $\vec c$ is returned as ciphertext which can be decrypted to get the result in $\Z_p$ and associated to the right Boolean value.
-    \item If the result is reused in further homomorphic computations, a PBS calculating $\texttt{Cast}_{\Encoding_{sum} \mapsto \Encoding_{new}}$ on the result is computed (like introduced in Property \ref{prop:cast_valid_to_canonical}), with $\Encoding_{new}$ a new canonical $p$-encoding. The resulting value can then be used as an input for a next Boolean function.
+    \item If the result is reused in further homomorphic computations, a \gls{PBS} calculating $\texttt{Cast}_{\Encoding_{sum} \mapsto \Encoding_{new}}$ on the result is computed (like introduced in Property \ref{prop:cast_valid_to_canonical}), with $\Encoding_{new}$ a new canonical $p$-encoding. The resulting value can then be used as an input for a next Boolean function.
     \end{enumerate}
 \end{enumerate}
 
@@ -180,14 +179,14 @@ Let us formalize this process by defining the notion of \textit{gadget associate
     \end{itemize}
 Applying a gadget to ciphertexts  $\vec c_1, \dots, \vec c_\ell$, that encrypt the bits $b_1, \dots, b_\ell$, produces a new ciphertext $c'$ encrypting the bit $f(b_1, \dots, b_\ell)$ under the $p_{out}$-encoding $\Encoding_{out}$. To do so, we perform the following algorithm:
 \begin{itemize}
-    \item Constructing an intermediate ciphertext $\vec{c}_{inter} = \sum_{i=1}^{\ell} \vec{c}_i$ using the homomorphic sum of TFHE. This ciphertext encrypts $f(b_1, \dots, b_\ell)$ under the $p_{in}$-encoding $f(\Encoding_1, \dots, \Encoding_\ell)$.
-    \item Reducing the encoding of $\vec{c}_{inter}$ from $\Encoding_{inter}$ to $\Encoding_{out}$ by applying a PBS on $\vec{c}_{inter}$ performing the function $\texttt{Cast}_{\Encoding_{inter} \mapsto \Encoding_{out}}$. This produces the expected result $\vec{c'}$.
+    \item Constructing an intermediate ciphertext $\vec{c}_{inter} = \sum_{i=1}^{\ell} \vec{c}_i$ using the homomorphic sum of \gls{TFHE}. This ciphertext encrypts $f(b_1, \dots, b_\ell)$ under the $p_{in}$-encoding $f(\Encoding_1, \dots, \Encoding_\ell)$.
+    \item Reducing the encoding of $\vec{c}_{inter}$ from $\Encoding_{inter}$ to $\Encoding_{out}$ by applying a \gls{PBS} on $\vec{c}_{inter}$ performing the function $\texttt{Cast}_{\Encoding_{inter} \mapsto \Encoding_{out}}$. This produces the expected result $\vec{c'}$.
     \end{itemize}
 \label{def:gadget}
 \end{definition}
 
 
-The advantage of this construction is that only one PBS is performed to apply the function. Moreover, depending on the function, the input size of the PBS lookup table might be much smaller than the arity of the function. Gadgets can be seen as a way to compress several Boolean operators into a single evaluation of univariate look-up table.
+The advantage of this construction is that only one \gls{PBS} is performed to apply the function. Moreover, depending on the function, the input size of the \gls{PBS} lookup table might be much smaller than the arity of the function. Gadgets can be seen as a way to compress several Boolean operators into a single evaluation of univariate look-up table.
 Of course, for a given $p_{in}$ and a given $f$, such a gadget may not exist. In such a case, two solutions can be considered:
 \begin{itemize}
     \item Increasing the value of $p_{in}$ (e.g.  taking $p_{in} \ge 2^\ell$ always works, but is very inefficient).
@@ -203,13 +202,13 @@ f(a, b, c) = \begin{cases}
     b \text{ if } c = 0
 \end{cases}
 $$
-Instead of leveraging its Boolean representation $f(a, b, c) = a \& c \oplus b \& \Bar{c}$, which would cost 3 PBS with the approach of \cite{JC:CGGI20}, our strategy consists in constructing a gadget and apply it to the inputs $a$, $b$ and $c$, which takes only one PBS. Here is the step-by-step procedure:
+Instead of leveraging its Boolean representation $f(a, b, c) = a \& c \oplus b \& \Bar{c}$, which would cost 3 \gls{PBS} with the approach of \cite{JC:CGGI20}, our strategy consists in constructing a gadget and apply it to the inputs $a$, $b$ and $c$, which takes only one \gls{PBS}. Here is the step-by-step procedure:
 
 \begin{enumerate}
     \item Encrypting the bits with the $7$-encodings:\[\Encoding_a = \Encoding_b = \EncDefOne{1} \text{ and } \Encoding_c = \EncDefOne{2}\].
     \item Applying the function $f$ on the $7$-encodings by summing the ciphertexts, producing a valid $7$-encoding:\[\Encoding_{sum} = \EncDef{\{0, 1, 2, 5\}}{\{3, 4, 6\}}\]
     \smallskip
-    \item With one PBS, resetting the result to a target canonical $p$-encoding (with any $p$), for example \[\Encoding_{new} = \EncDefOne{1} \text{ with } p=7\]
+    \item With one \gls{PBS}, resetting the result to a target canonical $p$-encoding (with any $p$), for example \[\Encoding_{new} = \EncDefOne{1} \text{ with } p=7\]
 \end{enumerate}
 
 A visualization of this procedure can be found in Figure \ref{fig:illustration}. We just defined the gadget $\Gamma = \left ( (\Encoding_a, \Encoding_b, \Encoding_c), \Encoding_{new}, 7, 7\right )$.
@@ -236,7 +235,7 @@ A visualization of this procedure can be found in Figure \ref{fig:illustration}.
 		
 		\draw[->, thick] (plusnode.east) -- (2 * \horizspace - \scaleTorus * 3.5, -\vertspace);
 		
-		\node[draw, align=center, thick] (pbsnode) at (3 * \horizspace, -\vertspace) {\Huge PBS};
+		\node[draw, align=center, thick] (pbsnode) at (3 * \horizspace, -\vertspace) {\Huge \gls{PBS}};
 		
 		\draw[->, thick] (2 * \horizspace + \scaleTorus * 3.5, -\vertspace) -- (pbsnode.west);
 		
@@ -284,13 +283,13 @@ Note that the condition of coprimality between $a$ and $p$ is a sufficient condi
 \end{property}
 
 \begin{proof}
-    The property is trivial by the linear homomorphism of the TFHE scheme.
+    The property is trivial by the linear homomorphism of the \gls{TFHE} scheme.
 \end{proof} 
 
 These techniques are powerful because they do not require any bootstrapping, so they can be considered as free in terms of performances. However, any valid $p$-encoding can be turned into any other one with a programmable bootstrapping, even with a different modulus $p$. A reduced version of this is given by Property \ref{prop:cast_valid_to_canonical}, but it can be extended to any valid output $p$-encoding.
 
-\begin{property} [Arbitrary encoding switching with a PBS]
-    Let $\vec c$ be a ciphertext encoded under $\Encoding$. Its encoding can be switched to $\Encoding'$ (even with a different modulus $p'$) by applying a PBS on $\vec c$ evaluating the function     \begin{align}
+\begin{property} [Arbitrary encoding switching with a \gls{PBS}]
+    Let $\vec c$ be a ciphertext encoded under $\Encoding$. Its encoding can be switched to $\Encoding'$ (even with a different modulus $p'$) by applying a \gls{PBS} on $\vec c$ evaluating the function     \begin{align}
         \texttt{Cast}_{\Encoding \mapsto \Encoding'}~:~& \Z_p \mapsto \Z_{p'}\\
         & x \mapsto \begin{cases}
                         \alpha' \in \Encoding'(0) & \text{ if } x \in \Encoding(0)\\
@@ -305,7 +304,7 @@ These techniques are powerful because they do not require any bootstrapping, so 
 
 \paragraph{Note for $p = 2$}: The case $p = 2$ is particular: we can observe that valid 2-encodings are automatically negacyclic. Moreover, they allow to evaluate the \texttt{XOR} operation by simply performing an homomorphic sum (so without bootstrapping). So it might be efficient to switch between $2$-encodings for \texttt{XOR} operations and $p$-encodings (with odd $p$) for non-linear Boolean functions. We make use
 of this strategy in our implementation of the Keccak permutation in Section \ref{sec:keccak} and for
-the AES in Section \ref{sec:p_encodings_aes}.
+the \gls{AES} in Section \ref{sec:p_encodings_aes}.
 
 
 

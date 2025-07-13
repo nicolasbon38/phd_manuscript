@@ -1,11 +1,11 @@
-\section{More Resources About TFHE}
+\section{More Resources About \gls{TFHE}}
 \label{sec:appendix_fhe}
 
 
 \subsection{Complexity assumptions}
 \label{sec:complexity_assumptions}
 
-Here, we define the assumptions on which the security of TFHE relies. 
+Here, we define the assumptions on which the security of \gls{TFHE} relies. 
 
 \begin{definition}
 	(LWE problem over the discretized torus). Let $q, n \in \mathbb N$ and let $\vec s = (s_1, \dots, s_n) \drawfrom \mathbb B^n$. Let $\chi$ be an error distribution over $\mathbb Z_q$. The \emph{decisional Learning With Errors over discretized torus problem} is to distinguish between samples drawn from the distributions: 
@@ -20,7 +20,7 @@ Here, we define the assumptions on which the security of TFHE relies.
 Both the search and decisional problems are reducible to each other \cite{Regev}, and their average case is as hard as the worst-case lattice problems.
 
 
-TFHE also relies on the generalized version of LWE over rings, introduced in \cite{ITCS:BraGenVai12}, known as GLWE.
+\gls{TFHE} also relies on the generalized version of LWE over rings, introduced in \cite{ITCS:BraGenVai12}, known as GLWE.
 
 \begin{definition}
 	(GLWE problem over the discretized torus). Let $N, q, k \in \mathbb N$ with $N$ a power of two and let $\vec s = (s_1, \dots, s_k) \drawfrom \mathbb B_N[X]^k$. Let $\chi$ be an error distribution over $\mathbb Z_{N, q}[X]$. The \emph{General decisional Learning With Errors over discretized torus problem} is to distinguish between samples drawn from the following distributions 
@@ -41,18 +41,18 @@ In practice, the error distribution $\chi$ is a centered Gaussian distribution p
 
 
 
-\subsection{Analysis of the variances inside a PBS}
+\subsection{Analysis of the variances inside a \gls{PBS}}
 \label{sec:pbs_variance_analysis}
 
-We recall that the PBS is composed of four successive operations: \textsf{Keyswitch}, \textsf{ModulusSwitch}, \textsf{BlindRotate} and \textsf{SampleExtract}.
+We recall that the \gls{PBS} is composed of four successive operations: \textsf{Keyswitch}, \textsf{ModulusSwitch}, \textsf{BlindRotate} and \textsf{SampleExtract}.
 
 
-The critical variance is the variance in input of the \textsf{BlindRotate} (\textsf{BR}). If the noise at this point of the algorithm is too high, the PBS will output the encryption of a wrong value with high probability. This critical variance satisfies:
-$$\sigma^2_{\text{in-}\textsf{BR}} = \sigma^2_{\text{in-}\textsf{PBS}} + \sigma^2_{\textsf{KS}} + \sigma^2_{\textsf{MS}}$$
-where $\sigma^2_{\text{in-}\textsf{PBS}}$ is the variance in input of the PBS, which according to Section~\ref{sec:rationale-controllin-noise} satisfies:
-$$\sigma^2_{\text{in-}\textsf{PBS}} = \sigma_\pseudoKS^2+\sigma^2_\mixC = 
-|\mathcal{K}| \cdot \left(\frac{p-1}2\right)^2 \cdot \sigma_{\text{long}}^2 + L_\mixC^2 \cdot \sigma^2_{\textsf{PBS}}~,$$
-and where $\sigma^2_{\textsf{KS}}$ and $\sigma^2_{\textsf{MS}}$ are additive terms introduced by the $\textsf{KeySwitch}$ and the $\textsf{ModSwitch}$ respectively and which depend on the internal parameters of the PBS. The former is defined by:
+The critical variance is the variance in input of the \textsf{BlindRotate} (\textsf{BR}). If the noise at this point of the algorithm is too high, the \gls{PBS} will output the encryption of a wrong value with high probability. This critical variance satisfies:
+$$\sigma^2_{\text{in-}\textsf{BR}} = \sigma^2_{\text{in-}\textsf{\gls{PBS}}} + \sigma^2_{\textsf{KS}} + \sigma^2_{\textsf{MS}}$$
+where $\sigma^2_{\text{in-}\textsf{\gls{PBS}}}$ is the variance in input of the \gls{PBS}, which according to Section~\ref{sec:rationale-controllin-noise} satisfies:
+$$\sigma^2_{\text{in-}\textsf{\gls{PBS}}} = \sigma_\pseudoKS^2+\sigma^2_\mixC = 
+|\mathcal{K}| \cdot \left(\frac{p-1}2\right)^2 \cdot \sigma_{\text{long}}^2 + L_\mixC^2 \cdot \sigma^2_{\textsf{\gls{PBS}}}~,$$
+and where $\sigma^2_{\textsf{KS}}$ and $\sigma^2_{\textsf{MS}}$ are additive terms introduced by the $\textsf{KeySwitch}$ and the $\textsf{ModSwitch}$ respectively and which depend on the internal parameters of the \gls{PBS}. The former is defined by:
 %
 \begin{equation*}
 	\begin{aligned}
@@ -72,7 +72,7 @@ The full noise analysis leading to these formulas can be found in \cite{phd_tap}
 
 
 \ifeprint{
-	\section{Further Compressing the TFHE Ciphertexts}
+	\section{Further Compressing the \gls{TFHE} Ciphertexts}
 	\label{sec:truncature}
 
 }
@@ -80,17 +80,17 @@ The full noise analysis leading to these formulas can be found in \cite{phd_tap}
 	\section{More about the Homomorphic Implementation of Transistor}
 	
 	
-	\subsection{Further Compressing the TFHE Ciphertexts}
+	\subsection{Further Compressing the \gls{TFHE} Ciphertexts}
 	\label{sec:truncature}
 }
 \fi
 
-We introduce hereafter a tweak to compress a TFHE encryption further than the folklore compression. By definition of the TFHE encryption process, the least significant bits of the body $b_i = \sum_{j=1}^n a_{i,j} \cdot s_j + \tilde{m}_i + e_i$ are randomized by the error $e_i$ and can hence be discarded without loss of information. We can thus tweak the above compressed encryption process by returning $(\mathsf{seed}, \mathrm{Tr}_\ell(b_1), \ldots, \mathrm{Tr}_\ell(b_t))$ where $\mathrm{Tr}_\ell(\cdot)$ denotes the truncation of the $\ell$ least significant bits. To decompress such ciphertexts, besides pseudorandomly generating the masks from the seed, one just needs to pad the truncated bodies with $\ell$ bits to $0$. By the randomness of the mask, the effect of this truncation plus $0$-padding is to add a uniform random error of $\ell$ bits to the body, namely an error of standard deviation: 
+We introduce hereafter a tweak to compress a \gls{TFHE} encryption further than the folklore compression. By definition of the \gls{TFHE} encryption process, the least significant bits of the body $b_i = \sum_{j=1}^n a_{i,j} \cdot s_j + \tilde{m}_i + e_i$ are randomized by the error $e_i$ and can hence be discarded without loss of information. We can thus tweak the above compressed encryption process by returning $(\mathsf{seed}, \mathrm{Tr}_\ell(b_1), \ldots, \mathrm{Tr}_\ell(b_t))$ where $\mathrm{Tr}_\ell(\cdot)$ denotes the truncation of the $\ell$ least significant bits. To decompress such ciphertexts, besides pseudorandomly generating the masks from the seed, one just needs to pad the truncated bodies with $\ell$ bits to $0$. By the randomness of the mask, the effect of this truncation plus $0$-padding is to add a uniform random error of $\ell$ bits to the body, namely an error of standard deviation: 
 $$\sigma_0^2  = \frac{(2^\ell - 1)^2}{12} \approx \frac{2^{2\ell}}{12} \approx 0.08 \cdot 2^{2\ell} ~.$$
 
 \noindent This optimization comes in two flavors:
 \begin{enumerate}
-	\item \emph{The ``free'' variant.} The number of truncated bits $\ell$ is selected to have a small impact on the noise distribution. For instance in \coolName, the noise of the fresh ciphertexts is summed with the noise coming from the FSM. Thus, we can compute $\ell$ to keep $\sigma^2_{\mathcal W} < \sigma^2_{\text{PBS}}$. Our experiments shows $\sigma^2_{\text{PBS}} = 2^{52}$, so running the numbers we find that we can truncate up to $\ell=19$ bits, allowing to reduce the volume of the TFHE ciphertexts to send by a factor $1 - \frac{19}{64} \approx 0.7$.
+	\item \emph{The ``free'' variant.} The number of truncated bits $\ell$ is selected to have a small impact on the noise distribution. For instance in \coolName, the noise of the fresh ciphertexts is summed with the noise coming from the FSM. Thus, we can compute $\ell$ to keep $\sigma^2_{\mathcal W} < \sigma^2_{\text{\gls{PBS}}}$. Our experiments shows $\sigma^2_{\text{\gls{PBS}}} = 2^{52}$, so running the numbers we find that we can truncate up to $\ell=19$ bits, allowing to reduce the volume of the \gls{TFHE} ciphertexts to send by a factor $1 - \frac{19}{64} \approx 0.7$.
 	
 	\smallskip
 	
@@ -127,11 +127,11 @@ In the context of transciphering with \coolName, the trade-off provided by the s
 	\subsection{Concrete Parameters}
 	\label{sec:concrete_parameters}
 	
-	Table \ref{tab:parameters} shows the parameters used for our experiments, all ensuring 128 bits of security. The obtained security levels $\lambda_{\text{short}}$ et $\lambda_{\text{long}}$ have been estimated using the \texttt{lattice estimator}~\cite{lattice-estimator}.
+	Table \ref{tab:transistor_parameters} shows the parameters used for our experiments, all ensuring 128 bits of security. The obtained security levels $\lambda_{\text{short}}$ et $\lambda_{\text{long}}$ have been estimated using the \texttt{lattice estimator}~\cite{lattice-estimator}.
 	
 	\begin{table}
 		\centering
-		\caption{TFHE Parameters used in our experimentations}.
+		\caption{\gls{TFHE} Parameters used in our experimentations}.
 			\label{tab:parameters}
 		\renewcommand{\arraystretch}{1.3}  % Adjust row spacing
 		\scalebox{1}{
@@ -167,7 +167,7 @@ In the context of transciphering with \coolName, the trade-off provided by the s
 	
 	%Calling Algorithm \ref{alg:lsfr} (\texttt{LFSR.clock}) several times yields an encrypted stream of pseudorandom elements $(o^{(0)}, o^{(1)}, \dots)$.
 	
-	\paragraph{Homomorphic evaluation of} \coolName. The complete homomorphic evaluation of a round of one clock cycle of \coolName is depicted in Algorithm~\ref{alg:transistor}, using $\pseudoKS.\texttt{clock}$ and $\whitening.\texttt{clock}$ as subroutines (i.e., Algorithm~\ref{alg:lsfr} evaluated on the key schedule and whitening LFSRs). The most computation intensive part of the algorithm is by far the evaluation of the PBS in $\subWords$ which can be fully parallelized to reduce the latency.
+	\paragraph{Homomorphic evaluation of} \coolName. The complete homomorphic evaluation of a round of one clock cycle of \coolName is depicted in Algorithm~\ref{alg:transistor}, using $\pseudoKS.\texttt{clock}$ and $\whitening.\texttt{clock}$ as subroutines (i.e., Algorithm~\ref{alg:lsfr} evaluated on the key schedule and whitening LFSRs). The most computation intensive part of the algorithm is by far the evaluation of the \gls{PBS} in $\subWords$ which can be fully parallelized to reduce the latency.
 	
 	\input{algorithms/round.tex}
 	}

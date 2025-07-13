@@ -13,7 +13,7 @@ However, one use case remains where cryptography is still ineffective, and where
 The problem is that performing computations on encrypted data is a massive technological challenge, long thought to be impossible. As a result, the server must necessarily decrypt the data before processing it, which leaves the data vulnerable to any potential compromise of the server by a cyberattack.
 
 
-Homomorphic encryption (Fully Homomorphic Encryption, or FHE) is the branch of cryptography that tackles this issue. Its goal is to develop encryption algorithms that allow a server to perform computations directly on encrypted data, without the need to decrypt it first. This way, an attacker has no incentive to breach the server, as all valuable data it contains remains encrypted and therefore useless. Additionally, the service provider itself does not have access to the data, ensuring full confidentiality for the user.
+Homomorphic encryption (Fully Homomorphic Encryption, or \gls{FHE}) is the branch of cryptography that tackles this issue. Its goal is to develop encryption algorithms that allow a server to perform computations directly on encrypted data, without the need to decrypt it first. This way, an attacker has no incentive to breach the server, as all valuable data it contains remains encrypted and therefore useless. Additionally, the service provider itself does not have access to the data, ensuring full confidentiality for the user.
 
 
 
@@ -32,7 +32,7 @@ Figure \ref{fig:classical_usage_fhe} demonstrates a procedure of private outsour
 \begin{figure}
 	\centering
 	\include{img/blocks_from_slides/simple_fhe.tex}
-	\caption{An illustration of a protocol of outsourced computation using FHE. Hatching denotes that the homomorphized version is run.}
+	\caption{An illustration of a protocol of outsourced computation using \gls{FHE}. Hatching denotes that the homomorphized version is run.}
 	\label{fig:classical_usage_fhe}
 \end{figure}
 
@@ -61,7 +61,7 @@ Such homomorphic schemes work by injecting some small random noise in the plaint
 
 Gentry's original scheme offered homomorphic additions and multiplications. However, because the plaintext messages are noisy, these operations increase the noise in the ciphertexts. So, if too many operations are performed, the noise gets so large that it becomes preponderant and blows the meaningful information contained in the ciphertexts.
 
-This is where bootstrappability comes in. It gives access to an operation (the \textit{bootstrapping}) that decrypts homomorphically the noisy ciphertexts. But how can this help to achieve FHE ?
+This is where bootstrappability comes in. It gives access to an operation (the \textit{bootstrapping}) that decrypts homomorphically the noisy ciphertexts. But how can this help to achieve \gls{FHE} ?
 
 Imagine the server has a ciphertext $\vec c_1$ encrypting the (noisy) message $m +e_1$ under the secret key $\vec s_1$, where $m$ is the plain message and $e_1$ denotes the noise. Let us say that $\vec c_1$ is the output of a circuit of homomorphic operations, so the noise $e_1$ is rather large. If we want to keep computing without losing information, we need to reduce the noise by a bootstrapping. 
 
@@ -70,7 +70,7 @@ To do so, the client needs to give to the server a \textit{bootstrapping key} $\
 Actually, \textit{all} the noise does not get removed (this would not be desirable, because all the security of the encryption relies on the presence of noise in the ciphertexts). As there is some noise in $\BSK$, the result $\vec c_2$ carries some noise $e_2$. But if things are well dimensioned, it is possible to get $e_2 \ll e_1$ and so retrieve some room for further computations. We illustrate the bootstrapping principle in Figure \ref{fig:bootstrapping_principle}.
 
 
-Gentry's original scheme was merely theoretical, because the homomorphic operations, and in particular the bootstrapping, were extremely slow. But since then, significant improvements have been achieved in FHE efficiency. Modern schemes are on the verge of being usable in practice for some use-cases. In the next section, we give a tour of the modern schemes and libraries that makes the FHE landcape as of today.
+Gentry's original scheme was merely theoretical, because the homomorphic operations, and in particular the bootstrapping, were extremely slow. But since then, significant improvements have been achieved in \gls{FHE} efficiency. Modern schemes are on the verge of being usable in practice for some use-cases. In the next section, we give a tour of the modern schemes and libraries that makes the \gls{FHE} landcape as of today.
 
 
 
@@ -85,29 +85,29 @@ Gentry's original scheme was merely theoretical, because the homomorphic operati
 \section{Current Landscape of the FHE Schemes and Libraries}
 \label{sec:landscape}
 
-After a decade of research, homomorphic schemes have evolved to stabilize around two main paradigms. We present both by their main representatives: TFHE \cite{JC:CGGI20} and CKKS \cite{AC:CKKS17}. They have quite different (and complementary) philosophies of computing, and lead to radically different design choices when used:
+After a decade of research, homomorphic schemes have evolved to stabilize around two main paradigms. We present both by their main representatives: \gls{TFHE} \cite{JC:CGGI20} and CKKS \cite{AC:CKKS17}. They have quite different (and complementary) philosophies of computing, and lead to radically different design choices when used:
 
 
-\paragraph{TFHE:} This scheme relies on a very low-latency bootstrapping operation\footnote{by FHE standards}. It manipulates small limbs of data of a few bits, and operates \textit{exact} computations on them.
+\paragraph{\gls{TFHE}:} This scheme relies on a very low-latency bootstrapping operation\footnote{by \gls{FHE} standards}. It manipulates small limbs of data of a few bits, and operates \textit{exact} computations on them.
 
 
-\paragraph{CKKS:} CKKS has quite opposite features of TFHE. It relies on a \textit{approximate} paradigm for the computations, so is quite appropriate for floating-point computations. Moreover, it supports SIMD (Same Instruction Multiple Data) within its ciphertexts, so it allows for heavy parallelization. While its bootstrapping is quite heavy and appeared later in the literature \cite{EC:CHKKS18}, a lot of advancements happened in the last few years making it closer to practical \cite{EC:CheChiSon19, RSA:HanKi20, AC:KPKKM22}.
+\paragraph{CKKS:} CKKS has quite opposite features of \gls{TFHE}. It relies on a \textit{approximate} paradigm for the computations, so is quite appropriate for floating-point computations. Moreover, it supports SIMD (Same Instruction Multiple Data) within its ciphertexts, so it allows for heavy parallelization. While its bootstrapping is quite heavy and appeared later in the literature \cite{EC:CHKKS18}, a lot of advancements happened in the last few years making it closer to practical \cite{EC:CheChiSon19, RSA:HanKi20, AC:KPKKM22}.
 
 
 We should also mention BFV/BGV \cite{C:Brakerski12, bgv, EPRINT:FanVer12}, that share most of the properties of CKKS. However these constructions do not work with approximate floating-point computation, but rather with exact computations over large integer rings.
 
 
 \paragraph{Libraries.}
-Several libraries implement these schemes, facilitating their adoption. For TFHE, we can mention tfhe-rs \cite{tfhe-rs}  and TFHEpp \cite{TFHEpp}. For CKKS, we can mention HEAAN \cite{heaan} and Lattigo \cite{lattigo}. Finally, OpenFHE \cite{OpenFHE} is an attempt at constructing a universal library that supports all the schemes and allows conversions.
+Several libraries implement these schemes, facilitating their adoption. For \gls{TFHE}, we can mention tfhe-rs \cite{tfhe-rs}  and TFHEpp \cite{TFHEpp}. For CKKS, we can mention HEAAN \cite{heaan} and Lattigo \cite{lattigo}. Finally, OpenFHE \cite{OpenFHE} is an attempt at constructing a universal library that supports all the schemes and allows conversions.
 
 
-These libraries target users familiar with FHE, and offer quite low-level API. One of the issue slowing down the massive adoption of FHE is the difficulty of developing concrete applications from the cryptographic primitives. A layer of compilation is thus required from ``plaintext'' programming to homomorphic code. Such projects of homomorphic compiler include Concrete \cite{Concrete} and HEIR \cite{HEIR}.
+These libraries target users familiar with \gls{FHE}, and offer quite low-level API. One of the issue slowing down the massive adoption of \gls{FHE} is the difficulty of developing concrete applications from the cryptographic primitives. A layer of compilation is thus required from ``plaintext'' programming to homomorphic code. Such projects of homomorphic compiler include Concrete \cite{Concrete} and HEIR \cite{HEIR}.
 
 \medskip
-Another active line of research is hardware acceleration. Quite promising theoretical results have been achieved \cite{TCHES:GVPHMS23, EPRINT:BBTV23a, EPRINT:CPBFSJ23, EPRINT:KHMR24} and the first ``FHE-tailored'' chips have started to be produced. Such hardware include \gls{NTT}/\gls{FFT}-dedicated accelerators, as these operations account for the largest part of the computations. 
+Another active line of research is hardware acceleration. Quite promising theoretical results have been achieved \cite{TCHES:GVPHMS23, EPRINT:BBTV23a, EPRINT:CPBFSJ23, EPRINT:KHMR24} and the first ``\gls{FHE}-tailored'' chips have started to be produced. Such hardware include \gls{NTT}/\gls{FFT}-dedicated accelerators, as these operations account for the largest part of the computations. 
 
 
-Some standardization projects are arising \cite{HomomorphicEncryptionSecurityStandard, call_nist}, which would be an important step for the adoption of FHE in practice.
+Some standardization projects are arising \cite{HomomorphicEncryptionSecurityStandard, call_nist}, which would be an important step for the adoption of \gls{FHE} in practice.
  	
 
 
@@ -125,12 +125,12 @@ By design, homomorphic schemes cannot achieve such security property because the
 Actually, things are even worse: if the scheme is bootstrappable, then even \textsf{CCA1} security is unachievable. This corresponds to a \textit{non-adaptative chosen-ciphertext security}, the difference with \textsf{CCA2} being that the attacker is no longer allowed to query the decryption oracle after having seen the challenge ciphertext (so it modelizes a weaker security property). To understand the attack, recall that in Gentry's blueprint, the bootstrapping key is an encryption of the secret key. So, by querying the decryption oracle with the bootstrapping key, the attacker may recover the secret key and decrypt any ciphertext sent by the challenger. Some attacks are even possible with more constrained decryption oracles: for example \cite{SAC:LMSV11} demonstrates attacks with only an access to an oracle that tells if a ciphertext is valid or not, which seems a very practical concern.
 
 
-Because these advanced security properties are so hard to achieve, the \textit{de facto} standard for FHE schemes has become \textsf{CPA} security (where the attacker has only access to an encryption oracle and no decryption oracle). This is the level of security targeted by most applied libraries. However, such security level is not sufficient in practice for most of the use-cases of FHE.
+Because these advanced security properties are so hard to achieve, the \textit{de facto} standard for \gls{FHE} schemes has become \textsf{CPA} security (where the attacker has only access to an encryption oracle and no decryption oracle). This is the level of security targeted by most applied libraries. However, such security level is not sufficient in practice for most of the use-cases of \gls{FHE}.
 
 
 The problem has first been revealed in the work of \cite{EC:LiMic21} for approximate homomorphic schemes. In their work, they leverage the fact that the decryption function leaks the noise in ciphertexts to mount a secret-key recovery attack. They named this framework $\textsf{CPA}^\textsf{D}$ ($\cdot ^ \textsf{D}$ denoting the use of the output of the Decryption algorithm). To be protected against such attacks, users should be prohibited to disclose the results of decrypted messages. But in some use-cases (such as Multi-Party Computations), it is necessary to share the decrypted message with other users. So the outputs of the decryption algorithm should be protected by injecting random noise to flood the leaked information \cite{EPRINT:CheHonKim20}. Actually, further works \cite{C:CSBB24, CCS:CCPSS24} have shown that non-approximate schemes are also vulnerable to $\textsf{CPA}^\textsf{D}$ attacks: instead of exploiting the noise leakage, the attacker can actively tamper with the noise in ciphertexts to trigger decryption errors and harvest information to mount a key-recovery attack.
 
 
-What these attacks show is that FHE by itself is not sufficient to build secure applications in the real world. To prevent against tampering of ciphertexts, \textsf{CPA}-secure FHE schemes need to be augmented with some machinery to prove the well-formedness of ciphertexts. Some literature on the topic has been developed in the recent years, notably the works of \cite{EC:ManNgu24, CiC:BCFPPR25}. They develop the new security notion of \textsf{vCCA} (for \textit{verified chosen ciphertext security}) and implement it in practice with SNARKS \cite{SNARKS} (succing non-interactive argument of knowledge). 
+What these attacks show is that \gls{FHE} by itself is not sufficient to build secure applications in the real world. To prevent against tampering of ciphertexts, \textsf{CPA}-secure \gls{FHE} schemes need to be augmented with some machinery to prove the well-formedness of ciphertexts. Some literature on the topic has been developed in the recent years, notably the works of \cite{EC:ManNgu24, CiC:BCFPPR25}. They develop the new security notion of \textsf{vCCA} (for \textit{verified chosen ciphertext security}) and implement it in practice with SNARKS \cite{SNARKS} (succing non-interactive argument of knowledge). 
 
 

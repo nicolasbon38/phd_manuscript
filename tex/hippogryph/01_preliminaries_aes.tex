@@ -3,18 +3,18 @@
 \section{Preliminaries on AES}
 \label{sec:preliminaries_aes}
 
-The Advanced Encryption Standard (AES), based on the Rijndael algorithm winner of the NIST competition in 2000 \cite{aes-original}, is a symmetric block cipher supporting key sizes of 128, 192, and 256 bits. Depending on the key size, AES uses 10, 12, or 14 rounds of processing, each applying a fixed sequence of substitution, permutation, and mixing steps to transform plaintext into ciphertext (or ciphertext into plaintext for decryption). A key schedule generates round keys for each encryption round, plus an initial key.
+The Advanced Encryption Standard (\gls{AES}), based on the Rijndael algorithm winner of the NIST competition in 2000 \cite{aes-original}, is a symmetric block cipher supporting key sizes of 128, 192, and 256 bits. Depending on the key size, \gls{AES} uses 10, 12, or 14 rounds of processing, each applying a fixed sequence of substitution, permutation, and mixing steps to transform plaintext into ciphertext (or ciphertext into plaintext for decryption). A key schedule generates round keys for each encryption round, plus an initial key.
 
-\hippo~focuses on AES with 128-bit keys, which uses 10 rounds. The encryption begins with an \AddRoundKey step, followed by 10 rounds. Each round includes four steps: \SubBytes, \ShiftRows, \MixColumns, and \AddRoundKey, except the final round, which omits \MixColumns. Below, we recall the key expansion and the subroutines:
+\hippo~focuses on \gls{AES} with 128-bit keys, which uses 10 rounds. The encryption begins with an \AddRoundKey step, followed by 10 rounds. Each round includes four steps: \SubBytes, \ShiftRows, \MixColumns, and \AddRoundKey, except the final round, which omits \MixColumns. Below, we recall the key expansion and the subroutines:
 \begin{itemize}
-\item \texttt{Key Expansion}: The \texttt{Key Expansion} operation is performed once for a given secret key. Starting from the 128-bit key (in our context), it generates eleven 128-bit round keys, which are then used in the \AddRoundKey operation throughout the AES encryption or decryption process, without needing access to the original key. The key expansion involves XORs and $\F_{256}$ multiplications.
+\item \texttt{Key Expansion}: The \texttt{Key Expansion} operation is performed once for a given secret key. Starting from the 128-bit key (in our context), it generates eleven 128-bit round keys, which are then used in the \AddRoundKey operation throughout the \gls{AES} encryption or decryption process, without needing access to the original key. The key expansion involves XORs and $\F_{256}$ multiplications.
 
     \item \SubBytes: The \SubBytes operation is the only non-linear transformation in the cipher. It involves a substitution step, where each byte in the state matrix is replaced according to a fixed S-box. Since it operates independently on each byte of the state, \SubBytes can be easily parallelized, allowing for more efficient execution.
     \item \AddRoundKey: 
     %Before encryption begins, the secret key undergoes an "expansion" process to generate several round keys. The encryption procedure relies solely on these round keys, rather than the initial secret key. 
     During this transformation, the state is updated by combining it with the current round key using a bitwise XOR operation. Specifically, the 128-bit round key is organized into a matrix format to align with the structure of the state matrix, and the two matrices are XORed element-wise to produce the new state.
    
-    \item \ShiftRows: The \ShiftRows step is a byte transposition that cyclically shifts the rows of the state by different offsets. For AES with 128-bit keys, the first row remains unchanged, the second row is shifted by one byte, the third by two bytes, and the fourth row by three bytes. 
+    \item \ShiftRows: The \ShiftRows step is a byte transposition that cyclically shifts the rows of the state by different offsets. For \gls{AES} with 128-bit keys, the first row remains unchanged, the second row is shifted by one byte, the third by two bytes, and the fourth row by three bytes. 
 
     \item \MixColumns: The \MixColumns step processes the state column by column through matrix multiplication. To compute each byte of the state matrix, they combine scalar multiplication in $\mathtt{GF}(256)$ with XOR operations. This approach facilitates parallelization of the operation.  
     

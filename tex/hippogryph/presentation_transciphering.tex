@@ -2,10 +2,10 @@
 \label{sec:transciphering}
 
 
-One common challenge with all FHE schemes is that the ciphertexts are much larger than the corresponding plaintexts. 
-For example, a plaintext message of a few kilobytes can require tens or even hundreds of megabytes of data, making the processing of large data sets impractical. While compression techniques can help reduce the expansion factor in TFHE ciphertexts, the encrypted data still remains an order or two of magnitude larger than the original plaintext. 
+One common challenge with all \gls{FHE} schemes is that the ciphertexts are much larger than the corresponding plaintexts. 
+For example, a plaintext message of a few kilobytes can require tens or even hundreds of megabytes of data, making the processing of large data sets impractical. While compression techniques can help reduce the expansion factor in \gls{TFHE} ciphertexts, the encrypted data still remains an order or two of magnitude larger than the original plaintext. 
 
-It is possible to mitigate this issue using \emph{transciphering}~\cite{transciphering}. The idea is to off-load the task of actually encrypting the data to a symmetric cipher, and to simply encrypt homomorphically the key that is used. The user then sends both the homomorphically encrypted key and the ciphertext to the server, which can then homomorphically decrypt the received ciphertexts. This is done by running a fully homomorphic evaluation of the decryption function of the symmetric cipher, producing valid homomorphic ciphertexts representing the data. The server can then proceed to the homomorphic operations, like in the traditional FHE setting. This principle is illustrated on Figure \ref{fig:transciphering}
+It is possible to mitigate this issue using \emph{transciphering}~\cite{transciphering}. The idea is to off-load the task of actually encrypting the data to a symmetric cipher, and to simply encrypt homomorphically the key that is used. The user then sends both the homomorphically encrypted key and the ciphertext to the server, which can then homomorphically decrypt the received ciphertexts. This is done by running a fully homomorphic evaluation of the decryption function of the symmetric cipher, producing valid homomorphic ciphertexts representing the data. The server can then proceed to the homomorphic operations, like in the traditional \gls{FHE} setting. This principle is illustrated on Figure \ref{fig:transciphering}
 
 \begin{figure}
 	\centering
@@ -19,25 +19,25 @@ It is possible to mitigate this issue using \emph{transciphering}~\cite{transcip
 			\item The server homomorphically evaluates the decryption algorithm of the symmetric cipher, using the symmetric key homomorphically encrypted. It retrieves the data, as valid homomorphic ciphertexts.
 			\item The server can then evaluate the homomorphic application!
 		\end{enumerate}
-		The red color is for symmetric algorithms, green for FHE, and hatched algorithms means that they are evaluated homomorphically.
+		The red color is for symmetric algorithms, green for \gls{FHE}, and hatched algorithms means that they are evaluated homomorphically.
 	}
 	\label{fig:transciphering}
 \end{figure}
 
 
 
-Implementing FHE encryption through transciphering solves the bandwidth issue: the data sent by the client to the server is encrypted using a symmetric cipher, thus avoiding the significant ciphertext 
-expansion implied by direct FHE encryption. The only exception is the symmetric key, which does experience expansion, but this overhead is amortized across the entire data set.
+Implementing \gls{FHE} encryption through transciphering solves the bandwidth issue: the data sent by the client to the server is encrypted using a symmetric cipher, thus avoiding the significant ciphertext 
+expansion implied by direct \gls{FHE} encryption. The only exception is the symmetric key, which does experience expansion, but this overhead is amortized across the entire data set.
 
-But still, a question remains: which symmetric cipher should we use ? The straightforward solution is to simply pick something very standard, such as AES, and turn it into a homomorphic version. This is what the first works on transciphering tried to do: the first attempt to transcipher AES ciphertexts into FHE data was made in 2012 by Gentry, Halevi, and Smart \cite{C:GenHalSma12}. They used the BGV scheme~\cite{ITCS:BraGenVai12}, a fully homomorphic encryption method based on the Ring-LWE problem, as implemented in HElib~\cite{EPRINT:HalSho20}, an open-source library for FHE. However, their implementation resulted in an execution latency of 17.5 minutes, with now obsolete parameters (despite an amortized cost of 5.8 seconds per block).
+But still, a question remains: which symmetric cipher should we use ? The straightforward solution is to simply pick something very standard, such as \gls{AES}, and turn it into a homomorphic version. This is what the first works on transciphering tried to do: the first attempt to transcipher \gls{AES} ciphertexts into \gls{FHE} data was made in 2012 by Gentry, Halevi, and Smart \cite{C:GenHalSma12}. They used the BGV scheme~\cite{ITCS:BraGenVai12}, a fully homomorphic encryption method based on the Ring-LWE problem, as implemented in HElib~\cite{EPRINT:HalSho20}, an open-source library for \gls{FHE}. However, their implementation resulted in an execution latency of 17.5 minutes, with now obsolete parameters (despite an amortized cost of 5.8 seconds per block).
 
-Since then, some progress have been made. We give a tour of the current litterature on the topic in Section \ref{sec:comparison}. But still, it seems that fast data transmission with AES will remain impractical, because its design is not adapted at all to homomorphic evaluation.
-
-
-That is why many researchers have since developed new ``FHE-friendly'' symmetric cryptosystems to improve efficiency. Several proposal exists, including block ciphers such as LowMC \cite{EC:ARSTZ15}, PRINCE \cite{AC:BCGKKK12}, and CHAGHRI \cite{CCS:AshMahTop22}, as well as stream ciphers like Elisabeth \cite{AC:CHMS22}, PASTA \cite{TCHES:DGHRSW23}, Kreyvium \cite{FSE:CCFLNP16} and Transistor \cite{EPRINT:BBBBCL25}. These new schemes, sometimes referred to as hybrid encryption schemes, offer faster and more efficient homomorphic execution, though none have yet been standardized.
+Since then, some progress have been made. We give a tour of the current litterature on the topic in Section \ref{sec:comparison}. But still, it seems that fast data transmission with \gls{AES} will remain impractical, because its design is not adapted at all to homomorphic evaluation.
 
 
-Still, homomorphic AES remains an active line of research in the FHE community. In 2022, the National Institute of Standards and Technology (NIST) announced a future call for threshold encryption with a specific focus on FHE, indicating that AES would serve as the benchmark for evaluating proposals \cite{call_nist}. It particularly exemplifies the challenge of switching between boolean- and byte-oriented operations, a recurrent issue in TFHE-based implementations.
+That is why many researchers have since developed new ``\gls{FHE}-friendly'' symmetric cryptosystems to improve efficiency. Several proposal exists, including block ciphers such as LowMC \cite{EC:ARSTZ15}, PRINCE \cite{AC:BCGKKK12}, and CHAGHRI \cite{CCS:AshMahTop22}, as well as stream ciphers like Elisabeth \cite{AC:CHMS22}, PASTA \cite{TCHES:DGHRSW23}, Kreyvium \cite{FSE:CCFLNP16} and Transistor \cite{transistor}. These new schemes, sometimes referred to as hybrid encryption schemes, offer faster and more efficient homomorphic execution, though none have yet been standardized.
+
+
+Still, homomorphic \gls{AES} remains an active line of research in the \gls{FHE} community. In 2022, the National Institute of Standards and Technology (NIST) announced a future call for threshold encryption with a specific focus on \gls{FHE}, indicating that \gls{AES} would serve as the benchmark for evaluating proposals \cite{call_nist}. It particularly exemplifies the challenge of switching between boolean- and byte-oriented operations, a recurrent issue in \gls{TFHE}-based implementations.
 
 
 
