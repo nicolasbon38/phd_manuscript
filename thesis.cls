@@ -32,6 +32,7 @@
 \RequirePackage{fancyhdr}
 \RequirePackage{geometry}
 \pagestyle{fancy}
+\fancyfoot[C]{\thepage}
 \geometry{a4paper, body={160mm,245mm}}
 
 
@@ -266,7 +267,7 @@
 }
 %% remove the top line : http://tex.stackexchange.com/questions/19738/why-doesnt-pagestyleempty-work-on-the-first-page-of-a-chapter
 \renewcommand\chapter{\if@openright\cleardoublepage\else\clearpage\fi
-  \thispagestyle{empty}% original style: plain
+  \thispagestyle{plain}% original style: plain
   \global\@topnum\z@
   \@afterindentfalse
   \secdef\@chapter\@schapter}

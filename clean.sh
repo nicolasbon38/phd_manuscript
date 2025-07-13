@@ -1,0 +1,16 @@
+rm thesis.mtc*
+rm thesis.pdf
+rm thesis.synctex.gz
+rm thesis.maf
+rm thesis.ist
+rm thesis.gls
+rm thesis.glg
+rm thesis.bbl
+rm thesis.acn
+rm thesis.acr
+rm thesis.alg
+rm thesis.toc
+rm thesis.out
+rm thesis.glo
+rm thesis.aux
+rm thesis.bcf

@@ -49,7 +49,7 @@ To implement our framework, we relied on the $\texttt{tfhe-rs}$ library~\cite{tf
 When such a structure is constructed, it self-checks whether $f(\Encoding_{in})$ is valid. Then, when provided $\ell$ $\texttt{Ciphertexts}$ objects encoded under their respective $p$-encoding, it executes the homomorphic sum and the PBS and outputs the results encoded under $\Encoding_{out}$. Some utilitary functions performing encoding-switching are also available, allowing the chaining of several $\texttt{Gadget}$.
 
 
-\paragraph{Implementation of the accumulator: } The procedure of bootstrapping of \texttt{tfhe-rs} is slightly modified to support the new version of the accumulator we introduced in Chapter \ref{sec:negacyclicity}.
+\paragraph{Implementation of the accumulator: } The procedure of bootstrapping of \texttt{tfhe-rs} is slightly modified to support the new version of the accumulator we introduced in Chapter \ref{chap:negacyclicity}.
 
 \paragraph{Parsing of graphs: } We implemented a Python script that produces graphs to represent more complex functions that requires several PBS, as described in Section \ref{sec:p_encodings_graphs}. These graphs are stored with a comprehensive file format and our Rust implementation has a module of parsing allowing to load these graphs and automatically generate the corresponding graph of \texttt{Gadget}.
 

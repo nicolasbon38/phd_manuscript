@@ -5,7 +5,7 @@
 
 In this section, we apply our approach on some cryptographic primitives. For each primitive, we first explain the construction of the gadgets required and report the concrete performances of our implementation. We detailed all the timings of our experimentations along with the sets of parameters we used in Section \ref{sec:tables_perfs}.
 
-For performance measurement, we implemented our framework in our fork of the library \texttt{tfhe-rs} \cite{tfhe-rs} adapted as discussed in Section \ref{sec:TFHE_adaptation} and we generated the sets of parameters thank to our version of \texttt{concrete-optimizer} \cite{concrete-optimizer}. By default, we tailored the sets of parameters to limit the probability of failure $\epsilon$ of a bootstrapping to $2^{-40}$, and a security level of $\lambda = 128$ bits. All experiments have been carried out on a laptop with a 12th Gen Intel(R) Core(TM) i5-1245U CPU with 10 cores and a frequency of 4.4 GHz, and 16 GB of RAM.
+For performance measurement, we implemented our framework in our fork of the library \texttt{tfhe-rs} \cite{tfhe-rs} adapted as discussed in Section \ref{sec:p_encodings_TFHE_adaptation} and we generated the sets of parameters thank to our version of \texttt{concrete-optimizer} \cite{concrete-optimizer}. By default, we tailored the sets of parameters to limit the probability of failure $\epsilon$ of a bootstrapping to $2^{-40}$, and a security level of $\lambda = 128$ bits. All experiments have been carried out on a laptop with a 12th Gen Intel(R) Core(TM) i5-1245U CPU with 10 cores and a frequency of 4.4 GHz, and 16 GB of RAM.
 
 
 \subsection{SIMON Block Cipher}

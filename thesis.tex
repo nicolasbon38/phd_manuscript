@@ -46,10 +46,16 @@
 \usepackage{csquotes} 	% to silence warning
 \usepackage{xparse} % for NewDocumentCommand	
 
-	
+\usepackage[acronym]{glossaries}\\
+\glsdisablehyper
+\makeglossaries
+\input{tex/glossary.tex}
+
+
 % --------------------------------------
 
 \definecolor{maincolor}{RGB}{36, 56, 141}
+
 \colorlet{secondarycolor}{violet}
 
 %%%==============================
@@ -92,6 +98,9 @@
  \begin{dedication}
    Dedication...
  \end{dedication}
+
+\pagenumbering{arabic}
+\pagestyle{plain}
 
 % =============================================
 %                 BEGIN
@@ -159,7 +168,12 @@
 \input{tex/how_to_read}
 
 \cleardoublepage
+\input{tex/notations}
+\input{tex/acronyms}
+
+\cleardoublepage
 \input{tex/intro_francais}
+
 
 \input{tex/fhe.tex}
 

@@ -4,7 +4,7 @@
 \KwContext{
 	$ \left \lbrace
 	    \begin{aligned}
-	    	&f_0 : \F_p^n \mapsto \F_p: \text{the function to evaluate.}\\
+	    	&f : \F_p^n \mapsto \F_p: \text{the function to evaluate.}\\
 		    &(x_0, \dots, x_{n-1}) \in \F_p^n: \text{the clear inputs of the function.}\\
 		    &\Phi_{n, \ell + t} = (\phi_0, \dots, \phi_{n + \ell + t-1}): \text{the chain used to generate the decomposition}
 	    \end{aligned}
@@ -18,7 +18,7 @@
 	    \end{aligned}
 	\right .$
 }
-\KwResult{$\vec c_y$: an encryption of $y=f_0(x_0, \dots, x_{n-1})$}
+\KwResult{$\vec c_y$: an encryption of $y=f(x_0, \dots, x_{n-1})$}
 
 \Comment{Evaluation of the chain of atomic functions}
 \For{$k \in \{n, \dots, n + \ell + t\}$}{
@@ -28,7 +28,7 @@
 $\vec c_y \gets 0$\\
 \For{$i \in \{0,\dots,t-1\}$}{
     \Comment{We compute the linear combination with the $\beta$'s}
-    \For{$j \in \{0, \dots, n+\ell-1\}$}{
+    \For{$j \in \{0, \dots, n+\ell + t -1\}$}{
         $\gamma_{ij} \gets \texttt{ClearMultTFHE}(\vec c_j, \beta_{ij})$
     }
     $\vec \sigma_i \gets \texttt{SumTFHE}(\gamma_{i0}, \dots, \gamma_{i,n+\ell-1})$\\

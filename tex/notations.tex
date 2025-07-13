@@ -1,0 +1,31 @@
+\chapter*{Notations}
+\addstarredchapter{Notations}
+
+Throughout this manuscript, we adopt the following conventions:
+
+\begin{itemize}
+	\item \textbf{Scalars} are denoted by lowercase letters (e.g., $a$), and \textbf{polynomials} by uppercase letters (e.g., $A$).
+	\item \textbf{Vectors} are written in bold (e.g., $\vec{a}$ or $\vec{A}$), and \textbf{matrices} in bold uppercase roman type (e.g., $\mat{A}$).
+\end{itemize}
+
+We use the following common symbols for standard mathematical sets:
+\begin{itemize}
+	\item $\N$ for the set of natural numbers,
+	\item $\Z$ for the set of integers,
+	\item $\R$ for the set of real numbers,
+	\item $\B = \{0, 1\}$ for the set of bits,
+	\item $\T = \R / \Z$ for the torus, i.e., real numbers modulo 1.
+\end{itemize}
+
+The ring of integers modulo $q$, denoted classically by $\Z/q\Z$, is abbreviated as $\Z_q$. Similarly, finite fields are denoted by $\F$, with $\F_p$ representing the finite field of prime order $p$.
+
+Polynomial rings are written as, for example, $\Z_q[X]$. In particular, we frequently use cyclotomic polynomial rings of the form $\Z_q[X]/(X^N + 1)$, where $N$ is a power of two. These are abbreviated as $\Z_{q, N}[X]$.
+
+We adopt the following mathematical operator notations:
+\begin{itemize}
+	\item $\rounding{x}$ denotes the rounding of a real value $x$ to the nearest integer,
+	\item $\modulo{x}{q}$ denotes the reduction of $x$ modulo $q$,
+	\item $\innerProduct{\vec{x}}{\vec{y}}$ denotes the inner product of vectors $\vec{x}$ and $\vec{y}$.
+\end{itemize}
+
+Finally, for randomness and distributions, if $\mathcal{D}$ is a distribution, the notation $x \drawfrom \mathcal{D}$ means that $x$ is sampled according to $\mathcal{D}$. The same notation is used for uniform sampling from a set; for example, $x \drawfrom \Z_q$ denotes that $x$ is sampled uniformly at random from $\Z_q$.
