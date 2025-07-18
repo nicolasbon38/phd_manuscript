@@ -33,7 +33,7 @@ In this context, an important quantity is the smallest length of output sequence
 
 Our paper also provides an estimation of the minimal data complexity required to recover the internal state of the key-register from the knowledge of the output sequence $(S_t)_{t\in \N}$, given that at least four consecutive outputs $(S_t, S_{t+1}, S_{t+2}, S_{t+3})$ need to be considered together. Applying the so-called Xiao-Massey lemma \cite{add:XiaMas88,add:Bry89}, it is possible to see that as soon as the key-LFSR and the considered segment of the output sequence are not statistically independent, there exists a biased linear relation between the digits of these two sequences.
 
-In the paper, we exhibit an upper bound on the correlation of such linear relation. This bound depends on the minimal number of active S-boxes over $n$ rounds, as well as the modulus of the Fourier coefficients of \coolName's S-box. We show that the design of our S-box brings the correlation down to a value small enough so that the amount of keystream that the attacker has to observe exceed the limit of $2^{31}$ digits fixed by TMDTO trade-offs.
+In the paper, we exhibit an upper bound on the correlation of such linear relation. This bound depends on the minimal number of active \gls{S-box}es over $n$ rounds, as well as the modulus of the Fourier coefficients of \coolName's \gls{S-box}. We show that the design of our \gls{S-box} brings the correlation down to a value small enough so that the amount of keystream that the attacker has to observe exceed the limit of $2^{31}$ digits fixed by TMDTO trade-offs.
 
 
 \paragraph{Linear Distinguishers}

@@ -116,7 +116,7 @@ Finally, summing the produced ciphertexts gives an encryption of $m$ under $\Enc
 \end{proof}
 
 
-In \cite{DBLP:conf/wahc/TramaCBS23}, the authors determined that the most time-efficient way to slice the 8-bit inputs of the S-box for the tree-based method is into two 4-bit chunks. Given that our Recomposer block requires an odd plaintext modulus, as established in Property \ref{prop:oddness_in_recomposition}, we selected the smallest odd modulus capable of representing 4-bit values: $p=17$. 
+In \cite{DBLP:conf/wahc/TramaCBS23}, the authors determined that the most time-efficient way to slice the 8-bit inputs of the \gls{S-box} for the tree-based method is into two 4-bit chunks. Given that our Recomposer block requires an odd plaintext modulus, as established in Property \ref{prop:oddness_in_recomposition}, we selected the smallest odd modulus capable of representing 4-bit values: $p=17$. 
 
 \paragraph{Key Expansion.} 
 To the best of our knowledge, no previous work on \gls{AES} transciphering has performed the key expansion phase in the homomorphic domain. Similarly, we work under the assumption that \gls{FHE} encryptions of the eleven \gls{AES} round keys are directly available. Since the round keys need to be computed only once for a given secret key, this makes sense in a client-server setting as the client is then expected to compute the key expansion and to send encryptions of the resulting round keys (rather than sending an encryption of the secret key under the homomorphic scheme).

@@ -1,5 +1,5 @@
 
-\section{Some Building Blocks for \gls{LUT}-based Evaluation}
+\section{Some Building Blocks for \acrshort{LUT}-based Evaluation}
 \label{sec:previous-blocks}
 
 
@@ -10,7 +10,7 @@ In this section, we present the approach from \cite{DBLP:conf/wahc/TramaCBS23}, 
 
 \subsection{AES Subroutines as LUTs}
 
-The \SubBytes step, which involves the evaluation of an S-box, is inherently a \gls{LUT} operation and is therefore naturally implemented in \gls{FHE} using a \gls{PBS}. However, \gls{PBS} is too slow in $\F_{256}$ (as we have seen in Section \ref{sec:pbs_performances}). So, they rely on a construction evaluating \gls{PBS} over $\Z_{16}$ rather than $\F_{256}$. Moreover, converting the other \gls{AES} steps into \gls{LUT} evaluations also requires additional effort.
+The \SubBytes step, which involves the evaluation of an \gls{S-box}, is inherently a \gls{LUT} operation and is therefore naturally implemented in \gls{FHE} using a \gls{PBS}. However, \gls{PBS} is too slow in $\F_{256}$ (as we have seen in Section \ref{sec:pbs_performances}). So, they rely on a construction evaluating \gls{PBS} over $\Z_{16}$ rather than $\F_{256}$. Moreover, converting the other \gls{AES} steps into \gls{LUT} evaluations also requires additional effort.
 
 In particular, in the original \gls{AES} design \cite{aes-original}, the \MixColumns step is computed using a series of XOR operations and multiplications in $\F_{256}$. Unfortunately, \gls{TFHE}’s native multiplication \texttt{ClearMultTFHE} cannot directly handle these $\F_{256}$ multiplications because of the polynomial nature of the elements of this field. As a result, \MixColumns must be reformulated as a \gls{LUT} evaluation.
 
@@ -18,9 +18,9 @@ Additionally, the \AddRoundKey step, which uses XOR as its key operation, presen
 
 \subsection{LUTs Evaluation}
 \label{sec:primitives_hyppogriph}
-Since the \gls{AES} evaluation involves computing an 8-bit S-box, a straightforward solution would be to work with 8-bit messages. With such messages, the homomorphic S-box evaluation would require only one bootstrapping per byte. However, processing messages with more bits significantly slow down the bootstrapping process. To address this issue, \cite{DBLP:conf/wahc/TramaCBS23} proposes a decomposition approach and demonstrates that the optimal representation of 8-bit inputs for their purpose is in $\Z_{16}$. Specifically, a message $m \in \{0, \cdots, 255\}$ is split into two 4-bit chunks (or \emph{nibbles}) $h$ and $l$ such that $m = 16h+l$. The encryption of $m$ is then represented as two ciphertexts encrypting $h$ and $l$ with the same key $\lweSecretKey$.
+Since the \gls{AES} evaluation involves computing an 8-bit \gls{S-box}, a straightforward solution would be to work with 8-bit messages. With such messages, the homomorphic \gls{S-box} evaluation would require only one bootstrapping per byte. However, processing messages with more bits significantly slow down the bootstrapping process. To address this issue, \cite{DBLP:conf/wahc/TramaCBS23} proposes a decomposition approach and demonstrates that the optimal representation of 8-bit inputs for their purpose is in $\Z_{16}$. Specifically, a message $m \in \{0, \cdots, 255\}$ is split into two 4-bit chunks (or \emph{nibbles}) $h$ and $l$ such that $m = 16h+l$. The encryption of $m$ is then represented as two ciphertexts encrypting $h$ and $l$ with the same key $\lweSecretKey$.
 
-However, bootstrapping these decomposed inputs requires a method capable of handling multiple encrypted inputs. The authors explore several approaches for this, namely the chain-based method and the tree-based method \cite{TCHES:GuiBorAra21}. Their analysis concludes that the Tree-Based Method (\gls{TBM}) is the most suitable for their needs. They also relies on the Multi-Value Bootstrapping (MVB) to produce several outputs for the cost of one \gls{PBS}. We provide details about \gls{TBM} and \gls{MVB}in the following:
+However, bootstrapping these decomposed inputs requires a method capable of handling multiple encrypted inputs. The authors explore several approaches for this, namely the chain-based method and the tree-based method \cite{TCHES:GuiBorAra21}. Their analysis concludes that the Tree-Based Method (\gls{TBM}) is the most suitable for their needs. They also relies on the \gls{MVB} to produce several outputs for the cost of one \gls{PBS}. We provide details about \gls{TBM} and \gls{MVB} in the following:
 
 \paragraph{Multi-Value Bootstrapping from \cite{RSA:CarIzaMol19}.}
 \label{primitive:mvb}
@@ -74,9 +74,9 @@ Finally, at the cost of a single $\BlindRotate$ and $k$ \texttt{clearMultTFHE} o
 	\label{fig:mvb}
 \end{figure}
 
-This \gls{MVB}primitive thus allows significant speed-ups in the implementation of \cite{DBLP:conf/wahc/TramaCBS23}, in particular in the evaluation of the S-box or in the multiplications in $\F_{256}$ that occur during the \MixColumns step. Indeed, since each byte is decomposed into two nibbles $h$ and $l$, the \gls{LUT} corresponding, for instance, to the S-box must also be decomposed into two tables: one providing the most significant nibble and one providing the least significant nibble. That is to say: 
+This \gls{MVB}primitive thus allows significant speed-ups in the implementation of \cite{DBLP:conf/wahc/TramaCBS23}, in particular in the evaluation of the \gls{S-box} or in the multiplications in $\F_{256}$ that occur during the \MixColumns step. Indeed, since each byte is decomposed into two nibbles $h$ and $l$, the \gls{LUT} corresponding, for instance, to the \gls{S-box} must also be decomposed into two tables: one providing the most significant nibble and one providing the least significant nibble. That is to say: 
 $$
-\texttt{tab}_{\textsc{msn}}[i] = \left\lfloor \frac{\texttt{S-box}[i]}{16} \right\rfloor \quad \text{and} \quad \texttt{tab}_{\textsc{lsn}}[i] = \texttt{S-box}[i] \mod 16.
+\texttt{tab}_{\textsc{msn}}[i] = \left\lfloor \frac{\texttt{\gls{S-box}}[i]}{16} \right\rfloor \quad \text{and} \quad \texttt{tab}_{\textsc{lsn}}[i] = \texttt{\gls{S-box}}[i] \mod 16.
 $$
 Each of these tables must be evaluated on an 8-bit payload ciphertext. 
 
@@ -124,7 +124,7 @@ In the implementation described in \cite{DBLP:conf/wahc/TramaCBS23}, this primit
 %
 To further enhance the performance of the \gls{TBM}, the blind rotations for the accumulators $acc_i(X)$ of \emph{the first layer of the tree} can be performed simultaneously using the \gls{MVB}technique (as discussed in~\cite{TCHES:GuiBorAra21}). 
 
-Finally, the ``full-\gls{LUT}'' approach facilitates efficient computation of the S-box through the Tree-Based Method, as opposed to directly evaluating the corresponding Boolean circuit. However, this approach also requires \gls{LUT}-based computation of XOR operations and other intermediary steps, which is notably slower when operating in $\Z_{16}$ compared to binary messages. Consequently, our new method \hippo{} proposed in this chapter strategically applies \gls{LUT} evaluation exclusively where it is most effective and yields the best performance, namely for the evaluation of the S-box.
+Finally, the ``full-\gls{LUT}'' approach facilitates efficient computation of the \gls{S-box} through the Tree-Based Method, as opposed to directly evaluating the corresponding Boolean circuit. However, this approach also requires \gls{LUT}-based computation of XOR operations and other intermediary steps, which is notably slower when operating in $\Z_{16}$ compared to binary messages. Consequently, our new method \hippo{} proposed in this chapter strategically applies \gls{LUT} evaluation exclusively where it is most effective and yields the best performance, namely for the evaluation of the \gls{S-box}.
 
 
 
@@ -145,7 +145,6 @@ Definition \ref{def:hippogryph_encoding} formalizes this generalization.
 			\forall (i, j) \in \Z_o^2, i \ne j, \Encoding(i) \cap \Encoding(j) = \emptyset~\text{ and}\\
 			\text{if $p$ is even:} ~\forall \:x \in \mathbb Z_p, \forall i \in \Z_o: x \in \Encoding(i) \iff \left [ x + \frac p 2 \right ]_p \in \Encoding([-i]_o)
 		\end{cases}
-		\label{def:validity}
 	\end{equation}
 	The latter property is a direct consequence of the negacyclicity problem, which we discussed extensively in Chapter \ref{chap:negacyclicity}.
 	\label{def:hippogryph_encoding}

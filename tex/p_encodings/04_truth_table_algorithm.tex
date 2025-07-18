@@ -224,7 +224,7 @@ To reduce the amount of samples required to find a solution, we want to avoid sa
 Running this algorithm several times and keeping the smallest returned value for $p$, one gets an upper bound on the minimum $p$ required to evaluate a function with our framework. Note that, on the contrary of the deterministic search algorithm, this heuristic does not require a prime $p$.
 
 
-\paragraph{Example:} Let us consider the S-box of the block cipher ASCON. We study this S-box in more details and provide an exact optimized solution for its homomorphic evaluation in Section \ref{sec:ascon}. Here, we apply Algorithm \ref{alg:heuristic_matthieu} on the five functions generating the five output bits and monitor the results until we gather $N=10000$ non-zero possible values for $p$.
+\paragraph{Example:} Let us consider the \gls{S-box} of the block cipher ASCON. We study this \gls{S-box} in more details and provide an exact optimized solution for its homomorphic evaluation in Section \ref{sec:ascon}. Here, we apply Algorithm \ref{alg:heuristic_matthieu} on the five functions generating the five output bits and monitor the results until we gather $N=10000$ non-zero possible values for $p$.
 
 
 The figure \ref{fig:ascon_0_p_frequencies} shows the repartition of the returned values of $p$ by the algorithm during these $N$ runs on the first subfunction. The optimal value of $p$ found by the deterministic approach of Section \ref{sec:search_algorithm} is $17$ so the upper bound $19$ is pretty close, despite being rarely found by the algorithm. Also, the figure \ref{fig:ascon_0_count_iter} shows $21$ (the second best solution found by the sieving) is almost instantly found by the algorithm.
@@ -234,7 +234,7 @@ The figure \ref{fig:ascon_0_p_frequencies} shows the repartition of the returned
   \begin{minipage}{0.48\linewidth}
     \    \centering
     \includegraphics[width=\linewidth]{img/p_encodings/heuristic_ascon_0_p_frequencies.png}
-    \caption{The outputs of $10000$ runs of the Algorithm \ref{alg:heuristic_matthieu} for the first subfunction of the Ascon S-box}
+    \caption{The outputs of $10000$ runs of the Algorithm \ref{alg:heuristic_matthieu} for the first subfunction of the Ascon \gls{S-box}}
     \label{fig:ascon_0_p_frequencies}
   \end{minipage} \hfill
   \begin{minipage}{0.48\linewidth}

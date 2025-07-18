@@ -10,7 +10,7 @@ In this chapter, we introduce \hippo, the fastest homomorphic implementation of 
 
 \begin{itemize}
 	\item[-] We generalized the $p$-encoding construction introduced in Chapter \ref{chap:p_encodings} to the arithmetic case.
-	\item[-] The \gls{LUT}-oriented implementation of \cite{DBLP:conf/wahc/TramaCBS23} is very efficient to evaluate the large S-box of \gls{AES}, so we borrowed this idea as it was.
+	\item[-] The \gls{LUT}-oriented implementation of \cite{DBLP:conf/wahc/TramaCBS23} is very efficient to evaluate the large \gls{S-box} of \gls{AES}, so we borrowed this idea as it was.
 	\item[-] We associated both previous techniques by developing a framework of conversion between Boolean and arithmetic representations.
 \end{itemize}
 
@@ -29,7 +29,7 @@ We start this chapter by introducing the notion of transciphering in Section \re
 		\hline
 		\textbf{Year} & \textbf{Reference} & \textbf{Method} & \textbf{Timings} \\
 		\hline
-		\multirow{3}{*}{2023} & \cite{DBLP:conf/wahc/TramaCBS23} & Tree-Based Method (\gls{TBM}) & 270 (270) s\\
+		\multirow{3}{*}{2023} & \cite{DBLP:conf/wahc/TramaCBS23} & Tree-Based Method (\acrshort{TBM}) & 270 (270) s\\
 		\cline{2-4}
 		& \cite{TCHES:BonPoiRiv24} (Chapter \ref{chap:p_encodings}) & $p$-encoding method & 135 (90) s\\
 		\cline{2-4}

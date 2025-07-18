@@ -71,7 +71,7 @@ Unfortunately, this construction is merely theoretical. Indeed, in practical set
 
 The first countermeasure, that already appeared in the original \gls{TFHE} paper, is called the \textit{bit of padding}. As in the ideal case presented in the previous section, it works in an \textbf{even} plaintext space.
 
-The idea is to ensure that the message stays in the first half of the torus all along the computations. An equivalent way of presenting it is to force the Most Significant Bit (\gls{MSB}) of the message to zero. By doing this, the modswitched phase used as the exponent in the blind rotation $\tilde{\mu}$ lives in $\{0, \dots, N - 1\}$, so the arising minus signs never reach the degree-zero coefficient.
+The idea is to ensure that the message stays in the first half of the torus all along the computations. An equivalent way of presenting it is to force the \gls{MSB} of the message to zero. By doing this, the modswitched phase used as the exponent in the blind rotation $\tilde{\mu}$ lives in $\{0, \dots, N - 1\}$, so the arising minus signs never reach the degree-zero coefficient.
 
 The advantage of this method is that it relaxes the negacyclicity constraint and makes the bootstrapping able to evaluate any function (not only the negacyclic one). However, this construction is rather fragile: any linear function can break it by propagating a carry into the \gls{MSB}. 
 

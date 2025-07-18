@@ -9,7 +9,7 @@ The Advanced Encryption Standard (\gls{AES}), based on the Rijndael algorithm wi
 \begin{itemize}
 \item \texttt{Key Expansion}: The \texttt{Key Expansion} operation is performed once for a given secret key. Starting from the 128-bit key (in our context), it generates eleven 128-bit round keys, which are then used in the \AddRoundKey operation throughout the \gls{AES} encryption or decryption process, without needing access to the original key. The key expansion involves XORs and $\F_{256}$ multiplications.
 
-    \item \SubBytes: The \SubBytes operation is the only non-linear transformation in the cipher. It involves a substitution step, where each byte in the state matrix is replaced according to a fixed S-box. Since it operates independently on each byte of the state, \SubBytes can be easily parallelized, allowing for more efficient execution.
+    \item \SubBytes: The \SubBytes operation is the only non-linear transformation in the cipher. It involves a substitution step, where each byte in the state matrix is replaced according to a fixed \gls{S-box}. Since it operates independently on each byte of the state, \SubBytes can be easily parallelized, allowing for more efficient execution.
     \item \AddRoundKey: 
     %Before encryption begins, the secret key undergoes an "expansion" process to generate several round keys. The encryption procedure relies solely on these round keys, rather than the initial secret key. 
     During this transformation, the state is updated by combining it with the current round key using a bitwise XOR operation. Specifically, the 128-bit round key is organized into a matrix format to align with the structure of the state matrix, and the two matrices are XORed element-wise to produce the new state.

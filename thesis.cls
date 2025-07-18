@@ -58,28 +58,9 @@
      minnames=99
  ]{biblatex}
 	
-	
-	
-	
-	%% Hyperref
-	\RequirePackage{hyperref}
 
-	
-	%
-	\hypersetup{
-		%backref=page,% add links into...
-		%pagebackref=true,%... references
-		%hyperindex=true, % add links in index
-		colorlinks=true, % add colors to links
-		breaklinks=true, % break line in long links
-		urlcolor= maincolor, % hyperlink color
-		linkcolor= maincolor, % external link color
-		%pdfpagelabels=true,
-		plainpages=false,% use i, ii, iii... page numbers in pdf readers
-		%bookmarks=true, %
-		%pdfa = true,
-		citecolor=secondarycolor
-	}
+\PassOptionsToPackage{colorlinks=true, linkcolor=black, citecolor=blue}{hyperref}
+\RequirePackage{hyperref}	
 
 \makeatletter
 \renewcommand{\@chapapp}{Chapter}

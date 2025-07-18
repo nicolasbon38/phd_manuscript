@@ -313,19 +313,39 @@
       \fontsize{11}{13}\selectfont
       %% french keywords
       \node[yshift=-5mm, above] (frKeywords) at (o) {
-        \pslbacknode{MOTS CL\'{E}S}{\@frkeywords{}}{10}{12}
+        \pslbacknode{MOTS CL\'{E}S}{\@frkeywords{Cryptographie, Chiffrement complètement homomorphe, Calcul sécurisé}}{10}{12}
       };
       %% french abstract
       \node[yshift=2mm, above] at (frKeywords.north) {
-        \pslbacknode{R\'{E}SUM\'{E}}{\@frabstract{}}{9}{11}
+        \pslbacknode{R\'{E}SUM\'{E}}{\@frabstract{
+          Dans cette thèse, nous étudions le chiffrement homomorphe, une technique cryptographique qui permet d’effectuer des calculs directement sur des données chiffrées, sans nécessiter de déchiffrement préalable. Ce domaine a connu un essor spectaculaire au cours des quinze dernières années, avec l’émergence de nombreux schémas de chiffrement de plus en plus performants. Néanmoins, les calculs homomorphes restent encore nettement plus coûteux que leurs équivalents classiques, ce qui freine leur adoption dans des applications concrètes.
+	
+	Nous nous concentrons dans ce travail sur l’un des schémas les plus prometteurs : TFHE. Nous proposons de nouvelles techniques destinées à accélérer les calculs homomorphes pour différents cas d’usage. En exploitant un encodage innovant des messages, nous commençons par convevoir des algorithmes plus efficaces pour l’évaluation homomorphe de fonctions booléennes.
+	
+	Dans un second temps, nous abordons le problème du transchiffrement, une approche visant à réduire la consommation de bande passante lors de la transmission de données chiffrées de manière homomorphe. Cela nécessite l’évaluation d’un algorithme de chiffrement symétrique dans le domaine homomorphe. Pour cela, et toujours en nous appuyant sur notre technique d’encodage, nous développons une implémentation homomorphe du chiffrement standard AES, plus rapide que celles de l’état de l’art, et contribuons à la conception d’un chiffrement par flot spécifiquement optimisé pour le transchiffrement.
+	
+	Nous poursuivons avec une contribution qui étend les capacités de TFHE, en lui permettant de fonctionner sur des espaces de messages plus larges. Cette amélioration est possible grâce à un nouvel algorithme d’évaluation de table de correspondances dans ces espaces étendus.
+	
+	Enfin, nous proposons une méthode conceptuellement simple et pratique pour générer des jeux de paramètres assurant sécurité, exactitude des calculs et efficacité, facilitant ainsi l’usage de TFHE dans les applications concrètes.
+        }}{9}{11}
       };
       %% english abstract
       \node[yshift=-15mm, below] (enAbstract) at (o) {
-        \pslbacknode{ABSTRACT}{\@enabstract{}}{9}{11}
+        \pslbacknode{ABSTRACT}{\@enabstract{
+          In this thesis, we study fully homomorphic encryption, a cryptographic technique that allows computations to be performed directly on encrypted data, without requiring prior decryption. This field has experienced remarkable growth over the past fifteen years, with the emergence of increasingly efficient encryption schemes. Nevertheless, homomorphic computations remain significantly more costly than their classical counterparts, which still hinders their adoption in practical applications.
+	
+        In this work, we focus on one of the most promising schemes: TFHE. We propose new techniques aimed at accelerating homomorphic computations for various use cases. By leveraging an innovative message encoding strategy, we begin by designing more efficient algorithms for the homomorphic evaluation of Boolean functions.
+      
+        Next, we address the problem of transciphering, an approach that seeks to reduce bandwidth consumption during the transmission of homomorphically encrypted data. This requires the evaluation of a symmetric encryption algorithm within the homomorphic domain. Still relying on our encoding technique, we develop a homomorphic implementation of the standard AES encryption scheme that outperforms state-of-the-art implementations, and present our contribution to the design of a stream cipher specifically optimized for transciphering.
+    
+        We continue with a contribution that extends the capabilities of TFHE by enabling it to operate over larger message spaces. This improvement is made possible by a new algorithm for evaluating look-up tables in these extended spaces.
+    
+        Finally, we propose a conceptually simple and practical method for generating parameter sets that ensure security, correctness, and efficiency, thereby facilitating the use of TFHE in real-world applications.
+        }}{9}{11}
       };
       %% english keywords
       \node[yshift=-2mm, below] at (enAbstract.south) {
-        \pslbacknode{KEYWORDS}{\@enkeywords{}}{10}{12}
+        \pslbacknode{KEYWORDS}{\@enkeywords{Cryptography, Fully Homomorphic Encryption, Secure computation}}{10}{12}
       };
 
     \end{tikzpicture}

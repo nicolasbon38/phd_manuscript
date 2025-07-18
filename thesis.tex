@@ -51,7 +51,6 @@
 
 \input{tex/glossary.tex}
 
-
 % --------------------------------------
 
 \definecolor{maincolor}{RGB}{36, 56, 141}
@@ -89,6 +88,9 @@
 
 %%%==============================
 \begin{document}
+
+
+
 \frontmatter 
 \hypersetup{pageanchor=false}
 \maketitle
@@ -99,7 +101,6 @@
    Dedication...
  \end{dedication}
 
-\pagenumbering{arabic}
 \pagestyle{plain}
 
 % =============================================
@@ -112,9 +113,9 @@
 \thefrabstract{
 	Dans cette thèse, nous étudions le chiffrement homomorphe, une technique cryptographique qui permet d’effectuer des calculs directement sur des données chiffrées, sans nécessiter de déchiffrement préalable. Ce domaine a connu un essor spectaculaire au cours des quinze dernières années, avec l’émergence de nombreux schémas de chiffrement de plus en plus performants. Néanmoins, les calculs homomorphes restent encore nettement plus coûteux que leurs équivalents classiques, ce qui freine leur adoption dans des applications concrètes.
 	
-	Nous nous concentrons dans ce travail sur l’un des schémas les plus prometteurs : \gls{TFHE}. Nous proposons de nouvelles techniques destinées à accélérer les calculs homomorphes pour différents cas d’usage. En exploitant un encodage innovant des messages, nous commençons par convevoir des algorithmes plus efficaces pour l’évaluation homomorphe de fonctions booléennes.
+	Nous nous concentrons dans ce travail sur l’un des schémas les plus prometteurs : \glsdisp{TFHE}{TFHE}. Nous proposons de nouvelles techniques destinées à accélérer les calculs homomorphes pour différents cas d’usage. En exploitant un encodage innovant des messages, nous commençons par convevoir des algorithmes plus efficaces pour l’évaluation homomorphe de fonctions booléennes.
 	
-	Dans un second temps, nous abordons le problème du transchiffrement, une approche visant à réduire la consommation de bande passante lors de la transmission de données chiffrées de manière homomorphe. Cela nécessite l’évaluation d’un algorithme de chiffrement symétrique dans le domaine homomorphe. Pour cela, et toujours en nous appuyant sur notre technique d’encodage, nous développons une implémentation homomorphe du chiffrement standard \gls{AES}, plus rapide que celles de l’état de l’art, et contribuons à la conception d’un chiffrement par flot spécifiquement optimisé pour le transchiffrement.
+	Dans un second temps, nous abordons le problème du transchiffrement, une approche visant à réduire la consommation de bande passante lors de la transmission de données chiffrées de manière homomorphe. Cela nécessite l’évaluation d’un algorithme de chiffrement symétrique dans le domaine homomorphe. Pour cela, et toujours en nous appuyant sur notre technique d’encodage, nous développons une implémentation homomorphe du chiffrement standard \glsdisp{AES}{AES}, plus rapide que celles de l’état de l’art, et contribuons à la conception d’un chiffrement par flot spécifiquement optimisé pour le transchiffrement.
 	
 	Nous poursuivons avec une contribution qui étend les capacités de \gls{TFHE}, en lui permettant de fonctionner sur des espaces de messages plus larges. Cette amélioration est possible grâce à un nouvel algorithme d’évaluation de table de correspondances dans ces espaces étendus.
 	
@@ -144,6 +145,7 @@
 \addstarredchapter{Acknowledgments}
 
 \cleardoublepage
+\phantomsection
 \hypertarget{contents}{}
 \tableofcontents
 
@@ -151,8 +153,6 @@
 % \mtcfixnomenclature % necessaire pour éviter le decalage des minitoc
 
 %% ====   Corps du texte   === %%
-\mainmatter
-
 \input{tex/macros.tex}
 
 \input{tex/algorithms/algorithms_settings.tex}
@@ -173,6 +173,8 @@
 
 \cleardoublepage
 \input{tex/intro_francais}
+
+\mainmatter
 
 
 \input{tex/fhe.tex}

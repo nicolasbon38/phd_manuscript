@@ -126,7 +126,7 @@ This strategy of implementation complies with the more generic one that we intro
 \label{sec:ascon}
 
 
-Ascon \cite{JC:DEMS21, asconv12nist} is a lightweight block cipher algorithm that was designed to provide efficient and secure encryption and authentication for a wide range of applications, particularly in resource-constrained environments such as embedded systems and IoT devices. The name ``Ascon'' stands for ``Authenticated encryption for Small Constrained Devices''. We implemented its S-box, whose circuit is represented on Figure \ref{fig:ascon}.
+Ascon \cite{JC:DEMS21, asconv12nist} is a lightweight block cipher algorithm that was designed to provide efficient and secure encryption and authentication for a wide range of applications, particularly in resource-constrained environments such as embedded systems and IoT devices. The name ``Ascon'' stands for ``Authenticated encryption for Small Constrained Devices''. We implemented its \gls{S-box}, whose circuit is represented on Figure \ref{fig:ascon}.
 
 \begin{figure}[h]
     \centering
@@ -137,11 +137,11 @@ Ascon \cite{JC:DEMS21, asconv12nist} is a lightweight block cipher algorithm tha
 
 
 
-This layout is a bit different from the others: the S-box takes five bits as input and outputs five bits. We denote $f_0, \dots, f_4$ the five functions of $\B^5 \mapsto \B$ that generate the 5 output bits $x_0, \dots, x_4$. Thus, we need to define five gadgets (one per function).
+This layout is a bit different from the others: the \gls{S-box} takes five bits as input and outputs five bits. We denote $f_0, \dots, f_4$ the five functions of $\B^5 \mapsto \B$ that generate the 5 output bits $x_0, \dots, x_4$. Thus, we need to define five gadgets (one per function).
 
 These functions, once analyzed by the algorithm, can be computed in one single bootstrapping each, but for different values of $p$ (respectively $p=17, 7, 7, 15, 11$ that are the smallest possible values). We could implement the gadgets $\Gamma_0, \dots, \Gamma_4$ (associated to $f_0, \dots, f_4$) with different values for $p_{in}$, but this would imply to introduce some encoding switchings before each round of hashing. To keep things simpler we generated only encodings with $p = 17$, making the implementation more straightforward as no encoding switching is required. For each subfunction $f_i$, five canonical $17$-encodings $(\Encoding_{i, 0}, \dots, \Encoding_{i, 4})$ of form $$\Encoding_{i, j} = \EncDefOne{d_{i,j}}$$ are computed. The results are displayed in the Table \ref{tab:encodings_ascon}. Note the zero values in some cases, they show that the variable is not used in the subfunction. 
 
-The S-box layer is followed by a linear layer, where the bits of the states are shifted and combined with \texttt{XOR} operations. This can be trivially done with $p=2$. Finally, to prepare the next round, an encoding switching is performed to send back the ciphertexts on $17$-encodings. This is summed up in Figure \ref{fig:layout_spn}. Note that there is no encoding switching from non-linear layer to linear layer because the gadgets can directly outputs ciphertexts under $\Encoding_\oplus = \EncDefOne{1}$ with $p=2$.
+The \gls{S-box} layer is followed by a linear layer, where the bits of the states are shifted and combined with \texttt{XOR} operations. This can be trivially done with $p=2$. Finally, to prepare the next round, an encoding switching is performed to send back the ciphertexts on $17$-encodings. This is summed up in Figure \ref{fig:layout_spn}. Note that there is no encoding switching from non-linear layer to linear layer because the gadgets can directly outputs ciphertexts under $\Encoding_\oplus = \EncDefOne{1}$ with $p=2$.
 
 \begin{figure}
     \centering
@@ -151,7 +151,7 @@ The S-box layer is followed by a linear layer, where the bits of the states are 
 \end{figure}
 
 
-To wrap up, we construct the five gadgets $\Gamma_i = \left ( (\Encoding_{i,0}, \dots,  \Encoding_{i, 4}), \Encoding_\oplus, 17, 2, f_i \right )$. They will carry the evaluation of the s-boxes and output ciphertexts encrypted under $\Encoding_\oplus$. Then, the linear layer is trivially evaluated with homomorphic sums. An encoding switching from $\Encoding_\oplus$ to $\Encoding_{i, j}$ allows to come back to non-linear operations.
+To wrap up, we construct the five gadgets $\Gamma_i = \left ( (\Encoding_{i,0}, \dots,  \Encoding_{i, 4}), \Encoding_\oplus, 17, 2, f_i \right )$. They will carry the evaluation of the \gls{S-box}es and output ciphertexts encrypted under $\Encoding_\oplus$. Then, the linear layer is trivially evaluated with homomorphic sums. An encoding switching from $\Encoding_\oplus$ to $\Encoding_{i, j}$ allows to come back to non-linear operations.
 
 
 
@@ -178,7 +178,7 @@ To wrap up, we construct the five gadgets $\Gamma_i = \left ( (\Encoding_{i,0}, 
 \end{table}
 
 
-Using this solution, the S-box is evaluated in $92$ ms. Note that the 5 different \gls{PBS} described in Table \ref{tab:encodings_ascon} have different norms of vector $\vec d$ so they may have a different set of parameters for each. We use the more restrictive one (i.e. the one with greater $\norm{\nu}$) for the 5. Estimating the timings of a full run of Ascon is not trivial because it depends a lot of the parameters. To give a rough idea, in hashing mode, 64 s-boxes are required per round, with 12 rounds recommended. The outputs of the s-boxes are in $\Z_2$ to allow the evaluation of the linear layer of Ascon. At the end of this linear layer, the encoding of each of the 320 bits of the state must be switched back to $\Z_{17}$ with a \gls{PBS}. To do so, we use the same set of parameters as for the encoding switching in Step 3 of the Keccak evaluation in Section \ref{sec:keccak}.
+Using this solution, the \gls{S-box} is evaluated in $92$ ms. Note that the 5 different \gls{PBS} described in Table \ref{tab:encodings_ascon} have different norms of vector $\vec d$ so they may have a different set of parameters for each. We use the more restrictive one (i.e. the one with greater $\norm{\nu}$) for the 5. Estimating the timings of a full run of Ascon is not trivial because it depends a lot of the parameters. To give a rough idea, in hashing mode, 64 \gls{S-box}es are required per round, with 12 rounds recommended. The outputs of the \gls{S-box}es are in $\Z_2$ to allow the evaluation of the linear layer of Ascon. At the end of this linear layer, the encoding of each of the 320 bits of the state must be switched back to $\Z_{17}$ with a \gls{PBS}. To do so, we use the same set of parameters as for the encoding switching in Step 3 of the Keccak evaluation in Section \ref{sec:keccak}.
 
 This gives an estimation of $89$ seconds for one Ascon hash.
 

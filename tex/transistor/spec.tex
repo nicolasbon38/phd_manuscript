@@ -52,7 +52,7 @@ The FSM state is initialized to all zeros, and each LFSR is initialized using di
 Obviously taking inspiration from the \gls{AES}, the state of the FSM is organized into a two-dimensional array of size $4\times 4$, where each entry corresponds to a digit in $\F_p$. With this representation, the successive operations applied to the state can be defined as follows.
 
 \begin{description}
-\item[$\subWords~(\subW)$] is an S-box layer: the permutation $\thesbox$ is applied on each digit.
+\item[$\subWords~(\subW)$] is an \gls{S-box} layer: the permutation $\thesbox$ is applied on each digit.
 \item[$\mixColumns~(\mixC)$] applies to each column an MDS matrix $\mixmat$ over \(\F_p\).
 \item[$\shiftRows~(\shiftR)$] rotates the $i$-th row by $i$ positions to the left.
 \item[$\filterName~(\mathbf{\filter})$] takes $4$ digits from the state and returns them. 
@@ -66,7 +66,7 @@ In what follows, we provide a more detailed description of each step, using the 
 
 
 
-\paragraph{S-box Layer ($\subW$).}
+\paragraph{\gls{S-box} Layer ($\subW$).}
 We let $\thesbox$ be defined by its lookup table:
 \begin{equation}
   \label{eq:thesbox}

@@ -16,15 +16,15 @@ A round of \gls{AES} can be decomposed into 4 steps:
 We refer to Section \ref{sec:preliminaries_aes} for a more in-depth presentation of the algorithm. 
 
 
- The S-box of \texttt{SubBytes} takes 8 bits in input and yields 8 bits of output. It is defined by two substeps: an inversion in $GF(2^8)$ followed by an affine transformation. While the latter is trivial to compute with \gls{TFHE}, the former is much trickier and thus we did not take advantage of this representation. Using our framework, the obvious-looking solution is to split the full S-box $\B^8 \mapsto \B^8$ into 8 subfunctions $f_0, \dots, f_7: \B^8 \mapsto \B$. We could then give them to the search algorithm of Section \ref{sec:p_encodings_search}. If this would work, we could evaluate the Rjindael S-box in 8 \gls{PBS}. Unfortunately, the algorithm does not converge for values of $p$ ``reasonable'', that is to say less than 7 bits. 
+ The \gls{S-box} of \texttt{SubBytes} takes 8 bits in input and yields 8 bits of output. It is defined by two substeps: an inversion in $GF(2^8)$ followed by an affine transformation. While the latter is trivial to compute with \gls{TFHE}, the former is much trickier and thus we did not take advantage of this representation. Using our framework, the obvious-looking solution is to split the full \gls{S-box} $\B^8 \mapsto \B^8$ into 8 subfunctions $f_0, \dots, f_7: \B^8 \mapsto \B$. We could then give them to the search algorithm of Section \ref{sec:p_encodings_search}. If this would work, we could evaluate the Rjindael \gls{S-box} in 8 \gls{PBS}. Unfortunately, the algorithm does not converge for values of $p$ ``reasonable'', that is to say less than 7 bits. 
 
 
-We thus need to leverage an alternative representation of the S-box. A well known efficient Boolean representation of the \gls{AES} S-box is given in \cite{boyar}. In this work, authors applied logic minimization techniques to produce an optimized Boolean circuit (in terms of number of gates) of the S-box splitted in 3 phases:
+We thus need to leverage an alternative representation of the \gls{S-box}. A well known efficient Boolean representation of the \gls{AES} \gls{S-box} is given in \cite{boyar}. In this work, authors applied logic minimization techniques to produce an optimized Boolean circuit (in terms of number of gates) of the \gls{S-box} splitted in 3 phases:
 
 \begin{enumerate}
     \item A purely linear layer mapping the 8 input bits onto 22 bits.
     \item A middle non-linear layer, represented by a circuit with exclusively \texttt{AND} and \texttt{XOR} logic gates, mapping the previous 22 bits onto 18 bits.
-    \item A final purely linear layer mapping the 18 bits on the 8 output bits of the S-box.
+    \item A final purely linear layer mapping the 18 bits on the 8 output bits of the \gls{S-box}.
 \end{enumerate}
 
 
@@ -35,7 +35,7 @@ To design our implementation of \gls{AES}, we will use the strategy we introduce
 In the following, we focus on the implementation of the non-linear layer using the approach by graphs of Section \ref{sec:p_encodings_graphs}.
 
 
-\subsubsection{Homomorphization of the S-box}
+\subsubsection{Homomorphization of the \gls{S-box}}
 
 
 We start from the circuit representation given in the work of \cite{boyar}. This set of instructions is compiled into a circuit $\mathcal{A}$, compliant with the definitions introduced in Section \ref{sec:graph_definition}.
@@ -45,13 +45,13 @@ Each of the $18$ outputs $(z_0, \dots, z_{17})$ are isolated from each other and
 
 Then, for each circuit $\mathcal{A}_i$, we run the algorithm explained in Section \ref{sec:p_encodings_graphs} to produce an efficient graph. We merge all those graphs and run everything for a total of 36 \gls{PBS} to evaluate the full circuit $\mathcal{A}$, with a global $p = 11$. This allows a relatively quick bootstrapping.
 
-Recall that the \texttt{SubBytes} step is made of 16 s-boxes. So, we can derive that one execution of the \texttt{SubBytes} step takes $16 \times 36 = 576$ \gls{PBS}. 
+Recall that the \texttt{SubBytes} step is made of 16 \gls{S-box}es. So, we can derive that one execution of the \texttt{SubBytes} step takes $16 \times 36 = 576$ \gls{PBS}. 
 
 The outputs of this step would be encoded with $p=2$, allowing the \texttt{XOR} operations of the following steps to be performed efficiently. We also need to take into account the encoding switching to come back to $p=11$ before each \texttt{SubBytes}. It costs one \gls{PBS} per bit, so $128$ \gls{PBS}. Finally, this gives a total of $704$ \gls{PBS} per round. For \texttt{\gls{AES}-128}, which takes 10 rounds, we estimate a full run to $7040$ \gls{PBS}.
 
 \subsubsection{Performances}
 
-In terms of performances, with a set of parameters ensuring a security level of $\lambda=128$ bits and an error probability $\epsilon=2^{-40}$, a \gls{PBS} takes $17$ ms on our hardware. The total runtime of the whole implementation on one thread is $135$ s. We note that the $16$ evaluations of s-boxes in \texttt{SubBytes} can be parallelized, as well as each of the $128$ encoding switchings before \texttt{SubBytes}. Moreover, within each S-box, we can locally apply our strategy of parallelization introduced in Section \ref{sec:parallelization}.
+In terms of performances, with a set of parameters ensuring a security level of $\lambda=128$ bits and an error probability $\epsilon=2^{-40}$, a \gls{PBS} takes $17$ ms on our hardware. The total runtime of the whole implementation on one thread is $135$ s. We note that the $16$ evaluations of \gls{S-box}es in \texttt{SubBytes} can be parallelized, as well as each of the $128$ encoding switchings before \texttt{SubBytes}. Moreover, within each \gls{S-box}, we can locally apply our strategy of parallelization introduced in Section \ref{sec:parallelization}.
 
 
 We compare favorably to previous works of \cite{C:GenHalSma12} and \cite{PKC:CorLepTib14}, who report timings of respectively 18~minutes and 5~minutes for a full \gls{AES}, Once again, authors do not mention the value of $\epsilon$. The more recent work of \cite{DBLP:conf/wahc/TramaCBS23}, also proposes an implementation of \texttt{\gls{AES}-128} using a completely different technique called the \emph{tree-bootstrapping}. On a similar experimental setup, but with a failure probability $\epsilon=2^{-23}$, they claim an execution in $270$~s on one thread. We ran again our code with another set of parameters tailored for the same $\epsilon$ and obtained a full run in $103$~s.  Note that in our implementation, we used the mode restrictive set of parameters $\texttt{\gls{PBS}}_{(11, 4)}$ for every bootstrapping (even the ones that should be performed with $\texttt{\gls{PBS}}_{(2, 1}$. We also derived the theoretical timing that could have been achieved if we had implemented this with two server keys (one for each set of parameters). This theoretical timing should be of $105$ s with $\epsilon=2^{-40}$, we added it in Table \ref{tab:concrete_perfs}.
@@ -119,11 +119,11 @@ We summarize hereafter the parameters and performances of our implementations of
         \cline{2-3}
         & A full Keccak permutation $(*)$ & ~38400 \texttt{$PBS_{(3, 2)}$} $+$ 38400 \texttt{$PBS_{(2, 1)}$} ~\\
         \hline
-      \multirow{2}{*}{ \ref{sec:ascon}} & One evaluation of Ascon's S-box & 5 \texttt{$PBS_{(17, 5)}$}\\
+      \multirow{2}{*}{ \ref{sec:ascon}} & One evaluation of Ascon's \gls{S-box} & 5 \texttt{$PBS_{(17, 5)}$}\\
       \cline{2-3}
       & One full Ascon hashing run $(*)$ & 3840 \texttt{$PBS_{(17, 5)} + 3840 PBS_{(2, 1)}$}\\
         \hline
-        \multirow{2}{*}{\ref{sec:p_encodings_aes}} & One evaluation of the \gls{AES} S-box & 36 \texttt{$PBS_{(11, 4)}$}\\
+        \multirow{2}{*}{\ref{sec:p_encodings_aes}} & One evaluation of the \gls{AES} \gls{S-box} & 36 \texttt{$PBS_{(11, 4)}$}\\
         \cline{2-3}
         & A full run of \texttt{\gls{AES}-128}  & 5760 \texttt{$PBS_{(11, 4)}$} + 1280 \texttt{$PBS_{(2, 1)}$}\\
         \hline
@@ -153,11 +153,11 @@ We summarize hereafter the parameters and performances of our implementations of
         \cline{2-3}
         & A full Keccak permutation $(*)$ & 184488\\
         \hline
-      \multirow{2}{*}{ \ref{sec:ascon}} & One evaluation of Ascon's S-box & 16\\
+      \multirow{2}{*}{ \ref{sec:ascon}} & One evaluation of Ascon's \gls{S-box} & 16\\
       \cline{2-3}
       & One full Ascon hashing run $(*)$ & 19968\\
         \hline
-        \multirow{2}{*}{\ref{sec:p_encodings_aes}} & One evaluation of the \gls{AES} S-box & 115 (\cite{boyar})\\
+        \multirow{2}{*}{\ref{sec:p_encodings_aes}} & One evaluation of the \gls{AES} \gls{S-box} & 115 (\cite{boyar})\\
         \cline{2-3}
         & A full run of \texttt{\gls{AES}-128}  & 23360 (\cite{boyar}, \cite{EPRINT:Maximov19})\\
         \hline
