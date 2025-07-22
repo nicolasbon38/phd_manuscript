@@ -15,24 +15,28 @@
 	\else
 	\draw[decorate,decoration={brace,mirror,amplitude=8pt}]
 	(#6.south west) -- (#6.south east)
-	node[midway,below,yshift=-6pt] {\( #4 \)};
+	node[midway,below,yshift=-10pt] {\( #4 \)};
 	\fi
 	
 	\ifx&#5&%
 	\else
 	\draw[decorate,decoration={brace,amplitude=8pt}]
 	(#6.south west) -- (#6.north west)
-	node[midway,left,xshift=-6pt] {\( #5 \)};
+	node[midway,left,xshift=-10pt] {\( #5 \)};
 	\fi
 }
 
 % Identity and base matrix shorthands
 \newcommand{\identityMatrixAt}[2]{%
-	\drawBoxAt{#1}{gray!30}{\(\mat{I}\)}{n}{s^n}{#2}{2}{4}
+	\drawBoxAt{#1}{gray!30}{\(\mat{I}\)}{n}{s^n}{#2}{1.5}{4}
 }
 
 \newcommand{\baseMatrixAt}[2]{%
 	\drawBoxAt{#1}{green!30}{\texttt{Eval}}{\lambda}{}{#2}{4}{4}
+}
+
+\newcommand{\AMatrix}[2]{
+	\drawBoxAt{#1}{purple!30}{\( \mat A^{(#2)} \)}{t_#2 \cdot n_#2}{s^n}{A#2}{7}{4}
 }
 
 \newcommand{\UMatrix}[2]{%
@@ -40,19 +44,34 @@
 	\baseMatrixAt{($ (U#2id.north east) + (0,0) $)}{U#2base}
 	\draw[decorate,decoration={brace,amplitude=8pt}]
 		(U#2id.north west) -- (U#2base.north east)
-		node[midway,above,yshift=6pt] {\( n_#2 \)};
+		node[midway,above,yshift=10pt] {\( n_#2 \)};
 }
 
-\newcommand{\DMatrix}[2]{
-	\drawBoxAt{#1}{yellow!30}{\(\mat{D}^T\)}{}{}{D#2}{4}{2}
+
+\newcommand{\UMatrixBis}[2]{%
+	\pgfmathsetmacro{\plusOne}{int(#2 + 1)}
+	\identityMatrixAt{#1}{U#2idBis}
+	\baseMatrixAt{($ (U#2idBis.north east) + (0,0) $)}{U#2baseBis}
+	\PMatrix{($ (U#2baseBis.north east) + (0, 0) $)}{P#2}
+	\draw[decorate,decoration={brace,amplitude=8pt}]
+	(U#2idBis.north west) -- (P#2.north east)
+	node[midway,above,yshift=10pt] {\( n_\plusOne \)};
+}
+
+\newcommand{\DMatrix}[3]{
+	\drawBoxAt{#1}{yellow!30}{\(\mat{D}^{(#2)}\)}{n_#2}{t_#2}{D#2}{#3}{1}
 }
 
 \newcommand{\yVector}[1]{
-	\drawBoxAt{#1}{orange!30}{\(\vec{y}^{(0)}\)}{s^n}{}{y}{1}{4}
+	\drawBoxAt{#1}{orange!30}{\(\vec{y}^{(0)}\)}{}{s^n}{y}{1}{4}
 }
 
 \newcommand{\betaVector}[1]{
-	\drawBoxAt{#1}{orange!30}{\(\boldsymbol{\beta}^{(0)}\)}{t_0 \cdot n_0}{}{beta}{1}{4}
+	\drawBoxAt{#1}{orange!30}{\(\boldsymbol{\beta}^{(0)}\)}{}{t_0 \cdot n_0}{beta}{1}{5}
+}
+
+\newcommand{\PMatrix}[2]{
+	\drawBoxAt{#1}{yellow!30}{\( \mat P^{(0)} \)}{t_0}{}{#2}{1}{4}
 }
 
 
@@ -60,129 +79,78 @@
 \newcommand{\figureHLUT}{
 	\begin{tikzpicture}[scale=0.7, transform shape]
 	
-	% V0
-	\UMatrix{(0, 0)}{0}
-	\node at ($ (U0id.west) + (-0.5,0) $) {\Huge(};
-	\node at ($ (U0base.east) + (1, 0) $) {$\cdot$};
-	\DMatrix{($ (U0base.east) + (2, 0) $)}{0}
-	\node at ($ (D0.east) + (0.5,0) $) {\Huge)};
-		 
-	% Slyusar
-	\node at ($ (D0.east) + (1, 0) $) {$\slyusar$};		
+	% U0 et D
+	\UMatrix{(0, 0)}{0};
+	\DMatrix{($ (U0id.south west) + (0, -2) $)}{0}{5.5}
+ 
 	
-	%U0
-	\UMatrix{($ (D0.north east) + (3,0) $)}{1}
+	% Truc
+	\node[draw, minimum width=1cm, minimum height=1cm]  (truc)
+			at ($ (D0.north east) + (4, 2) $) {$\left (\mat U^{(0)} \cdot (\mat D^{(0)})^T \right ) \slyusar \mat U^{(0)}$};
+	\draw[->] (U0base.east) -- (truc);
+	\draw[->] (D0.east) -- (truc);
+	\node[ minimum width=1cm, minimum height=1cm]  (3. step) at ($ (truc.north west) + (-0.5, 0) $) {3.};
+	
+	%A
+	\AMatrix{($ (truc) + (4,3) $)}{0}
+	\draw[->] (truc) -- (A0.west);
 	
 	%Chain
 	\node[draw, minimum width=1cm, minimum height=1cm]  (chain)
-				at ($ (U0base.north) + (0, 3) $) {\(\Phi_{n, \lambda}\)};
+				at ($ (U0base.north) + (0, 2) $) {\(\Phi_{n, \lambda}\)};
 	\draw[->] (chain) -- (U0base.north);
-	\draw[->] (chain) -- (U1base.north);
-	
+	\node[ minimum width=1cm, minimum height=1cm]  (1. step) at ($ (chain.north west) + (-0.5, 0) $) {1.};
+
 	% Random draw for D^T
 	\node[draw, minimum width=1cm, minimum height=1cm]  (draw0)
-	at ($ (D0.north) + (0, 3) $) {\$};
-	\draw[->] (draw0) -- (D0.north);
-	
+	at ($ (D0.south) + (-2, - 2) $) {\$};
+	\draw[->] (draw0) -- (D0);
+	\node[ minimum width=1cm, minimum height=1cm]  (2. step) at ($ (draw0.west) + (-0.5, 0) $) {2.};	
+
+
 	%y
-	\yVector{($ (U1base.south) + (0, -2) $)}
+	\yVector{($ (A0.south) + (0, -4) $)}
+	
+%	Gauss Elimination
+	\node[draw, minimum width=2cm, minimum height=2cm]  (gaussElimination)
+			at ($ (y.west) + (-4, 1) $) {\texttt{GaussElimination}}		;	
+	\draw[->] (y.west) -- (gaussElimination);
+	\draw[->] (A0) -- (gaussElimination);
+	\node[ minimum width=1cm, minimum height=1cm]  (4. step) at ($ (gaussElimination.north west) + (-0.5, 0) $) {4.};
+	
+%	beta
+	\betaVector{($ (gaussElimination.west) + (-2, 1) $)}
+	\draw[->] (gaussElimination.west) -- (beta);
+	
+%	Compute Product
+	\node[draw, minimum width=2cm, minimum height=2cm]  (computeProducts)
+	at ($ (beta.west) + (-5, -2) $) {\texttt{ComputeProducts}}		;	
+	\draw[->] (beta) -- (computeProducts);
+	\node[ minimum width=1cm, minimum height=1cm]  (5. step) at ($ (computeProducts.north west) + (-0.5, 0) $) {5.};
 	
 	
+% Deuxième étage
+	\UMatrixBis{($ (U0id.south west) + (0, -12) $)}{0}
+	\draw[->] (computeProducts) -- (P0.north);
+	\node at ($ (U0baseBis.east) + (1, 0) $) {$\cdot$};
+	\DMatrix{($ (U0idBis.south west) + (0, -2) $)}{1}{6.5}
+	\node[ minimum width=1cm, minimum height=1cm]  (5. step) at ($ (U0idBis.north west) + (-0.5, 0) $) {6.};
+	
+	
+%	Second Draw
+	\node[draw, minimum width=1cm, minimum height=1cm]  (draw1)
+	at ($ (D1.south) + (-2, -2) $) {\$};
+	\draw[->] (draw1) -- (D1);
+
+%	truc 2
+	\node[draw, minimum width=1cm, minimum height=1cm]  (truc2)
+	at ($ (D1.north east) + (3, 2) $) {$(\mat U^{(1)} \cdot (\mat D^{(1)})^T) \slyusar \mat U^{(1)}$};
+	\draw[->] (P0.east) -- (truc2);
+	\draw[->] (D1.east) -- (truc2);	
+
+	%A
+\AMatrix{($ (truc2) + (4,3) $)}{1}
+\draw[->] (truc2) -- (A1.west);
 	
 	\end{tikzpicture}
 }
-
-%\newcommand{\testMatrix}{
-%
-%	\begin{tikzpicture}
-%		\drawBox{1}{4}{gray!30}{$\mat I$}{n}{s^n}{0}{0}{matrixIdentity}
-%		\drawBox{2}{4}{green!30}{$\mat B$}{\ell}{}{1}{0}{matrixBase}
-%		\drawBox{1.5}{4}{red!30}{$\mat V^{(0)}$}{t_0}{}{3}{0}{matrixChainInner}
-%		\drawBox{1.5}{4}{red!30}{$\mat V^{(0)}$}{t_0}{}{6.5}{0}{matrixChainOuter}
-%		
-%		\node[draw, minimum width=1cm, minimum height=1cm]  (chainV0)
-%			at ($ (matrixChainOuter.north) + (-1.5, 2) $) {\(\Phi_{n+\ell, t_0}\)};
-%		\node at ($ (chainV0.west) + (-0.5, 0) $) {2.};
-%		
-%		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (chainV0.south) -- (matrixChainOuter.north);	
-%		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (chainV0.south) -- (matrixChainInner.north);	
-%		
-%		\node[draw, minimum width=1cm, minimum height=1cm]  (chainBase)
-%		at ($ (matrixBase.north) + (0, 2) $) {\(\Phi_{n, \ell}\)};
-%		\node at ($ (chainBase.west) + (-0.5, 0) $) {1.};
-%		
-%		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (chainBase.south) -- (matrixBase.north);
-%		
-%		
-%		\draw[blue, dashed, line width=2pt] (0,0) rectangle ++(4.5,4);
-%		\node at ($ (matrixBase.north) + (-2, 0.5) $) {\(\textcolor{blue}{\mat U^{(0)}}\)};	
-%		\node at ($ (matrixChainOuter.west) + (-1, 0) $) {\( \slyusar \)};
-%		\node at ($ (matrixChainOuter.west) + (-1, -0.5) $) {3.};
-%	
-%		\node at ($ (matrixChainOuter.east) + (1, 0) $) {\( = \)};
-%		
-%		\drawBox{4.5}{4}{red!30}{$\mat A^{(0)}$}{t_0(n + \ell + t_0)}{}{10}{0}{matrixA}
-%		
-%		
-%		%%%second floor
-%		\drawBox{0.75}{4}{orange!30}{$\vec y^{(0)}$}{1}{}{13}{-6}{matrixY0}
-%		\draw[decorate,decoration={brace,amplitude=8pt}]
-%		(matrixY0.north east) -- (matrixY0.south east)
-%		node[midway,right,xshift=6pt] {\( s^n \)};
-%		
-%		\node[draw, minimum width=2cm, minimum height=2cm]  (gaussElimination)
-%			at ($ (matrixY0.west) + (-4, 0) $) {\texttt{GaussElimination}}		;
-%		\node at ($ (gaussElimination.north west) + (-0.25, 0.25) $) {4.};
-%		
-%		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (matrixY0.west) -- (gaussElimination);		
-%		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (matrixA) -- (gaussElimination);		
-%		
-%		\drawBox{0.75}{4}{orange!30}{$\boldsymbol \beta^{(0)}$}{1}{}{5}{-8}{matrixBeta}
-%		\draw[decorate,decoration={brace,amplitude=8pt}]
-%		(matrixBeta.north east) -- (matrixBeta.south east)
-%		node[midway,right,xshift=6pt] {\( t_0(n + \ell + t_0) \)};
-%		
-%		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (gaussElimination) -- (matrixBeta);		
-%		
-%		\node[draw, minimum width=2cm, minimum height=2cm]  (ComputeProducts)
-%			at ($ (matrixBeta.west) + (-4, 1.5) $) {\texttt{ComputeProducts}};
-%		\node at ($ (ComputeProducts.north west) + (-0.25, 0.25) $) {5.};
-%			
-%		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (matrixA.south west) -- (ComputeProducts);		
-%		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (matrixBeta) -- (ComputeProducts);
-%		
-%		
-%		
-%		%%%third floor
-%		\drawBox{1}{4}{gray!30}{$\mat I$}{n}{s^n}{0}{-14}{matrixIdentity2}
-%		\drawBox{2}{4}{green!30}{$\mat B$}{\ell}{}{1}{-14}{matrixBase2}
-%		\drawBox{1.5}{4}{red!30}{$\mat V^{(0)}$}{t_0}{}{3}{-14}{matrixChainInner2}
-%		\drawBox{1.5}{4}{yellow!30}{$\mat \rho^{(0)}$}{t_0}{}{4.5}{-14}{matrixRho}
-%		\drawBox{1}{4}{red!30}{$\mat V^{(1)}$}{t_1}{}{6}{-14}{matrixChainInnerBis}
-%		
-%		\node[draw, minimum width=1cm, minimum height=1cm]  (chainV1)
-%			at ($ (matrixChainInnerBis.north) + (1.5, 1) $) {\(\Phi_{n+\ell+t_0, t_1}\)};
-%			
-%		\node at ($ (chainV1.west) + (-0.5, 0) $) {6.};
-%			
-%		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (chainV1) -- (matrixChainInnerBis.north);		
-%
-%			
-%		
-%		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (ComputeProducts) -- (matrixRho.north);		
-%		
-%		\node at ($ (matrixChainInnerBis.east) + (1, 0) $) {\( \slyusar \)};
-%		
-%		\drawBox{1}{4}{red!30}{$\mat V^{(1)}$}{t_1}{}{9}{-14}{matrixChainOuterBis}
-%		\draw[->, >=Stealth, arrows={-Stealth[scale=1.5]}] (chainV1) -- (matrixChainOuterBis.north);
-%		
-%		\node at ($ (matrixChainOuterBis.east) + (1, 0) $) {\( = \)};
-%		
-%		\drawBox{4.5}{4}{red!30}{$\mat A^{(1)}$}{t_1(n + \ell + t_1)}{}{12}{-14}{matrixABis}
-%		
-%		\draw[blue, dashed, line width=2pt] (0,-14) rectangle ++(7,4);
-%		\node at ($ (matrixBase2.north) + (-2, 0.5) $) {\(\textcolor{blue}{\mat U^{(1)}}\)};	
-%
-%	\end{tikzpicture}
-%
-%}
