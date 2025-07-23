@@ -1,12 +1,12 @@
 
-\section{Some Building Blocks for \acrshort{LUT}-based Evaluation}
+\section{Some Building Blocks for LUT-based Evaluation}
 \label{sec:previous-blocks}
 
 
 In this section, we present the approach from \cite{DBLP:conf/wahc/TramaCBS23}, some components of which we use for our own work. We formally present some advanced homomorphic primitives used in this work that we reuse as well.
 
 
-\cite{DBLP:conf/wahc/TramaCBS23} is a ``Full-\gls{LUT}'' approach, that is to say \gls{AES} is evaluated entirely with \gls{TFHE}'s programmable bootstrapping, encoding exclusively all operations within LUTs. To meet the performance constraints of the bootstrapping algorithm, this method operates on elements in $\Z_{16}$, ensuring efficient computation.
+\cite{DBLP:conf/wahc/TramaCBS23} is a ``Full-\acrshort{LUT}'' approach, that is to say \gls{AES} is evaluated entirely with \gls{TFHE}'s programmable bootstrapping, encoding exclusively all operations within LUTs. To meet the performance constraints of the bootstrapping algorithm, this method operates on elements in $\Z_{16}$, ensuring efficient computation.
 
 \subsection{AES Subroutines as LUTs}
 
