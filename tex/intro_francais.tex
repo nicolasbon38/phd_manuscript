@@ -1,5 +1,6 @@
 %!TeX_ROOT=../thesis.tex
 
+\markboth{INTRODUCTION EN FRANÇAIS}{} % Fix the header
 \chapter*{Introduction en Français}
 \addstarredchapter{Introduction en Français}
 
@@ -62,7 +63,7 @@ Le bootstrapping n'est cependant pas une solution miracle. En effet, c'est une o
 
 
 
-\paragraph{Le schéma \gls{TFHE}.}
+\paragraph{Le schéma TFHE.}
 L'un des schémas homomorphes les plus prometteurs se nomme \gls{TFHE} \cite{JC:CGGI20} (pour \textit{Fully Homomorphic Encryption over the Torus}). Comme tous les autres schémas, il permet d'effectuer des opérations linéaires, c'est-à-dire l'addition de deux chiffrés et la multiplication d'un chiffré par une constante. Ces opérations linéaires sont quasiment gratuites en terme de quantité de calcul, donc sont extrèmement rapides. Par contre, elles augmentent le bruit dans les chiffrés, et le serveur ne peut donc pas en effectuer un nombre illimité. Fort heureusement, \gls{TFHE} possède une opération de bootstrapping relativement efficace par rapport aux standards du \gls{FHE}, et donc les chiffrés peuvent être régulièrement rafraîchi sans tuer les performances. 
 La particularité du bootstrapping de \gls{TFHE} est qu'il est \textit{programmable}. Cela signifie qu'en plus de réduire le niveau de bruit, le bootstrapping permet d'évaluer n'importe quelle fonction sur le chiffré, sans aucun surcoût ni en terme de calculs ni en terme de bruit ! Cette fonctionnalité représente une avancée majeure dans le domaine, car cela permet de rentabiliser le temps passé dans les opérations de bootstrapping.
 
@@ -76,7 +77,7 @@ Malgré ces faiblesses, \gls{TFHE} reste très étudié dans la littérature sci
 
 
 
-\section*{Résumé de la thèse et des contributions scientifiques.}
+\section*{Résumé de la thèse et des contributions scientifiques}
 
 La thèse commence par une introduction (chapitre \ref{chap:fhe}) présentant le chiffrement totalement homomorphe, incluant quelques considérations historiques et présentant un état de l’art de l'écosystème. Puis, le chapitre \ref{chap:spec_tfhe} introduit en détail le cryptosystème \gls{TFHE}, en présentant tous ses composants internes ainsi que leur fonctionnement. En particulier, son opération de bootstrapping, qui constitue le coeur de ses capacités homomorphes, est présenté en détail.
 

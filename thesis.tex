@@ -46,9 +46,9 @@
 \usepackage{xparse} % for NewDocumentCommand	
 
 \usepackage[acronym]{glossaries}
-\makeglossaries
 
 \input{tex/glossary.tex}
+\makeglossaries
 
 % --------------------------------------
 
@@ -78,6 +78,7 @@
 % Abstract/Résumé/Mots-clés/Keywords
 \frabstract{
 %Résumé
+\vfill
 }
 \enabstract{
 %Abstract
@@ -100,8 +101,6 @@
  \begin{dedication}
    Dedication...
  \end{dedication}
-
-% \pagestyle{plain}
 
 % =============================================
 %                 BEGIN
@@ -168,6 +167,8 @@
 
 \cleardoublepage
 \input{tex/notations}
+
+\cleardoublepage
 \input{tex/acronyms}
 
 \cleardoublepage
@@ -207,9 +208,10 @@
 \chapter{A Practical Solution for Parameter Selection}
 \label{chap:parameters}
 \input{tex/orpheus/main_orpheus.tex}
-
+\cleardoublepage
 
 \include{tex/conclusion}
+\cleardoublepage
 
 \addstarredchapter{Bibliography}
 \printbibliography

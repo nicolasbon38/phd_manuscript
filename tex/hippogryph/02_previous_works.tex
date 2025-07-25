@@ -76,7 +76,7 @@ Finally, at the cost of a single $\BlindRotate$ and $k$ \texttt{clearMultTFHE} o
 
 This \gls{MVB}primitive thus allows significant speed-ups in the implementation of \cite{DBLP:conf/wahc/TramaCBS23}, in particular in the evaluation of the \gls{S-box} or in the multiplications in $\F_{256}$ that occur during the \MixColumns step. Indeed, since each byte is decomposed into two nibbles $h$ and $l$, the \gls{LUT} corresponding, for instance, to the \gls{S-box} must also be decomposed into two tables: one providing the most significant nibble and one providing the least significant nibble. That is to say: 
 $$
-\texttt{tab}_{\textsc{msn}}[i] = \left\lfloor \frac{\texttt{\gls{S-box}}[i]}{16} \right\rfloor \quad \text{and} \quad \texttt{tab}_{\textsc{lsn}}[i] = \texttt{\gls{S-box}}[i] \mod 16.
+\texttt{tab}_{\textsc{msn}}[i] = \left\lfloor \frac{\texttt{\gls{S-box}}[i]}{16} \right\rfloor \quad \text{and} \quad \texttt{tab}_{\textsc{lsn}}[i] = \modulo{\texttt{\gls{S-box}}[i]}{16}.
 $$
 Each of these tables must be evaluated on an 8-bit payload ciphertext. 
 
