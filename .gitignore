@@ -10,5 +10,15 @@
 *.bbl
 *.blg
 *.fls
+*.synctex(busy)
 cryptobib/
-thesis.brf
+*.brf
+*.bcf
+*.xml
+*.acn
+*.acr
+*.alg
+*.glg
+*.glo
+*.gls
+*.ist
