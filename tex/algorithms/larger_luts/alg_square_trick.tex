@@ -18,16 +18,16 @@
 \KwResult{$\vec c'$: an encryption of $x_1 \cdot x_2$}
 
 \Comment{We compute the sum and the difference}
-$\vec s_1 \gets \texttt{SumTFHE}(\vec c_1, \vec c_2)$\\
-$\vec s_2 \gets \texttt{SumTFHE}(\vec c_1, \texttt{MulTFHE}(\vec c_2, \modulo{-1}{p}))$\\
+$\boldsymbol \sigma_1 \gets \texttt{SumTFHE}(\vec c_1, \vec c_2)$\\
+$\boldsymbol \sigma_2 \gets \texttt{SumTFHE}(\vec c_1, \texttt{MulTFHE}(\vec c_2, \modulo{-1}{p}))$\\
 
 \Comment{Evaluation of the squares (we precompute the minus sign in front of the second one)}
-$\vec s'_1 \gets \texttt{PBS\_TFHE}(\vec s_1, x \mapsto x^2 \cdot \modulo{4^{-1}}{p})$ \\
-$\vec s'_2 \gets \texttt{PBS\_TFHE}(\vec s_2, x \mapsto x^2 \cdot \modulo{-4^{-1}}{p})$ \\
+$\boldsymbol{\sigma}'_1 \gets \texttt{PBS\_TFHE}(\boldsymbol{\sigma}_1, x \mapsto x^2 \cdot \modulo{4^{-1}}{p})$ \\
+$\boldsymbol{\sigma}'_2 \gets \texttt{PBS\_TFHE}(\boldsymbol{\sigma}_2, x \mapsto x^2 \cdot \modulo{-4^{-1}}{p})$ \\
 
 \Comment{Summing the square}
-$\vec c_r \gets \texttt{SumTFHE}(\vec s'_1, \vec s'_2)$\\
+$\vec c_r \gets \texttt{SumTFHE}(\boldsymbol{\sigma}'_1, \boldsymbol{\sigma}'_2)$\\
 
-\Return{$c_r$}
+\Return{$\vec c_r$}
 
 \end{algorithm}

@@ -15,7 +15,7 @@
 %Another recent contribution is the construction of a PRF~\cite{EPRINT:DJLCB24} based on the Learning With Rounding (LWR) problem~\cite{EC:BanPeiRos12}. Computing one PRF output requires only a single \gls{PBS} in the \gls{TFHE} context. Still, the main overhead stems from the transmission of the secret key in GGSW format,\footnote{This technique is a generalization of the one introduced in~\cite{C:GenSahWat13}.}  which is significantly larger than traditional LWE ciphertexts.
 %
 %Finally, the {\tt FRAST} stream cipher~\cite{FRAST} is built on top of a block cipher with a \gls{TFHE}-friendly round function, %that leverages a random \gls{S-box} to enable a reduced number of rounds,
-%and evaluates it efficiently using the double-blind rotation technique combined with WoP-\gls{PBS}. This allows multiple \gls{S-box} invocations to be processed at the cost of a single \gls{PBS}. {\tt FRAST} achieves substantial improvements in throughput while maintaining competitive noise growth. Its main trade-offs lie in a slight increase in communication cost and the need for an initial setup phase to convert GLWE ciphertexts into GGSW form~\cite{C:GenSahWat13}.
+%and evaluates it efficiently using the double-blind rotation technique combined with \gls{WoP-PBS}. This allows multiple \gls{S-box} invocations to be processed at the cost of a single \gls{PBS}. {\tt FRAST} achieves substantial improvements in throughput while maintaining competitive noise growth. Its main trade-offs lie in a slight increase in communication cost and the need for an initial setup phase to convert GLWE ciphertexts into GGSW form~\cite{C:GenSahWat13}.
 %
 %Concrete performance figures for all the above-mentioned ciphers are provided in Section~\ref{sec:perfs_soa}.
 %

@@ -5,7 +5,7 @@
 
 The previous chapter presented insights on Fully Homomorphic Encryption in general, but this thesis will exclusively cover the \gls{TFHE} scheme.
 
-Introduced in \cite{AC:CGGI16, AC:CGGI17} as an evolution of the FHEW scheme \cite{EC:DucMic15}, \gls{TFHE} quickly gained traction to become one of the most promising scheme to attain performances good enough to be  used in real-world scenarios. It has been enriched with more features later: and more complete versions of this work have been published in \cite{JC:CGGI20, these_chillotti}.
+Introduced in \cite{AC:CGGI16, AC:CGGI17} as an evolution of the FHEW scheme \cite{EC:DucMic15}, \gls{TFHE} quickly gained traction to become one of the most promising scheme to attain performances good enough to be  used in real-world scenarios. It has been enriched with more features later: and more complete versions of this work have been published in \cite{these_chillotti, JC:CGGI20}.
 
 At the core of \gls{TFHE} lies a powerful \textit{Programmable Bootstrapping} operation (\gls{PBS}). As we presented in Section \ref{sec:gentry_bootstrapping}, it allows to manage the noise in the ciphertexts during the computation, allowing to achieve Fully Homomorphic Encryption. In \gls{TFHE}, this bootstrapping operation goes a step further: it enables the evaluation of arbitrary functions directly on the refreshed ciphertexts, with no computational or noise overhead.
 
@@ -649,7 +649,7 @@ One key aspect of \gls{TFHE} is \textit{the degradation of the speed of the boot
 
 Intuitively, the reason of this degradation is simple. When one wants to use a greater $p$, the torus must be sliced into more parts, that are thus smaller. When we switch the modulus to $2N$ in the bootstrapping, the ``windows'' of the accumulator polynomial gets smaller, so the bound on the noise to ensure correct bootstrapping must be smaller. To keep some room to enable the homomorphic capabilities of \gls{TFHE}, one has to pick a greater value for the degree $N$. As this must be a power of two, it quickly reach values where the polynomial operations gets very slow.
 
-Usually, \gls{PBS} is not used for plaintext modulus greater than 8 bits. Some constructions exist in the literature to extend the capabilities of this algorithm to larger plaintext spaces, notably the tree bootstrapping of \cite{TCHES:GuiBorAra21} and the WoP-\gls{PBS} of \cite{AC:CLOT21}. In this thesis, we propose our own method in Chapter \ref{chap:larger_lut}.
+Usually, \gls{PBS} is not used for plaintext modulus greater than 8 bits. Some constructions exist in the literature to extend the capabilities of this algorithm to larger plaintext spaces, notably the tree bootstrapping of \cite{TCHES:GuiBorAra21} and the \gls{WoP-PBS} of \cite{AC:CLOT21}. In this thesis, we propose our own method in Chapter \ref{chap:larger_lut}.
 
 
 

@@ -1,48 +1,47 @@
-\begin{algorithm}[hbt!]
-\caption{Homomorphic evaluation of a decomposition}
-\label{alg:homomorphic_evaluation}
-\KwContext{
-	$ \left \lbrace
-	    \begin{aligned}
-	    	&f : \F_p^n \mapsto \F_p: \text{the function to evaluate.}\\
-		    &(x_0, \dots, x_{n-1}) \in \F_p^n: \text{the clear inputs of the function.}\\
-		    &\Phi_{n, \lambda} = (\phi_0, \dots, \phi_{\lambda-1}): \text{the chain used to generate the decomposition}\\
-		    &L = n + \lambda.
-	    \end{aligned}
-	   \right .$
-}
-\KwIn{
-	$\left \lbrace
-	    \begin{aligned}
-		    & (\vec c_0, \dots, \vec c_{n-1}): \text{the ciphertexts encrypting the inputs}\\
-		    &(\beta_{i,j})_{\substack{0 \le i < t \\ 0 \le j < L}} \in \F_p^{t \times L}: \text{the coefficients of the left-hand linear combination of Equation \ref{eq:decomposition}.}\\
-		    &(d_{i,j})_{\substack{0 \le i < t \\ 0 \le j < L}} \in \F_p^{t \times L}: \text{the coefficients of the right-hand linear combination of Equation \ref{eq:decomposition}.}\\
-	    \end{aligned}
-	\right .$
-}
-\KwResult{$\vec c_y$: an encryption of $y=f(x_0, \dots, x_{n-1})$}
+\begin{algorithm}
+	\caption{Homomorphic evaluation of a decomposition}
+	\label{alg:homomorphic_evaluation}
+	\KwContext{
+		$ \left \lbrace
+		\begin{aligned}
+			&f : \F_p^n \mapsto \F_p: \text{the function to evaluate.}\\
+			&(x_0, \dots, x_{n-1}) \in \F_p^n: \text{the clear inputs of the function.}\\
+			&\Phi_{n, \lambda} = (\phi_0, \dots, \phi_{\lambda-1}): \text{the chain used to generate the decomposition}\\
+			&L = n + \lambda.
+		\end{aligned}
+		\right .$
+	}
+	\KwIn{
+		$\left \lbrace
+		\begin{aligned}
+			& (\vec c_0, \dots, \vec c_{n-1}): \text{the ciphertexts encrypting the inputs}\\
+			&(\beta_{i,j})_{\substack{0 \le i < t \\ 0 \le j < L}} \in \F_p^{t \times L}: \text{coefficients of the left-hand linear combination of Equation \ref{eq:decomposition}.}\\
+			&(d_{i,j})_{\substack{0 \le i < t \\ 0 \le j < L}} \in \F_p^{t \times L}: \text{coefficients of the right-hand linear combination of Equation \ref{eq:decomposition}.}\\
+		\end{aligned}
+		\right .$
+	}
+	\KwResult{$\vec c_y$: an encryption of $y=f(x_0, \dots, x_{n-1})$}
+	
+	\vspace{0.5em}
+	\hrule
+	\vspace{0.5em}
 
-\Comment{Evaluation of the chain of atomic functions}
-\For{$k \in \{n, \dots, L\}$}{
-    $\vec c_k \gets \texttt{EvalAtom}(\phi_k, (\vec c_0, \dots, \vec c_{k-1}))$
-}
-
-$\vec c_y \gets 0$\\
-\For{$i \in \{0,\dots,t-1\}$}{
-    \Comment{We compute the linear combination with the $\beta$'s}
-    \For{$j \in \{0, \dots, L -1\}$}{
-        $\boldsymbol{\gamma}_{ij} \gets \texttt{ClearMultTFHE}(\vec c_j, \beta_{ij})$
-    }
-    $\boldsymbol{\sigma_i} \gets \texttt{SumTFHE}(\boldsymbol{\gamma}_{i0}, \dots, \boldsymbol{\gamma}_{i,L-1})$\\
-    \Comment{We compute the linear combination with the $d$'s}
-    \For{$j \in \{0, \dots, L -1\}$}{
-    	$\boldsymbol{\gamma}_{ij}' \gets \texttt{ClearMultTFHE}(\vec c_j, d_{ij})$
-    }
-    $\boldsymbol{\sigma}_i' \gets \texttt{SumTFHE}(\boldsymbol{\gamma}_{i0}', \dots, \boldsymbol{\gamma}_{i,L-1}')$\\
-    \Comment{We compute the encrypted product using the trick of Algorithm \ref{alg:square_trick}}
-    $\vec c_y \gets \texttt{SumTFHE}(\vec c_y, \texttt{EncryptedProduct}(\boldsymbol{\sigma}_i, \boldsymbol{\sigma}_i'))$
-}
-
-\Return{$\vec c_y$}
-
+	\Comment{Evaluation of the chain of atomic functions}
+	\For{$k \in \{n, \dots, L\}$}{
+		$\vec c_k \gets \texttt{EvalAtom}(\phi_k, (\vec c_0, \dots, \vec c_{k-1}))$
+	}
+	$\vec c_y \gets 0$\\
+	\For{$i \in \{0,\dots,t-1\}$}{
+		\Comment{We compute the linear combinations with the $\beta$'s and $d$'s}
+		\For{$j \in \{0, \dots, L -1\}$}{
+			$\boldsymbol{\gamma}_{ij} \gets \texttt{ClearMultTFHE}(\vec c_j, \beta_{ij})$\\
+			$\boldsymbol{\gamma}_{ij}' \gets \texttt{ClearMultTFHE}(\vec c_j, d_{ij})$\\
+		}
+		$\boldsymbol{\sigma_i} \gets \texttt{SumTFHE}(\boldsymbol{\gamma}_{i0}, \dots, \boldsymbol{\gamma}_{i,L-1})$\\
+		$\boldsymbol{\sigma}_i' \gets \texttt{SumTFHE}(\boldsymbol{\gamma}_{i0}', \dots, \boldsymbol{\gamma}_{i,L-1}')$\\
+		\Comment{We compute the encrypted product using the trick of Algorithm \ref{alg:square_trick}}
+		$\vec c_y \gets \texttt{SumTFHE}(\vec c_y, \texttt{EncryptedProduct}(\boldsymbol{\sigma}_i, \boldsymbol{\sigma}_i'))$\\
+	}
+		
+		\Return{$\vec c_y$}
 \end{algorithm}

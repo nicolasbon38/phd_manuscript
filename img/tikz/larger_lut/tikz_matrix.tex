@@ -28,7 +28,7 @@
 
 % Identity and base matrix shorthands
 \newcommand{\identityMatrixAt}[2]{%
-	\drawBoxAt{#1}{gray!30}{\(\mat{I}\)}{n}{s^n}{#2}{1.5}{4}
+	\drawBoxAt{#1}{gray!30}{\texttt{Triv}}{n}{s^n}{#2}{1.5}{4}
 }
 
 \newcommand{\baseMatrixAt}[2]{%
@@ -126,6 +126,7 @@
 	\node[draw, minimum width=2cm, minimum height=2cm]  (computeProducts)
 	at ($ (beta.west) + (-5, -2) $) {\texttt{ComputeProducts}}		;	
 	\draw[->] (beta) -- (computeProducts);
+	\draw[->](A0.south west) -- (computeProducts);
 	\node[ minimum width=1cm, minimum height=1cm]  (5. step) at ($ (computeProducts.north west) + (-0.5, 0) $) {5.};
 	
 	

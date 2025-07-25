@@ -260,6 +260,6 @@
 \fancyhead{}              % Clear all header fields
 \fancyhead[LO,RE]{\leftmark} % Chapter name on Outside header (Left on Odd, Right on Even)
 \fancyhead[LE,RO]{}       % Clear Inside headers
-\fancyfoot{}              % Optional: clear footers if undesired
+%\fancyfoot{}              % Optional: clear footers if undesired
 
 
