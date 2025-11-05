@@ -33,7 +33,7 @@
     \centering
     \begin{tikzpicture}[xscale=0.8,yscale=0.6]
       \footnotesize
-      \draw (0.5, 0) rectangle (4, 0.5) node[pos=0.5]{LFSR} ;
+      \draw (0.5, 0) rectangle (4, 0.5) node[pos=0.5]{\gls{LFSR}} ;
       \draw (1, -1.5) rectangle (3, -1) node[pos=0.5]{FSM} ;
       \draw (0, -1.25) node(nl){$U$} ;
       \draw (3.8, -1.25) node(phi){$\phi$} ;
@@ -46,7 +46,7 @@
       \draw[->] (3.8, 0) -- (phi) ;
       \draw[->] (phi) -- (s) ;
     \end{tikzpicture}    
-    \caption{\label{fig:classical-stream}LFSR and FSM.}
+    \caption{\label{fig:classical-stream}\gls{LFSR} and FSM.}
   \end{subfigure}
   \caption{Different types of stream cipher structures.}
   \label{fig:streams}

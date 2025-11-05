@@ -59,7 +59,8 @@
  ]{biblatex}
 	
 
-\PassOptionsToPackage{colorlinks=true, linkcolor=black, citecolor=blue}{hyperref}
+%%\PassOptionsToPackage{colorlinks=true, linkcolor=black, citecolor=black}{hyperref}
+\PassOptionsToPackage{colorlinks=false}{hyperref}
 \RequirePackage{hyperref}	
 
 \makeatletter

@@ -4,9 +4,9 @@
     \centering
     \footnotesize
     \begin{tikzpicture}[xscale=0.9,yscale=0.4]
-      % LFSR interactions
+      % \gls{LFSR} interactions
       \draw (0, -0.5) rectangle (3, 0.5) node[pos=0.5]{$\pseudoKS$ {\tiny \emph{(Key schedule)}}} ;
-      \draw (0, 2.5) rectangle (3, 3.5) node[pos=0.5]{$\whitening$ {\tiny \emph{(whitening LFSR)}}} ;
+      \draw (0, 2.5) rectangle (3, 3.5) node[pos=0.5]{$\whitening$ {\tiny \emph{(whitening \gls{LFSR})}}} ;
       \draw (4, 0) node[inner sep=0pt](addm){$\boxplus$} ;
       \draw[->] (3, 0) -- (addm) ;
       \draw[->] (3.5, 0) -- (3.5, 1) -- (1.5, 1) -- (1.5, 0.5) ;

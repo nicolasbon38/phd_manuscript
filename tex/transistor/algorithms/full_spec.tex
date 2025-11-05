@@ -38,7 +38,7 @@ For the key schedule $\pseudoKS$, we use the following taps:
                       12, 15, 9, 12, 3\}~,
   \end{split}
 \end{equation*}
-and for the whitening LFSR $\whitening$ we use
+and for the whitening \gls{LFSR} $\whitening$ we use
 \begin{equation*}
   \footnotesize
   \begin{split}
@@ -67,7 +67,7 @@ Using \coolName{} to generate a keystream is done as follows.
   \begin{enumerate}
   \item Clock the key schedule 16 times and add its content (modulo 17) into the FSM in the order specified in Figure~\ref{fig:numbering}.
   \item ($\subWords$) Apply the \gls{S-box} $\thesbox$ (see Equation~(\ref{eq:thesbox})) to each element of the FSM.
-  \item ($\phi$) Take the elements with indices in $\{ 4, 6, 12, 14\}$, clock the whitening LFSR four times, and add its successive outputs to these elements. The result forms a keystream tuple of four digits.
+  \item ($\phi$) Take the elements with indices in $\{ 4, 6, 12, 14\}$, clock the whitening \gls{LFSR} four times, and add its successive outputs to these elements. The result forms a keystream tuple of four digits.
   \item ($\shiftRows$) Shift the elements of the $i$-th row of the FSM by $i$ positions to the left.
   \item ($\mixColumns$) Apply the matrix $\mixmat$ (see Equation~(\ref{eq:mixmat})) to each column of the FSM.
   \end{enumerate}

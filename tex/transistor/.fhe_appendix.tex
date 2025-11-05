@@ -159,13 +159,13 @@ In the context of transciphering with \coolName, the trade-off provided by the s
 	In the following, we provide a more detailed way of how we implemented the homomorphic version of \coolName.
 	
 	\paragraph{Homomorphic evaluation of LSFRs.}
-	The \coolName design involves two LSFRs operating on elements of $\field{17}$. The standard way to implement an LSFR is to evaluate the linear feedback function on the state at each clock cycle, thus producing a new element that enters the state, while the state is shifted to output an element. 
+	The \coolName design involves two LSFRs operating on elements of $\field{17}$. The standard way to implement an \gls{LFSR} is to evaluate the linear feedback function on the state at each clock cycle, thus producing a new element that enters the state, while the state is shifted to output an element. 
 	%generate the new element at each clock cycle, and then to mutate the state by shifting the elements of the state and compute the linear combination of the state with the coefficients of retroaction to produce a new one.
-	We suggest the \emph{silent LFSR} approach for the homomorphic evaluation of LFSRs. In this approach, the encrypted LFSR state is immutable to avoid any noise growth in the underlying ciphertexts (hence keeping the LFSR ``silent''). We use the fact that every output element of the LFSR can be expressed as a linear combination of the initial state. So, at each clock cycle, we compute \emph{in the clear} the coefficients of this linear combination and homomorphically evaluate it on the immutable encrypted state. This process is depicted in Algorithm~\ref{alg:lsfr}.
+	We suggest the \emph{silent \gls{LFSR}} approach for the homomorphic evaluation of LFSRs. In this approach, the encrypted \gls{LFSR} state is immutable to avoid any noise growth in the underlying ciphertexts (hence keeping the \gls{LFSR} ``silent''). We use the fact that every output element of the \gls{LFSR} can be expressed as a linear combination of the initial state. So, at each clock cycle, we compute \emph{in the clear} the coefficients of this linear combination and homomorphically evaluate it on the immutable encrypted state. This process is depicted in Algorithm~\ref{alg:lsfr}.
 	
 	\input{algorithms/silent_lsfr.tex}
 	
-	%Calling Algorithm \ref{alg:lsfr} (\texttt{LFSR.clock}) several times yields an encrypted stream of pseudorandom elements $(o^{(0)}, o^{(1)}, \dots)$.
+	%Calling Algorithm \ref{alg:lsfr} (\texttt{\gls{LFSR}.clock}) several times yields an encrypted stream of pseudorandom elements $(o^{(0)}, o^{(1)}, \dots)$.
 	
 	\paragraph{Homomorphic evaluation of} \coolName. The complete homomorphic evaluation of a round of one clock cycle of \coolName is depicted in Algorithm~\ref{alg:transistor}, using $\pseudoKS.\texttt{clock}$ and $\whitening.\texttt{clock}$ as subroutines (i.e., Algorithm~\ref{alg:lsfr} evaluated on the key schedule and whitening LFSRs). The most computation intensive part of the algorithm is by far the evaluation of the \gls{PBS} in $\subWords$ which can be fully parallelized to reduce the latency.
 	

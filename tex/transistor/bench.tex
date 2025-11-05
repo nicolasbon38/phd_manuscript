@@ -103,9 +103,9 @@ This approach can be generalized to address other plaintext representations. In 
 In the following, we provide a more detailed way of how we implemented the homomorphic version of \coolName.
 
 \paragraph{Homomorphic evaluation of LFSRs.}
-The \coolName design involves two LFSRs operating on elements of $\F_{17}$. The standard way to implement an LFSR is to evaluate the linear feedback function on the state at each clock cycle, thus producing a new element that enters the state, while the state is shifted to output an element. 
+The \coolName design involves two LFSRs operating on elements of $\F_{17}$. The standard way to implement an \gls{LFSR} is to evaluate the linear feedback function on the state at each clock cycle, thus producing a new element that enters the state, while the state is shifted to output an element. 
 
-We suggest the \emph{silent LFSR} approach for the homomorphic evaluation of LFSRs. In this approach, the encrypted LFSR state is immutable to avoid any noise growth in the underlying ciphertexts (hence keeping the LFSR ``silent''). We use the fact that every output element of the LFSR can be expressed as a linear combination of the initial state. So, at each clock cycle, we compute \emph{in the clear} the coefficients of this linear combination and homomorphically evaluate it on the immutable encrypted state. This process is depicted in Algorithm~\ref{alg:lsfr}.
+We suggest the \emph{silent \gls{LFSR}} approach for the homomorphic evaluation of LFSRs. In this approach, the encrypted \gls{LFSR} state is immutable to avoid any noise growth in the underlying ciphertexts (hence keeping the \gls{LFSR} ``silent''). We use the fact that every output element of the \gls{LFSR} can be expressed as a linear combination of the initial state. So, at each clock cycle, we compute \emph{in the clear} the coefficients of this linear combination and homomorphically evaluate it on the immutable encrypted state. This process is depicted in Algorithm~\ref{alg:lsfr}.
 
 
 \input{tex/algorithms/transistor/silent_lsfr.tex}
