@@ -14,3 +14,5 @@ rm thesis.out
 rm thesis.glo
 rm thesis.aux
 rm thesis.bcf
+rm thesis.blg
+rm thesis.log
